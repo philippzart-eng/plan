@@ -20,22 +20,25 @@
 <style>
 /* ============ TOKENS ============ */
 :root{
-  --paper:#F5F4F0;
+  --paper:#F5F5F3;
   --card:#FFFFFF;
-  --ink:#1B2237;
-  --ink-soft:#5C6276;
-  --ink-faint:#9097A6;
-  --line:#E5E3DC;
-  --line-soft:#EFEDE7;
-  --ok:#2E8B6B;
-  --bad:#C8503F;
-  /* language accent — overwritten when a language is active */
-  --accent:#2D2A55;
-  --accent-tint:#E9E8F2;
+  --ink:#16171B;
+  --ink-soft:#5E6066;
+  --ink-faint:#9B9CA2;
+  --line:#E3E2DE;
+  --line-soft:#EDECE9;
+  --ok:#16171B;
+  --bad:#9B9CA2;
+  /* accent bleibt monochrom */
+  --accent:#16171B;
+  --accent-tint:#EFEEEB;
   --display:"Bricolage Grotesque", "Inter", system-ui, sans-serif;
   --body:"Inter", system-ui, -apple-system, sans-serif;
   --radius:18px;
   --radius-sm:12px;
+  --shadow:0 1px 2px rgba(20,24,40,.04), 0 6px 20px rgba(20,24,40,.05);
+  --shadow-sm:0 1px 3px rgba(20,24,40,.06);
+  --shadow-btn:0 3px 12px rgba(20,24,40,.14);
   --safe-top:env(safe-area-inset-top,0px);
   --safe-bot:env(safe-area-inset-bottom,0px);
 }
@@ -93,6 +96,28 @@ input{font-family:inherit;}
 .bar{height:7px;background:var(--line-soft);border-radius:999px;overflow:hidden;}
 .bar>i{display:block;height:100%;background:var(--lc);border-radius:999px;transition:width .4s ease;}
 .lang-foot{display:flex;justify-content:space-between;margin-top:9px;font-size:12px;color:var(--ink-faint);}
+/* Heute-Dashboard */
+.streak-row{display:flex;align-items:center;gap:13px;background:var(--card);border:1px solid var(--line);border-radius:var(--radius);padding:15px 17px;margin-bottom:14px;}
+.streak-flame{font-size:28px;line-height:1;}
+.streak-num{font-family:var(--display);font-size:25px;font-weight:800;line-height:1;}
+.streak-lbl{font-size:11.5px;color:var(--ink-faint);margin-top:2px;}
+.week-strip{display:flex;gap:7px;margin-left:auto;}
+.wd{display:flex;flex-direction:column;align-items:center;gap:4px;font-size:9.5px;color:var(--ink-faint);}
+.wd i{width:17px;height:17px;border-radius:50%;background:var(--line-soft);display:block;border:1px solid var(--line);}
+.wd.met i{background:#2D2A55;border-color:#2D2A55;}
+.wd.today i{box-shadow:0 0 0 2px var(--paper),0 0 0 4px #2D2A55;}
+.plan-card{background:var(--card);border:1px solid var(--line);border-radius:var(--radius);padding:6px 4px;margin-bottom:20px;}
+.plan-head{display:flex;align-items:center;justify-content:space-between;padding:10px 14px 4px;}
+.plan-head .ph-lang{font-weight:600;}
+.task{display:flex;align-items:center;gap:13px;width:100%;text-align:left;padding:13px 14px;border-radius:12px;background:transparent;transition:background .12s ease;}
+.task:active{background:var(--accent-tint);}
+.task .tk-ic{width:34px;height:34px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:16px;background:var(--accent-tint);color:var(--accent);flex:0 0 auto;}
+.task.done .tk-ic{background:var(--ok);color:#fff;}
+.task .tk-t{font-weight:600;}
+.task.done .tk-t{color:var(--ink-faint);}
+.task .tk-d{font-size:12.5px;color:var(--ink-soft);}
+.task .tk-go{margin-left:auto;color:var(--accent);font-size:18px;}
+.day-goal-done{text-align:center;padding:13px;background:var(--accent-tint);border-radius:12px;margin:6px;color:var(--accent);font-weight:600;}
 
 /* ============ BUTTONS ============ */
 .btn{
@@ -280,6 +305,58 @@ input{font-family:inherit;}
 @media (prefers-reduced-motion: reduce){
   *{animation-duration:.001ms !important;}
 }
+
+/* ============ DESIGN-POLISH (schwarz-weiß, minimal) ============ */
+body{ background:var(--paper); }
+.brand{font-size:32px;}
+.brand span{color:var(--ink);}
+.lang-card,.plan-card,.streak-row,.goal-card,.lesson-card,.vstat,.mode-btn,.unit,.flashcard,.iconbtn{
+  box-shadow:none;
+  border-color:var(--line);
+}
+.lang-card{border-radius:18px;}
+.btn{box-shadow:none;}
+.streak-row{ background:var(--card); border-radius:18px; }
+.task .tk-ic{box-shadow:none;background:transparent;border:1.5px solid var(--line);color:var(--ink);}
+.task.done .tk-ic{background:var(--ink);color:#fff;border-color:var(--ink);}
+.task{border-radius:12px;}
+.plan-card{padding:8px 6px;border-radius:18px;}
+.plan-hero{display:flex;align-items:center;justify-content:space-between;gap:14px;padding:14px 14px 6px;}
+.plan-focus{font-family:var(--display);font-weight:700;font-size:21px;letter-spacing:-.01em;margin-top:4px;display:flex;align-items:center;gap:9px;}
+.goal-ring{flex:0 0 auto;}
+.plan-sub{font-size:11px;font-weight:700;letter-spacing:.07em;text-transform:uppercase;color:var(--ink-faint);padding:16px 16px 4px;}
+.module-head{margin:26px 4px 12px;}
+.page-title{font-size:30px;}
+.lang-card .stripe{width:0;}
+/* Sprach-Kürzel statt Flagge */
+.lcode{display:inline-flex;align-items:center;justify-content:center;width:40px;height:40px;border:1.5px solid var(--ink);border-radius:11px;font-family:var(--display);font-weight:700;font-size:13px;letter-spacing:.04em;flex:0 0 auto;}
+.lcode.sm{width:auto;height:auto;min-width:0;padding:3px 8px;border-radius:7px;font-size:12px;}
+/* Wochenleiste monochrom */
+.wd.met i{background:var(--ink);border-color:var(--ink);}
+.wd.today i{box-shadow:0 0 0 2px var(--paper),0 0 0 4px var(--ink);}
+/* Feedback monochrom */
+.opt.correct{border-color:var(--ink);background:#F1F1EF;color:var(--ink);font-weight:600;}
+.opt.wrong{border-color:var(--ink-faint);background:transparent;color:var(--ink-faint);text-decoration:line-through;}
+.feedback.ok{background:#F1F1EF;color:var(--ink);}
+.feedback.no{background:#F1F1EF;color:var(--ink-soft);}
+.ans-input:focus,.field input:focus,.field select:focus,.opt:active{border-color:var(--ink);}
+/* Call-Screen dunkel & monochrom */
+.call-screen{background:linear-gradient(170deg,#26272B 0%, #0E0F12 100%);filter:grayscale(1);}
+/* verbleibende Emojis entsättigen */
+.mode-btn .mi,.orb,.streak-flame,.day-goal-done,.big-emoji{filter:grayscale(1);}
+/* Statistik */
+.sb-chart{display:flex;align-items:flex-end;gap:5px;height:84px;}
+.sb-col{flex:1;display:flex;align-items:flex-end;justify-content:center;}
+.sb-bar{width:70%;min-height:2px;background:var(--ink);border-radius:3px 3px 0 0;}
+.heatmap{display:flex;gap:5px;}
+.hm-col{display:flex;flex-direction:column;gap:5px;flex:1;}
+.hm-cell{aspect-ratio:1;border-radius:3px;background:var(--line-soft);border:1px solid var(--line);}
+.hm-1{background:#BFBFBC;border-color:#BFBFBC;}
+.hm-2{background:var(--ink);border-color:var(--ink);}
+.hm-future{opacity:.35;}
+.fc-example{font-size:13.5px;color:var(--ink-soft);margin-top:8px;line-height:1.4;max-width:320px;}
+.fc-example span{display:block;color:var(--ink-faint);font-size:12px;margin-top:3px;}
+.btn.live{background:var(--ink-faint);}
 </style>
 </head>
 <body>
@@ -296,9 +373,9 @@ input{font-family:inherit;}
 
 /* ---- statische Sprach-Konfiguration ---- */
 const LANG_CONFIG = {
-  es: { name:"Spanisch",   flag:"🇪🇸", speak:"es-ES", aiName:"Spanisch",   accent:"#D6453F", tint:"#FBEAE8", defLevel:"A2" },
-  fr: { name:"Französisch",flag:"🇫🇷", speak:"fr-FR", aiName:"Französisch",accent:"#3556C9", tint:"#E7EBFA", defLevel:"A1" },
-  sv: { name:"Schwedisch", flag:"🇸🇪", speak:"sv-SE", aiName:"Schwedisch", accent:"#178A77", tint:"#E2F3EF", defLevel:"B1" },
+  es: { name:"Spanisch",   flag:"🇪🇸", speak:"es-ES", aiName:"Spanisch",   accent:"#16171B", tint:"#EFEEEB", defLevel:"A2" },
+  fr: { name:"Französisch",flag:"🇫🇷", speak:"fr-FR", aiName:"Französisch",accent:"#16171B", tint:"#EFEEEB", defLevel:"A1" },
+  sv: { name:"Schwedisch", flag:"🇸🇪", speak:"sv-SE", aiName:"Schwedisch", accent:"#16171B", tint:"#EFEEEB", defLevel:"B1" },
 };
 const LEVELS = ["A1","A2","B1","B2","C1","C2"];
 
@@ -336,23 +413,113 @@ function loadState(){
       model:"claude-sonnet-4-6",
       rate:0.95
     },
+    routine:{ langs:Object.keys(LANG_CONFIG), focusMode:"rotate", reviews:20, conv:true },
+    streak:{ current:0, longest:0, lastDate:null },
+    daily:null,
+    history:{},
     langs
   };
 }
 function saveState(){ try{ localStorage.setItem(STORE_KEY, JSON.stringify(state)); }catch(e){} }
 
+/* Routine-/Streak-Felder für bestehende (ältere) States nachrüsten */
+function ensureRoutineState(){
+  if(!state.routine) state.routine = { langs:Object.keys(LANG_CONFIG), focusMode:"rotate", reviews:20, conv:true };
+  if(!Array.isArray(state.routine.langs) || !state.routine.langs.length) state.routine.langs = Object.keys(LANG_CONFIG);
+  if(!state.routine.focusMode) state.routine.focusMode = (state.routine.mode==="focus" && state.routine.focus) ? state.routine.focus : "rotate";
+  if(typeof state.routine.reviews!=="number") state.routine.reviews = 20;
+  if(typeof state.routine.conv!=="boolean") state.routine.conv = true;
+  if(!state.streak) state.streak = { current:0, longest:0, lastDate:null };
+  if(!state.history) state.history = {};
+}
+
 function L(code){ return { ...LANG_CONFIG[code], code, ...state.langs[code] }; }
+
+/* ---- Tages-/Wochen-Routine ---- */
+function todayStr(d){ d=d||new Date(); return d.getFullYear()+"-"+String(d.getMonth()+1).padStart(2,"0")+"-"+String(d.getDate()).padStart(2,"0"); }
+function dateFromStr(s){ return new Date(s+"T00:00:00"); }
+
+function routineFocusForDate(t){
+  const r = state.routine;
+  const langs = (r.langs&&r.langs.length) ? r.langs : Object.keys(LANG_CONFIG);
+  if(r.focusMode && r.focusMode!=="rotate" && langs.includes(r.focusMode)) return r.focusMode;
+  const epochDay = Math.floor(dateFromStr(t).getTime()/86400000);
+  return langs[((epochDay % langs.length)+langs.length)%langs.length];
+}
+
+function ensureToday(){
+  ensureRoutineState();
+  const t = todayStr();
+  if(!state.daily || state.daily.date!==t){
+    if(state.daily && state.daily.date){
+      state.history[state.daily.date] = {
+        goalMet:!!state.daily.goalMet, xp:state.daily.xp||0,
+        reviews:state.daily.reviews||0, lessonDone:!!state.daily.lessonDone, conv:state.daily.convDone?1:0
+      };
+    }
+    state.daily = { date:t, focus:routineFocusForDate(t), reviews:0,
+                    lessonDone:false, convDone:false, maint:{}, xp:0, goalMet:false };
+    saveState();
+  }
+  return state.daily;
+}
+
+function dailyTargetsMet(){
+  const r = state.routine, d = state.daily, f = d.focus;
+  const need = [ !!d.maint[f], d.lessonDone ];
+  if(r.conv) need.push(d.convDone);
+  r.langs.forEach(c=>{ if(c!==f) need.push(!!d.maint[c]); });
+  return need.every(Boolean);
+}
+function recomputeDaily(){
+  if(dailyTargetsMet() && !state.daily.goalMet){
+    state.daily.goalMet = true;
+    updateStreak();
+    saveState();
+    toast("Tagesziel erreicht! Streak "+state.streak.current);
+  }else{ saveState(); }
+}
+function updateStreak(){
+  const s = state.streak, t = state.daily.date;
+  if(s.lastDate===t) return;
+  const yesterday = todayStr(new Date(Date.now()-86400000));
+  s.current = (s.lastDate===yesterday) ? s.current+1 : 1;
+  s.lastDate = t;
+  s.longest = Math.max(s.longest||0, s.current);
+}
+
+/* Hooks aus den Lern-Aktivitäten */
+function recordReview(code, n){
+  ensureToday();
+  state.daily.reviews += (n||0);
+  state.daily.maint[code] = true;           // Auffrischung dieser Sprache erledigt
+  recomputeDaily();
+}
+function recordLessonDone(code){
+  ensureToday();
+  if(code===state.daily.focus) state.daily.lessonDone = true;
+  recomputeDaily();
+}
+function recordConv(code){
+  ensureToday();
+  if(code===state.daily.focus) state.daily.convDone = true;
+  recomputeDaily();
+}
+
+/* Wochenleiste: Mo–So der aktuellen Woche */
+function weekDates(){
+  const now = new Date();
+  const dow = (now.getDay()+6)%7; // Mo=0
+  const monday = new Date(now); monday.setDate(now.getDate()-dow);
+  const out=[]; for(let i=0;i<7;i++){ const d=new Date(monday); d.setDate(monday.getDate()+i); out.push(todayStr(d)); }
+  return out;
+}
 
 /* ---- Akzentfarbe setzen ---- */
 function setAccent(code){
   const root = document.documentElement.style;
-  if(code && LANG_CONFIG[code]){
-    root.setProperty("--accent", LANG_CONFIG[code].accent);
-    root.setProperty("--accent-tint", LANG_CONFIG[code].tint);
-  }else{
-    root.setProperty("--accent", "#2D2A55");
-    root.setProperty("--accent-tint", "#E9E8F2");
-  }
+  root.setProperty("--accent", "#16171B");
+  root.setProperty("--accent-tint", "#EFEEEB");
 }
 
 /* =========================================================
@@ -482,6 +649,7 @@ function render(){
   else if(view.name==="settings"){ setAccent(view.lang||null); renderSettings(); }
   else if(view.name==="path"){ setAccent(view.lang); renderPath(); }
   else if(view.name==="vocab"){ setAccent(view.lang); renderVocab(); }
+  else if(view.name==="stats"){ setAccent(null); renderStats(); }
   else if(view.name==="lesson"){ setAccent(view.lang); renderLesson(); }
   window.scrollTo(0,0);
 }
@@ -497,25 +665,77 @@ function toast(msg){
    HOME
    ========================================================= */
 function renderHome(){
-  const cards = Object.keys(LANG_CONFIG).map(code=>{
-    const l = L(code);
-    const total = (Array.isArray(l.modules) && l.modules.length) ? l.modules.length*UNITS_PER_MODULE : PATH_MODULES*UNITS_PER_MODULE;
-    const done = Object.values(l.progress).filter(s=>s==="done").length;
-    const pct = total ? Math.min(100, Math.round(done/total*100)) : 0;
-    const words = wordsLearned(code);
+  const d = ensureToday();
+  const r = state.routine;
+  const focus = d.focus || routineFocusForDate(d.date) || Object.keys(LANG_CONFIG)[0];
+  const fl = L(focus);
+  setAccent(focus);
+
+  // 0-fällige Sprachen gelten automatisch als aufgefrischt
+  r.langs.forEach(c=>{ if(vocabStats(c).due===0 && !d.maint[c]) d.maint[c]=true; });
+  recomputeDaily();
+  maybeRemind();
+
+  const dueFocus = vocabStats(focus).due;
+
+  // Wochenleiste
+  const wk = weekDates(), t = d.date, dayLbls = ["M","D","M","D","F","S","S"];
+  const strip = wk.map((ds,i)=>{
+    const h = state.history[ds];
+    const met = ds===t ? d.goalMet : (h && h.goalMet);
+    return `<div class="wd ${met?'met':''} ${ds===t?'today':''}"><i></i><span>${dayLbls[i]}</span></div>`;
+  }).join("");
+
+  // Fokus-Aufgaben
+  const fTasks = [
+    { done:!!d.maint[focus], t:"Vokabeln wiederholen",
+      d:d.maint[focus]?(dueFocus===0?"Keine fälligen Wörter":"Erledigt"):`${dueFocus} fällig`,
+      onclick:`startTodayReviews('${focus}')` },
+    { done:d.lessonDone, t:"Neue Einheit lernen",
+      d:d.lessonDone?"Erledigt":"Nächste Einheit im Lernpfad", onclick:`openNextUnit('${focus}')` }
+  ];
+  if(r.conv) fTasks.push({ done:d.convDone, t:"Konversation üben",
+      d:d.convDone?"Erledigt":"Ein kurzes Gespräch", onclick:`go('call',{lang:'${focus}'})` });
+  const fTaskHTML = fTasks.map((tk,i)=>`
+    <button class="task ${tk.done?'done':''}" onclick="${tk.onclick}">
+      <span class="tk-ic">${tk.done?'✓':(i+1)}</span>
+      <div><div class="tk-t">${tk.t}</div><div class="tk-d">${tk.d}</div></div>
+      ${tk.done?'':'<span class="tk-go">›</span>'}
+    </button>`).join("");
+
+  // Auffrischung der übrigen Sprachen
+  const others = r.langs.filter(c=>c!==focus);
+  const maintHTML = others.map(c=>{
+    const lc = LANG_CONFIG[c], due = vocabStats(c).due, done = !!d.maint[c];
     return `
-    <button class="lang-card" onclick="openLang('${code}')" style="--lc:${l.accent};--lct:${l.tint};">
+    <button class="task ${done?'done':''}" onclick="startTodayReviews('${c}')">
+      <span class="tk-ic">${done?'✓':c.toUpperCase()}</span>
+      <div><div class="tk-t">${lc.name}</div><div class="tk-d">${done?(due===0?"Keine fälligen Wörter":"Aufgefrischt"):`${due} Wörter fällig`}</div></div>
+      ${done?'':'<span class="tk-go">›</span>'}
+    </button>`;
+  }).join("");
+
+  // Tagesziel-Ring
+  const totalTasks = fTasks.length + others.length;
+  const doneTasks = fTasks.filter(x=>x.done).length + others.filter(c=>!!d.maint[c]).length;
+  const pct = totalTasks ? Math.round(doneTasks/totalTasks*100) : 0;
+
+  const cards = Object.keys(LANG_CONFIG).map(c=>{
+    const lc = L(c);
+    const total = (Array.isArray(lc.modules) && lc.modules.length) ? lc.modules.length*UNITS_PER_MODULE : PATH_MODULES*UNITS_PER_MODULE;
+    const done = Object.values(lc.progress).filter(s=>s==="done").length;
+    const p = total ? Math.min(100, Math.round(done/total*100)) : 0;
+    const words = wordsLearned(c);
+    return `
+    <button class="lang-card" onclick="openLang('${c}')" style="--lc:${lc.accent};--lct:${lc.tint};">
       <span class="stripe"></span>
       <div class="lang-head">
-        <span class="flag">${l.flag}</span>
-        <div>
-          <div class="lang-name">${l.name}</div>
-          <div class="lang-sub">${done} von ${total} Einheiten</div>
-        </div>
-        <span class="chip">${l.level}</span>
+        <span class="lcode">${c.toUpperCase()}</span>
+        <div><div class="lang-name">${lc.name}</div><div class="lang-sub">${done} von ${total} Einheiten</div></div>
+        <span class="chip">${lc.level}</span>
       </div>
-      <div class="bar"><i style="width:${pct}%"></i></div>
-      <div class="lang-foot"><span>${l.xp} XP</span><span>📚 ${words} Wörter</span><span>${pct}%</span></div>
+      <div class="bar"><i style="width:${p}%"></i></div>
+      <div class="lang-foot"><span>${lc.xp} XP</span><span>${words} Wörter</span><span>${p}%</span></div>
     </button>`;
   }).join("");
 
@@ -524,15 +744,149 @@ function renderHome(){
       <div class="brand">sprich<span>.</span></div>
       <button class="iconbtn" onclick="go('settings')" aria-label="Einstellungen">⚙</button>
     </div>
+
+    <div class="streak-row" onclick="go('stats')" style="cursor:pointer">
+      <div>
+        <div class="streak-num">${state.streak.current}</div>
+        <div class="streak-lbl">Tage in Folge${state.streak.longest>state.streak.current?` · Rekord ${state.streak.longest}`:''}</div>
+      </div>
+      <div class="week-strip">${strip}</div>
+    </div>
+
+    <div class="plan-card">
+      <div class="plan-hero">
+        <div>
+          <span class="eyebrow" style="margin:0">Fokus heute</span>
+          <div class="plan-focus"><span class="lcode sm">${focus.toUpperCase()}</span> ${fl.name}</div>
+        </div>
+        ${ringSVG(pct)}
+      </div>
+      ${d.goalMet?`<div class="day-goal-done">Tagesziel erreicht 🎉</div>`:""}
+      ${fTaskHTML}
+      ${others.length?`<div class="plan-sub">Kurz auffrischen</div>${maintHTML}`:""}
+    </div>
+
     <p class="eyebrow">Deine Sprachen</p>
     ${cards}
-    <p class="eyebrow" style="margin-top:26px">Heute</p>
-    <div class="lesson-card" style="text-align:center;">
-      <p style="margin:0 0 14px;color:var(--ink-soft);font-size:14.5px;">Wähle eine Sprache und steig in den Lernpfad ein — oder geh direkt in den Call Mode zum Sprechen.</p>
-    </div>
   `;
 }
+
+function ringSVG(pct){
+  const R=24, C=2*Math.PI*R, off=C*(1-pct/100);
+  return `<svg class="goal-ring" width="60" height="60" viewBox="0 0 60 60" aria-hidden="true">
+    <circle cx="30" cy="30" r="${R}" fill="none" stroke="var(--line)" stroke-width="6"/>
+    <circle cx="30" cy="30" r="${R}" fill="none" stroke="var(--accent)" stroke-width="6" stroke-linecap="round"
+      stroke-dasharray="${C.toFixed(1)}" stroke-dashoffset="${off.toFixed(1)}" transform="rotate(-90 30 30)"/>
+    <text x="30" y="35" text-anchor="middle" font-size="15" font-weight="800" fill="var(--ink)" style="font-family:var(--display)">${pct}%</text>
+  </svg>`;
+}
 function openLang(code){ go("path", { lang:code }); }
+
+function startTodayReviews(code){
+  view = { name:"vocab", lang:code }; setAccent(code);
+  if(vocabStats(code).total===0) renderVocab();
+  else startVocabSession("mixed");
+}
+function openNextUnit(code){
+  const path = state.langs[code].path || [];
+  const prog = state.langs[code].progress || {};
+  const next = path.find(u=>prog[u.id]!=="done");
+  if(next) go("lesson", { lang:code, unitId:next.id });
+  else go("path", { lang:code });
+}
+function findUnit(code, id){
+  return (state.langs[code].path||[]).find(u=>u.id===id)
+      || (state.langs[code].custom||[]).find(u=>u.id===id) || null;
+}
+function addCustomTopic(code){
+  const theme = prompt("Worüber möchtest du lernen? (z. B. Im Krankenhaus, Klinische Studien, Wandern in den Alpen)");
+  if(!theme || !theme.trim()) return;
+  const u = { id:"custom-"+Date.now(), module:"Eigene Themen", level:state.langs[code].level,
+              title:theme.trim(), theme:theme.trim(), can_do:"Eigenes Thema" };
+  state.langs[code].custom = state.langs[code].custom || [];
+  state.langs[code].custom.unshift(u);
+  saveState();
+  go("lesson", { lang:code, unitId:u.id });
+}
+function deleteCustom(code, id){
+  state.langs[code].custom = (state.langs[code].custom||[]).filter(u=>u.id!==id);
+  saveState(); go("path",{lang:code});
+}
+
+/* =========================================================
+   STATISTIK
+   ========================================================= */
+function dayRecord(ds){
+  if(state.daily && state.daily.date===ds) return { goalMet:state.daily.goalMet, reviews:state.daily.reviews, xp:state.daily.xp };
+  return state.history[ds] || null;
+}
+function renderStats(){
+  ensureToday();
+  // 14-Tage-Balken (Wiederholungen)
+  const days = []; for(let i=13;i>=0;i--) days.push(todayStr(new Date(Date.now()-i*86400000)));
+  const reviews = days.map(ds=>{ const r=dayRecord(ds); return r?(r.reviews||0):0; });
+  const maxR = Math.max(10, ...reviews);
+  const bars = reviews.map((v,i)=>{
+    const h = Math.round(v/maxR*72);
+    return `<div class="sb-col"><div class="sb-bar" style="height:${h}px;opacity:${v?1:.12}"></div></div>`;
+  }).join("");
+
+  // Heatmap: 8 Wochen (Mo-So)
+  const now = new Date(); const dow=(now.getDay()+6)%7;
+  const monday = new Date(now); monday.setDate(now.getDate()-dow-7*7);
+  let cols = "";
+  for(let w=0; w<8; w++){
+    let cells = "";
+    for(let dd=0; dd<7; dd++){
+      const dt = new Date(monday); dt.setDate(monday.getDate()+w*7+dd);
+      const ds = todayStr(dt); const rec = dayRecord(ds);
+      const future = dt > now;
+      const lvl = !rec ? 0 : (rec.goalMet ? 2 : (rec.reviews>0?1:0));
+      cells += `<div class="hm-cell hm-${lvl} ${future?'hm-future':''}" title="${ds}"></div>`;
+    }
+    cols += `<div class="hm-col">${cells}</div>`;
+  }
+
+  const totWords = Object.keys(LANG_CONFIG).reduce((s,c)=>s+buildVocabPool(c).length,0);
+  const totMastered = Object.keys(LANG_CONFIG).reduce((s,c)=>s+vocabStats(c).mastered,0);
+  const activeDays = Object.keys(state.history).filter(k=>state.history[k].goalMet).length + (state.daily.goalMet?1:0);
+  const totXp = Object.keys(LANG_CONFIG).reduce((s,c)=>s+(state.langs[c].xp||0),0);
+
+  app().innerHTML = `
+    <button class="back" onclick="go('home')">‹ Zurück</button>
+    <h1 class="page-title">Statistik</h1>
+    <p class="page-sub">Dein Verlauf auf einen Blick</p>
+
+    <div class="vstats">
+      <div class="vstat"><b>${state.streak.current}</b><span>STREAK</span></div>
+      <div class="vstat"><b>${state.streak.longest||0}</b><span>REKORD</span></div>
+      <div class="vstat"><b>${activeDays}</b><span>AKTIVE TAGE</span></div>
+    </div>
+    <div class="vstats">
+      <div class="vstat"><b>${totWords}</b><span>WÖRTER</span></div>
+      <div class="vstat"><b>${totMastered}</b><span>GEFESTIGT</span></div>
+      <div class="vstat"><b>${totXp}</b><span>XP</span></div>
+    </div>
+
+    <p class="eyebrow" style="margin-top:24px">Wiederholungen · 14 Tage</p>
+    <div class="lesson-card"><div class="sb-chart">${bars}</div></div>
+
+    <p class="eyebrow" style="margin-top:8px">Aktivität · 8 Wochen</p>
+    <div class="lesson-card"><div class="heatmap">${cols}</div>
+      <p class="hint" style="margin:10px 0 0;">Gefüllt = Tagesziel erreicht · halb = geübt</p>
+    </div>
+
+    <p class="eyebrow" style="margin-top:8px">Pro Sprache</p>
+    ${Object.keys(LANG_CONFIG).map(c=>{
+      const vs=vocabStats(c);
+      return `<div class="lesson-card" style="display:flex;align-items:center;gap:12px;">
+        <span class="lcode">${c.toUpperCase()}</span>
+        <div style="flex:1"><b>${LANG_CONFIG[c].name}</b><div class="hint">${vs.total} Wörter · ${vs.mastered} gefestigt · ${vs.due} fällig</div></div>
+      </div>`;
+    }).join("")}
+  `;
+}
+
 
 /* =========================================================
    PATH (Lernpfad)
@@ -542,7 +896,7 @@ async function renderPath(){
   app().innerHTML = `
     <button class="back" onclick="go('home')">‹ Sprachen</button>
     <div style="display:flex;align-items:center;gap:12px;margin-bottom:4px;">
-      <span class="flag">${l.flag}</span>
+      <span class="lcode">${code.toUpperCase()}</span>
       <h1 class="page-title" style="margin:0">${l.name}</h1>
       <span class="chip" style="--lc:${l.accent};--lct:${l.tint};margin-left:auto;background:${l.tint};color:${l.accent};">${l.level}</span>
     </div>
@@ -680,6 +1034,24 @@ function paintUnits(){
       <button class="btn soft sm" style="width:auto" onclick="regeneratePath('${code}')">↻ Pfad neu erstellen</button>
     </div>`;
 
+  // Eigene Themen
+  const custom = state.langs[code].custom || [];
+  if(custom.length){
+    html += `<div class="module-head">Eigene Themen</div>`;
+    custom.forEach(u=>{
+      const st = progress[u.id];
+      html += `
+      <button class="unit ${st==='done'?'done':''}" onclick="openUnit('${u.id}')">
+        <span class="unit-num">${st==='done'?'✓':'★'}</span>
+        <div class="unit-body">
+          <div class="unit-title">${esc(u.title)}</div>
+          <div class="unit-can">Eigenes Thema · ${u.level||''}</div>
+        </div>
+        <span class="unit-state">›</span>
+      </button>`;
+    });
+  }
+
   modules.forEach((mod,mi)=>{
     const mUnits = path.filter(u=>u.module===mod.name);
     const gDone = mUnits.filter(u=>progress[u.id]==="done").length;
@@ -715,8 +1087,9 @@ function paintUnits(){
 
   document.getElementById("pathBody").innerHTML = html + `
     <div class="center-actions">
-      <button class="btn" onclick="go('vocab',{lang:'${code}'})">🎴 Vokabeltrainer</button>
-      <button class="btn ghost" style="margin-top:10px" onclick="go('call',{lang:'${code}'})">📞 Freies Gespräch im Call Mode</button>
+      <button class="btn soft" onclick="addCustomTopic('${code}')">+ Eigenes Thema lernen</button>
+      <button class="btn" style="margin-top:10px" onclick="go('vocab',{lang:'${code}'})">Vokabeltrainer</button>
+      <button class="btn ghost" style="margin-top:10px" onclick="go('call',{lang:'${code}'})">Freies Gespräch im Call Mode</button>
     </div>
   `;
 
@@ -758,7 +1131,7 @@ function ensureLesson(code, unitId){
 
 async function renderLesson(){
   const code = view.lang, l = L(code);
-  const unit = l.path.find(u=>u.id===view.unitId);
+  const unit = findUnit(code, view.unitId);
   app().innerHTML = `
     <button class="back" onclick="go('path',{lang:'${code}'})">‹ ${esc(l.name)}</button>
     <h1 class="page-title">${esc(unit.title)}</h1>
@@ -876,7 +1249,7 @@ function paintLessonIntro(lesson, unit){
       ${html}
     </div>
     <button class="btn" onclick="startExercises()">Übungen starten</button>
-    <button class="btn ghost" style="margin-top:10px" onclick="startUnitConversation()">💬 Konversation zum Thema üben</button>
+    <button class="btn ghost" style="margin-top:10px" onclick="startUnitConversation()">Konversation zum Thema üben</button>
     ${done?`<p class="hint" style="text-align:center;margin-top:12px">✓ Übungen dieser Einheit bereits abgeschlossen</p>`:""}
   `;
 }
@@ -886,7 +1259,7 @@ async function startExercises(){
   const lesson = ensureLesson(code, unitId);
   if(!lesson.exercises){
     document.getElementById("lessonBody").innerHTML = loadingHTML("Erstelle Übungen zum Wortschatz …");
-    const unit = L(code).path.find(u=>u.id===unitId);
+    const unit = findUnit(code, unitId);
     try{
       lesson.exercises = await generateExercises(code, unit, lesson.vocab);
       saveState();
@@ -906,7 +1279,7 @@ async function startUnitConversation(){
   const lesson = ensureLesson(code, unitId);
   if(!lesson.scenarios){
     document.getElementById("lessonBody").innerHTML = loadingHTML("Bereite Gesprächssituationen vor …");
-    const unit = L(code).path.find(u=>u.id===unitId);
+    const unit = findUnit(code, unitId);
     try{
       lesson.scenarios = await generateScenarios(code, unit);
       saveState();
@@ -1022,11 +1395,12 @@ function finishLesson(){
   // gleitender Mastery-Wert
   l.mastery = +(l.mastery*0.6 + score*0.4).toFixed(3);
   saveState();
+  if(firstTime){ ensureToday(); state.daily.xp += 20 + Math.round(score*30); recordLessonDone(code); }
 
   const lvlSuggest = suggestLevel(code);
   app().innerHTML = `
     <div style="text-align:center;padding:40px 0;">
-      <div style="font-size:64px;margin-bottom:8px;">${score>=0.8?'🌟':score>=0.5?'👍':'💪'}</div>
+      <div class="big-emoji" style="font-size:64px;margin-bottom:8px;">${score>=0.8?'🌟':score>=0.5?'👍':'💪'}</div>
       <h1 class="page-title">Lektion geschafft</h1>
       <p class="page-sub">${lessonRT.correct} von ${total} richtig · +${firstTime?(20+Math.round(score*30)):0} XP</p>
       <div class="lesson-card" style="text-align:left;">
@@ -1035,7 +1409,7 @@ function finishLesson(){
       </div>
       ${lvlSuggest?`<div class="grammar-note" style="text-align:left;margin-bottom:16px;">${lvlSuggest.msg}
         <button class="btn sm" style="margin-top:10px" onclick="applyLevel('${code}','${lvlSuggest.level}')">Auf ${lvlSuggest.level} wechseln</button></div>`:""}
-      <button class="btn" onclick="startUnitConversation()">💬 Konversation zum Thema</button>
+      <button class="btn" onclick="startUnitConversation()">Konversation zum Thema</button>
       <button class="btn ghost" style="margin-top:10px" onclick="go('path',{lang:'${code}'})">Weiter im Lernpfad</button>
     </div>
   `;
@@ -1145,22 +1519,31 @@ function renderVocab(){
   body.innerHTML = `
     <div class="vstats">
       <div class="vstat"><b>${st.total}</b><span>WÖRTER</span></div>
-      <div class="vstat"><b style="color:var(--accent)">${st.due}</b><span>FÄLLIG</span></div>
+      <div class="vstat"><b>${st.due}</b><span>FÄLLIG</span></div>
       <div class="vstat"><b>${st.fresh}</b><span>NEU</span></div>
-      <div class="vstat"><b style="color:var(--ok)">${st.mastered}</b><span>GEFESTIGT</span></div>
+      <div class="vstat"><b>${st.mastered}</b><span>GEFESTIGT</span></div>
     </div>
     <button class="btn" onclick="startVocabSession('mixed')">${st.due>0?`${st.due} fällige üben`:'Üben starten'} →</button>
     <p class="eyebrow" style="margin:24px 0 12px">Methode wählen</p>
-    <button class="mode-btn" onclick="startVocabSession('flash')"><span class="mi">🎴</span><div><div class="mt">Karteikarten</div><div class="md">Umdrehen und selbst bewerten</div></div></button>
+    <button class="mode-btn" onclick="startVocabSession('flash')"><span class="mi">🎴</span><div><div class="mt">Karteikarten</div><div class="md">Umdrehen, Beispielsatz, selbst bewerten</div></div></button>
     <button class="mode-btn" onclick="startVocabSession('mc')"><span class="mi">🔤</span><div><div class="mt">Multiple Choice</div><div class="md">Richtige Bedeutung wählen</div></div></button>
     <button class="mode-btn" onclick="startVocabSession('write')"><span class="mi">⌨️</span><div><div class="mt">Schreiben</div><div class="md">Übersetzung eintippen</div></div></button>
     <button class="mode-btn" onclick="startVocabSession('cloze')"><span class="mi">📝</span><div><div class="mt">Lückentext</div><div class="md">Wort im Beispielsatz ergänzen</div></div></button>
     <button class="mode-btn" onclick="startVocabSession('listen')"><span class="mi">🎧</span><div><div class="mt">Hören</div><div class="md">Gesprochenes Wort zuordnen</div></div></button>
+    <button class="mode-btn" onclick="startVocabSession('diktat')"><span class="mi">✍️</span><div><div class="mt">Diktat</div><div class="md">Wort hören und schreiben</div></div></button>
+    <button class="mode-btn" onclick="startVocabSession('speak')"><span class="mi">🎙️</span><div><div class="mt">Aussprache</div><div class="md">Wort laut sprechen, Erkennung prüft</div></div></button>
+    <button class="mode-btn" onclick="startVocabSession('leech')"><span class="mi">🧩</span><div><div class="mt">Schwierige Wörter</div><div class="md">Gezielt deine häufigsten Fehler</div></div></button>
   `;
 }
 
-function buildSession(code, limit){
+function buildSession(code, limit, opts){
+  opts = opts || {};
   const pool = buildVocabPool(code), now = Date.now();
+  if(opts.leech){
+    const leeches = pool.filter(v=>{ const r=getRec(code,v.term); return r && (r.lapses>=2 || r.ease<=1.8); });
+    shuffle(leeches);
+    return leeches.slice(0, limit).map(v=>({ ...v, _again:0, _mode:null, _done:false }));
+  }
   const due=[], fresh=[], later=[];
   pool.forEach(v=>{ const r=getRec(code,v.term); if(!r) fresh.push(v); else if(r.due<=now) due.push(v); else later.push(v); });
   shuffle(due); shuffle(fresh); shuffle(later);
@@ -1171,10 +1554,12 @@ function buildSession(code, limit){
 
 async function startVocabSession(mode){
   const code = view.lang;
-  const queue = buildSession(code, 20);
-  if(!queue.length){ toast("Keine Vokabeln verfügbar"); return; }
+  const limit = state.routine && state.routine.reviews ? state.routine.reviews : 20;
+  const queue = buildSession(code, limit, { leech: mode==="leech" });
+  if(!queue.length){ toast(mode==="leech"?"Noch keine schwierigen Wörter":"Keine Vokabeln verfügbar"); return; }
   vocabRT = { code, mode, queue, pos:0, reviewed:0, correct:0 };
-  if(mode==="cloze" || mode==="mixed"){
+  // Modi, die Beispielsätze brauchen
+  if(["cloze","mixed","flash","leech"].includes(mode)){
     const b = document.getElementById("vocabBody");
     if(b) b.innerHTML = loadingHTML("Bereite Beispielsätze vor …");
     await prefetchCloze(code, queue);
@@ -1201,6 +1586,7 @@ JSON-Array, jeder Eintrag: {"term":"<Wort exakt wie vorgegeben>","cloze":"<Satz 
 }
 
 function pickMode(code, card){
+  if(vocabRT.mode==="leech") return "flash";
   if(vocabRT.mode!=="mixed") return vocabRT.mode;
   const opts = ["mc","write","listen"];
   if(clozeStore(code)[srsKey(card.term)]) opts.push("cloze");
@@ -1260,6 +1646,24 @@ function paintVocabCard(){
         onkeydown="if(event.key==='Enter')submitVocabCloze()">
       <button class="btn" style="margin-top:18px" onclick="submitVocabCloze()">Prüfen</button>`;
   }
+  else if(m==="diktat"){
+    body = `<p class="q-prompt">Diktat — hören und schreiben</p>
+      <div class="q-text"><button class="btn soft sm" onclick="speak(${esc(JSON.stringify(card.term))},'${l.speak}')">🔊 Nochmal hören</button></div>
+      <input class="ans-input" id="vAns" placeholder="Gehörtes Wort tippen…" autocomplete="off" autocapitalize="off" autocorrect="off"
+        onkeydown="if(event.key==='Enter')submitVocabDiktat()">
+      <button class="btn" style="margin-top:18px" onclick="submitVocabDiktat()">Prüfen</button>`;
+    setTimeout(()=>speak(card.term, l.speak), 350);
+  }
+  else if(m==="speak"){
+    const canSpeak = sttAvailable();
+    body = `<p class="q-prompt">Aussprache — sprich das Wort</p>
+      <div class="q-text target">${esc(card.term)} <button class="btn soft sm" style="vertical-align:middle" onclick="speak(${esc(JSON.stringify(card.term))},'${l.speak}')">🔊</button></div>
+      <p style="font-size:13px;color:var(--ink-faint);margin:-8px 0 16px">${esc(card.de)}</p>
+      ${canSpeak
+        ? `<button class="btn" id="spkBtn" onclick="speakVocab()">🎙️ Antippen & sprechen</button>`
+        : `<p class="hint">Spracherkennung hier nicht verfügbar — als Homescreen-App nutzbar. Bewerte dich selbst:</p>
+           <div class="grade-row" style="margin-top:10px"><button class="again" onclick="gradeVocab('again')">Nochmal</button><button class="good" onclick="gradeVocab('good')">Gut</button><button class="easy" onclick="gradeVocab('easy')">Leicht</button></div>`}`;
+  }
 
   app().innerHTML = `
     <button class="back" onclick="quitVocab()">‹ Beenden</button>
@@ -1274,7 +1678,9 @@ function paintVocabCard(){
 
 function flipFlash(){
   const code = vocabRT.code, card = vocabRT.queue[vocabRT.pos];
-  document.getElementById("fcReveal").innerHTML = `<div class="fc-divider"></div><div class="fc-back">${esc(card.de)}</div>`;
+  const c = clozeStore(code)[srsKey(card.term)];
+  const example = c ? `<div class="fc-example">„${esc((c.cloze||"").replace(/_{2,}/, card.term))}"${c.de?`<span>${esc(c.de)}</span>`:""}</div>` : "";
+  document.getElementById("fcReveal").innerHTML = `<div class="fc-divider"></div><div class="fc-back">${esc(card.de)}</div>${example}`;
   const flip = document.getElementById("fcFlip");
   flip.outerHTML = `<div class="grade-row">
       <button class="again" onclick="gradeVocab('again')">Nochmal</button>
@@ -1315,6 +1721,34 @@ function submitVocabCloze(){
   vocabFeedback(ok, ans, ok?null:`Richtig: ${ans}`);
 }
 
+function submitVocabDiktat(){
+  const card = vocabRT.queue[vocabRT.pos];
+  const val = (document.getElementById("vAns").value||"").trim();
+  if(!val){ toast("Bitte etwas eintippen"); return; }
+  const ok = norm(val)===norm(card.term) || stripAccents(norm(val))===stripAccents(norm(card.term));
+  const inp = document.getElementById("vAns"); inp.disabled=true; inp.style.borderColor = ok?"var(--ok)":"var(--bad)";
+  vocabFeedback(ok, card.term, ok?`${card.term} — ${card.de}`:`Richtig: ${card.term}`);
+}
+
+function speakVocab(){
+  if(!SR){ toast("Spracherkennung nicht verfügbar"); return; }
+  const card = vocabRT.queue[vocabRT.pos], code = vocabRT.code;
+  stopSpeak();
+  const rec = new SR();
+  rec.lang = LANG_CONFIG[code].speak; rec.interimResults=false; rec.maxAlternatives=3;
+  const btn = document.getElementById("spkBtn");
+  if(btn){ btn.textContent="⏹ Zuhören…"; btn.classList.add("live"); }
+  rec.onresult = (e)=>{
+    const alts = []; for(let i=0;i<e.results[0].length;i++) alts.push(e.results[0][i].transcript);
+    const target = norm(card.term);
+    const ok = alts.some(a=> norm(a)===target || stripAccents(norm(a))===stripAccents(target) || norm(a).includes(target));
+    vocabFeedback(ok, card.term, `Erkannt: „${esc(alts[0]||"")}"`);
+  };
+  rec.onerror = ()=>{ if(btn){ btn.textContent="🎙️ Antippen & sprechen"; btn.classList.remove("live"); } toast("Nicht erkannt — nochmal"); };
+  rec.onend = ()=>{ if(btn){ btn.textContent="🎙️ Antippen & sprechen"; btn.classList.remove("live"); } };
+  try{ rec.start(); }catch(e){}
+}
+
 function vocabFeedback(ok, answer, note){
   const l = L(vocabRT.code);
   const fb = document.getElementById("vFeedback");
@@ -1350,11 +1784,12 @@ function finishVocab(){
   stopSpeak();
   const rt = vocabRT, code = rt.code;
   const acc = rt.reviewed ? Math.round(rt.correct/rt.reviewed*100) : 0;
+  recordReview(code, rt.reviewed);
   const st = vocabStats(code);
   vocabRT = null;
   app().innerHTML = `
     <div style="text-align:center;padding:44px 0;">
-      <div style="font-size:60px;margin-bottom:8px;">${acc>=80?'🌟':acc>=50?'👍':'💪'}</div>
+      <div class="big-emoji" style="font-size:60px;margin-bottom:8px;">${acc>=80?'🌟':acc>=50?'👍':'💪'}</div>
       <h1 class="page-title">Session beendet</h1>
       <p class="page-sub">${rt.reviewed} Karten · ${acc}% richtig</p>
       <div class="lesson-card" style="text-align:left;">
@@ -1406,13 +1841,13 @@ function renderCall(){
   setAccent(code);
   if(!call){
     callScenarios = resolveScenarios(code);
-    const unit = view.unitId ? l.path.find(u=>u.id===view.unitId) : null;
+    const unit = view.unitId ? findUnit(code, view.unitId) : null;
     const scs = callScenarios.map((s,i)=>`
       <button onclick="startCall(${i})"><b>${esc(s.t)}</b><span>${esc(s.d)}</span></button>`).join("");
     app().innerHTML = `
       <div class="call-screen">
         <div class="call-top">
-          <div class="call-who">${l.flag} ${unit?esc(unit.title):l.name}<small>Call Mode · Niveau ${l.level}</small></div>
+          <div class="call-who">${unit?esc(unit.title):l.name}<small>Call Mode · Niveau ${l.level}</small></div>
           <button class="call-end" onclick="endCall()" aria-label="schließen">✕</button>
         </div>
         <div class="call-stage">
@@ -1430,7 +1865,7 @@ async function startCall(scIdx){
   const code = view.lang, l = L(code);
   const list = callScenarios || resolveScenarios(code);
   const sc = list[scIdx];
-  call = { code, scenario:sc, messages:[], line:"…", status:"verbindet …", correction:null, busy:true, listening:false };
+  call = { code, scenario:sc, messages:[], line:"…", status:"verbindet …", correction:null, corrections:[], busy:true, listening:false };
   paintCallStage();
   const sys = callSystemPrompt(l, sc);
   try{
@@ -1458,6 +1893,7 @@ function handleTutorReply(txt){
   if(m){ correction = m[1].trim(); line = txt.slice(0, m.index).trim(); }
   call.line = line || "…";
   call.correction = correction;
+  if(correction) call.corrections.push(correction);
   call.messages.push({role:"assistant", content:txt});
   call.busy = false;
   call.status = "spricht …";
@@ -1477,7 +1913,7 @@ function paintCallStage(){
   app().innerHTML = `
     <div class="call-screen">
       <div class="call-top">
-        <div class="call-who">${l.flag} ${esc(call.scenario.t)}<small>${l.name} · Niveau ${l.level}</small></div>
+        <div class="call-who">${esc(call.scenario.t)}<small>${l.name} · Niveau ${l.level}</small></div>
         <button class="call-end" onclick="endCall()" aria-label="auflegen">✕</button>
       </div>
       <div class="call-stage">
@@ -1564,9 +2000,54 @@ async function sendUserTurn(text){
 function endCall(){
   stopSpeak(); stopMic();
   const code = call ? call.code : view.lang;
-  if(call){ state.langs[code].xp += 5; saveState(); }
+  if(call){
+    state.langs[code].xp += 5; saveState();
+    const userTurns = call.messages.filter(m=>m.role==="user").length;
+    if(userTurns >= 2){
+      ensureToday(); state.daily.xp += 5; recordConv(code);
+      lastReport = { code, corrections:call.corrections.slice(), messages:call.messages.slice() };
+      call = null;
+      showCallReport();
+      return;
+    }
+  }
   call=null;
   go("path",{lang:code});
+}
+
+let lastReport = null;
+function showCallReport(){
+  const rep = lastReport, code = rep.code, l = L(code);
+  setAccent(null);
+  const corr = rep.corrections.length
+    ? `<div class="lesson-card"><h3>Korrekturen (${rep.corrections.length})</h3>${rep.corrections.map(c=>`<div style="padding:9px 0;border-bottom:1px solid var(--line-soft);font-size:14.5px;">${esc(c)}</div>`).join("")}</div>`
+    : `<div class="lesson-card"><p style="margin:0;color:var(--ink-soft)">Keine Korrekturen — sauber gesprochen.</p></div>`;
+  app().innerHTML = `
+    <button class="back" onclick="go('path',{lang:'${code}'})">‹ Fertig</button>
+    <h1 class="page-title">Gesprächsbericht</h1>
+    <p class="page-sub">${l.name}</p>
+    ${corr}
+    <div id="repVocab"></div>
+    <button class="btn" onclick="extractCallVocab()">Wichtige Wörter in den Trainer übernehmen</button>
+    <button class="btn ghost" style="margin-top:10px" onclick="go('path',{lang:'${code}'})">Schließen</button>
+  `;
+}
+async function extractCallVocab(){
+  const rep = lastReport, code = rep.code, l = LANG_CONFIG[code];
+  const box = document.getElementById("repVocab");
+  if(box) box.innerHTML = loadingHTML("Sammle Wörter aus dem Gespräch …");
+  const convo = rep.messages.map(m=>(m.role==="assistant"?"A: ":"U: ")+m.content).join("\n").slice(-3000);
+  const sys = "Du extrahierst nützliche Lernvokabeln aus einem Übungsgespräch. Antworte AUSSCHLIESSLICH mit einem gültigen JSON-Array, ohne Markdown.";
+  const usr = `Aus diesem ${l.aiName}-Übungsgespräch: liste 6-10 nützliche Vokabeln/Wendungen, die die lernende Person üben sollte. JSON-Array, jeder Eintrag {"term":"<${l.aiName}>","de":"<deutsche Bedeutung>","cat":"Aus Gespräch"}.\n\n${convo}`;
+  try{
+    const txt = await callAI(sys, [{role:"user",content:usr}], {maxTokens:1200});
+    const arr = extractObjects(txt).filter(v=>v&&v.term).map(v=>({term:String(v.term),de:String(v.de||""),cat:"Aus Gespräch"}));
+    if(!arr.length){ if(box) box.innerHTML = `<div class="err">Keine Wörter gefunden.</div>`; return; }
+    state.langs[code].lessons["call-"+Date.now()] = { vocab:arr };
+    saveState();
+    if(box) box.innerHTML = `<div class="lesson-card"><h3>${arr.length} Wörter übernommen</h3>${arr.map(v=>`<div class="vocab-row"><div class="vocab-term">${esc(v.term)}</div><div class="vocab-de">${esc(v.de)}</div></div>`).join("")}</div>`;
+    toast("In den Trainer übernommen");
+  }catch(e){ if(box) box.innerHTML = `<div class="err">Fehler: ${esc(e.message)}</div>`; }
 }
 
 /* =========================================================
@@ -1583,7 +2064,7 @@ function voiceField(code){
   const none = matches.length ? "" : `<p class="hint">Noch keine ${esc(l.name)}-Stimme auf dem Gerät — siehe Hinweis unten zum Nachladen.</p>`;
   return `
     <div class="field">
-      <label>${l.flag} ${l.name}</label>
+      <label>${l.name}</label>
       <div class="call-row" style="gap:8px;">
         <select id="voice-${code}" onchange="setVoice('${code}', this.value)" style="flex:1;">${opts}</select>
         <button class="btn soft sm" style="width:auto;" onclick="testVoice('${code}')">🔊 Test</button>
@@ -1598,11 +2079,23 @@ function renderSettings(){
   const langLevels = Object.keys(LANG_CONFIG).map(code=>{
     const l=L(code);
     const segs = LEVELS.map(lv=>`<button class="${l.level===lv?'on':''}" onclick="setLevel('${code}','${lv}')">${lv}</button>`).join("");
-    return `<div class="field"><label>${l.flag} ${l.name}</label><div class="seg">${segs}</div></div>`;
+    return `<div class="field"><label>${l.name}</label><div class="seg">${segs}</div></div>`;
   }).join("");
   const voiceFields = Object.keys(LANG_CONFIG).map(voiceField).join("");
   const rateSeg = [["Langsam",0.8],["Normal",0.95],["Zügig",1.1]]
     .map(([t,r])=>`<button class="${Math.abs(rate-r)<0.01?'on':''}" onclick="setRate(${r})">${t}</button>`).join("");
+
+  ensureRoutineState();
+  const r = state.routine;
+  const langToggle = Object.keys(LANG_CONFIG).map(c=>`<button class="${r.langs.includes(c)?'on':''}" onclick="toggleRoutineLang('${c}')">${c.toUpperCase()}</button>`).join("");
+  const focusSeg = [`<button class="${r.focusMode==='rotate'?'on':''}" onclick="setRoutineFocus('rotate')">Rotierend</button>`]
+    .concat(r.langs.map(c=>`<button class="${r.focusMode===c?'on':''}" onclick="setRoutineFocus('${c}')">${c.toUpperCase()}</button>`)).join("");
+  const revSeg = [10,20,30].map(n=>`<button class="${(r.reviews||20)===n?'on':''}" onclick="setReviews(${n})">${n}</button>`).join("");
+  const convSeg = [["An",true],["Aus",false]].map(([t,v])=>`<button class="${(!!r.conv)===v?'on':''}" onclick="setRoutineConv(${v})">${t}</button>`).join("");
+  if(!s.reminder) s.reminder = { on:false, time:"19:00" };
+  if(!s.firebase) s.firebase = { config:"", lastSync:"" };
+  const rem = s.reminder;
+  const remOnSeg = [["An",true],["Aus",false]].map(([t,v])=>`<button class="${(!!rem.on)===v?'on':''}" onclick="setReminderOn(${v})">${t}</button>`).join("");
 
   app().innerHTML = `
     <button class="back" onclick="go('home')">‹ Zurück</button>
@@ -1612,6 +2105,14 @@ function renderSettings(){
     <p class="eyebrow">Niveau pro Sprache</p>
     ${langLevels}
     <p class="hint" style="margin:-6px 0 24px;">Niveau ändern erzeugt einen neuen Lernpfad für diese Sprache.</p>
+
+    <p class="eyebrow">Tägliche Routine</p>
+    <div class="field"><label>Sprachen im Plan</label><div class="seg">${langToggle}</div>
+      <p class="hint">Alle ausgewählten Sprachen werden jeden Tag kurz aufgefrischt.</p></div>
+    <div class="field"><label>Tagesfokus</label><div class="seg">${focusSeg}</div>
+      <p class="hint">Die Fokus-Sprache bekommt das volle Programm (Wiederholen, neue Einheit, Gespräch). „Rotierend" wechselt täglich durch.</p></div>
+    <div class="field"><label>Wiederholungen pro Session</label><div class="seg">${revSeg}</div></div>
+    <div class="field" style="margin-bottom:24px;"><label>Konversation im Tagesziel</label><div class="seg">${convSeg}</div></div>
 
     <p class="eyebrow">Stimmen</p>
     ${voiceFields}
@@ -1635,6 +2136,33 @@ function renderSettings(){
       <p class="hint">z. B. <code>claude-sonnet-4-6</code> (beste Gesprächsqualität) oder <code>claude-3-5-haiku-20241022</code> (schnell/günstig).</p>
     </div>
     <button class="btn" onclick="saveSettings()">Verbindung speichern</button>
+
+    <p class="eyebrow" style="margin-top:28px">Statistik</p>
+    <button class="btn soft" onclick="go('stats')">Aktivität & Verlauf ansehen</button>
+
+    <p class="eyebrow" style="margin-top:28px">Erinnerung</p>
+    <div class="field"><label>Tägliche Erinnerung</label><div class="seg">${remOnSeg}</div></div>
+    ${rem.on?`<div class="field"><label>Uhrzeit</label><input type="time" id="remTime" value="${esc(rem.time||'19:00')}" onchange="setReminderTime(this.value)"></div>`:""}
+    <p class="hint" style="margin:-6px 0 0;">Da eine Web-App keine zuverlässigen Hintergrund-Pushes auf iOS senden kann, erinnert dich sprich. beim Öffnen, falls dein Tagesziel noch offen ist. ${rem.on?`<button class="btn soft sm" style="width:auto;margin-top:10px" onclick="testReminderPermission()">Benachrichtigungen erlauben</button>`:""}</p>
+
+    <p class="eyebrow" style="margin-top:28px">Backup</p>
+    <button class="btn soft" onclick="exportData()">Daten exportieren (Sicherung)</button>
+    <button class="btn ghost" style="margin-top:10px" onclick="document.getElementById('importFile').click()">Daten importieren</button>
+    <input type="file" id="importFile" accept="application/json" style="display:none" onchange="importData(event)">
+    <p class="hint" style="margin:8px 0 0;">Alles liegt nur lokal in diesem Browser. Exportiere regelmäßig — und nutze dieselbe Datei, um sprich. auf einem anderen Gerät zu übernehmen.</p>
+
+    <p class="eyebrow" style="margin-top:28px">Cloud-Sync (Firebase, optional)</p>
+    <div class="field">
+      <label>Firebase Web-Config (JSON)</label>
+      <input id="fbConfig" value="${esc(s.firebase&&s.firebase.config||'')}" placeholder='{"apiKey":"…","projectId":"…",…}'>
+      <p class="hint">Aus deiner Firebase-Konsole (Projekteinstellungen → Web-App). Aktiviere dort „Anonyme Anmeldung" und Firestore. Dann gerätübergreifend sichern/laden.</p>
+    </div>
+    <div class="call-row" style="gap:8px;">
+      <button class="btn soft sm" style="flex:1" onclick="saveFirebaseConfig()">Config speichern</button>
+      <button class="btn soft sm" style="flex:1" onclick="cloudSave()">In Cloud sichern</button>
+      <button class="btn soft sm" style="flex:1" onclick="cloudLoad()">Aus Cloud laden</button>
+    </div>
+    <p class="hint" id="fbStatus" style="margin:8px 0 0;">${s.firebase&&s.firebase.lastSync?`Zuletzt synchronisiert: ${esc(s.firebase.lastSync)}`:""}</p>
 
     <p class="eyebrow" style="margin-top:28px">Aufs iPhone</p>
     <div class="lesson-card">
@@ -1673,6 +2201,17 @@ function setLevel(code, lv){
   if(state.langs[code].level===lv){ return; }
   applyLevel(code, lv);
 }
+function toggleRoutineLang(c){
+  ensureRoutineState();
+  const a = state.routine.langs, i = a.indexOf(c);
+  if(i>=0){ if(a.length>1) a.splice(i,1); } else a.push(c);
+  if(state.routine.focusMode!=="rotate" && !a.includes(state.routine.focusMode)) state.routine.focusMode = "rotate";
+  saveState(); renderSettings();
+}
+function setRoutineFocus(v){ ensureRoutineState(); state.routine.focusMode=v; saveState(); renderSettings(); }
+function setReviews(n){ ensureRoutineState(); state.routine.reviews=n; saveState(); renderSettings(); }
+function setRoutineConv(v){ ensureRoutineState(); state.routine.conv=v; saveState(); renderSettings(); }
+
 function saveSettings(){
   state.settings.endpoint = document.getElementById("setEndpoint").value.trim();
   state.settings.model = document.getElementById("setModel").value.trim();
@@ -1688,6 +2227,112 @@ function resetAll(){
   }
 }
 
+/* ---- Backup: Export / Import ---- */
+function exportData(){
+  try{
+    const blob = new Blob([JSON.stringify(state)], {type:"application/json"});
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    a.href = url; a.download = "sprich-backup-"+todayStr()+".json";
+    document.body.appendChild(a); a.click(); a.remove();
+    setTimeout(()=>URL.revokeObjectURL(url), 1000);
+    toast("Sicherung exportiert");
+  }catch(e){ toast("Export fehlgeschlagen"); }
+}
+function importData(ev){
+  const file = ev.target.files && ev.target.files[0];
+  if(!file) return;
+  const rd = new FileReader();
+  rd.onload = ()=>{
+    try{
+      const obj = JSON.parse(rd.result);
+      if(!obj || !obj.langs) throw new Error("kein gültiges Backup");
+      if(!confirm("Aktuelle Daten durch das Backup ersetzen?")) return;
+      state = obj; saveState(); toast("Backup importiert"); go("home");
+    }catch(e){ toast("Import fehlgeschlagen: "+e.message); }
+  };
+  rd.readAsText(file);
+}
+
+/* ---- Erinnerung ---- */
+function setReminderOn(v){
+  if(!state.settings.reminder) state.settings.reminder={on:false,time:"19:00"};
+  state.settings.reminder.on = v;
+  saveState();
+  if(v) testReminderPermission();
+  renderSettings();
+}
+function setReminderTime(t){ if(!state.settings.reminder) state.settings.reminder={on:true,time:t}; state.settings.reminder.time=t; saveState(); }
+function testReminderPermission(){
+  if(!("Notification" in window)){ toast("Benachrichtigungen nicht unterstützt"); return; }
+  Notification.requestPermission().then(p=>{ toast(p==="granted"?"Benachrichtigungen erlaubt":"Erinnerung erscheint beim Öffnen"); });
+}
+function maybeRemind(){
+  const r = state.settings && state.settings.reminder;
+  if(!r || !r.on) return;
+  const d = ensureToday();
+  if(d.goalMet) return;
+  const now = new Date(), [h,m] = (r.time||"19:00").split(":").map(Number);
+  if(now.getHours()*60+now.getMinutes() < h*60+m) return;        // noch vor der Zeit
+  if(r.lastNudge===d.date) return;                                 // heute schon erinnert
+  r.lastNudge = d.date; saveState();
+  const msg = "Dein Tagesziel in sprich. ist noch offen.";
+  if(("Notification" in window) && Notification.permission==="granted"){
+    try{ new Notification("sprich.", { body:msg }); }catch(e){ toast(msg); }
+  }else{ toast(msg); }
+}
+
+/* ---- Cloud-Sync (Firebase, optional) ---- */
+function saveFirebaseConfig(){
+  if(!state.settings.firebase) state.settings.firebase={config:"",lastSync:""};
+  state.settings.firebase.config = document.getElementById("fbConfig").value.trim();
+  saveState(); toast("Config gespeichert");
+}
+let _fb = null;
+async function fbInit(){
+  const cfgRaw = state.settings.firebase && state.settings.firebase.config;
+  if(!cfgRaw) throw new Error("Keine Firebase-Config eingetragen");
+  let cfg; try{ cfg = JSON.parse(cfgRaw); }catch(e){ throw new Error("Config ist kein gültiges JSON"); }
+  if(_fb) return _fb;
+  async function load(src){ return new Promise((res,rej)=>{ const sc=document.createElement("script"); sc.src=src; sc.onload=res; sc.onerror=()=>rej(new Error("SDK-Ladefehler")); document.head.appendChild(sc); }); }
+  if(!window.firebase){
+    await load("https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js");
+    await load("https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js");
+    await load("https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js");
+  }
+  const app = window.firebase.apps.length ? window.firebase.app() : window.firebase.initializeApp(cfg);
+  await window.firebase.auth().signInAnonymously();
+  const uid = window.firebase.auth().currentUser.uid;
+  _fb = { db: window.firebase.firestore(), uid };
+  return _fb;
+}
+async function cloudSave(){
+  const st = document.getElementById("fbStatus"); if(st) st.textContent="Sichere …";
+  try{
+    const { db, uid } = await fbInit();
+    await db.collection("sprich").doc(uid).set({ data: JSON.stringify(state), updated: Date.now() });
+    state.settings.firebase.lastSync = new Date().toLocaleString("de-DE");
+    saveState();
+    if(st) st.textContent = "Gesichert: "+state.settings.firebase.lastSync;
+    toast("In Cloud gesichert");
+  }catch(e){ if(st) st.textContent="Fehler: "+e.message; toast("Sync-Fehler"); }
+}
+async function cloudLoad(){
+  const st = document.getElementById("fbStatus"); if(st) st.textContent="Lade …";
+  try{
+    const { db, uid } = await fbInit();
+    const snap = await db.collection("sprich").doc(uid).get();
+    if(!snap.exists){ if(st) st.textContent="Keine Cloud-Sicherung gefunden"; return; }
+    const obj = JSON.parse(snap.data().data);
+    if(!obj || !obj.langs) throw new Error("ungültige Daten");
+    if(!confirm("Lokale Daten durch die Cloud-Sicherung ersetzen?")) return;
+    obj.settings = obj.settings || state.settings;        // Config/Endpoint lokal behalten
+    obj.settings.firebase = state.settings.firebase;
+    obj.settings.endpoint = state.settings.endpoint;
+    state = obj; saveState(); toast("Aus Cloud geladen"); go("home");
+  }catch(e){ if(st) st.textContent="Fehler: "+e.message; toast("Sync-Fehler"); }
+}
+
 /* =========================================================
    Helpers
    ========================================================= */
@@ -1701,6 +2346,9 @@ Object.assign(window,{ go,openLang,renderPath,paintUnits,toggleModule,retryModul
   answerMC,submitText,nextExercise,quitExercises,applyLevel,startCall,toggleMic,sendCallText,
   sendCallText,replayLine,endCall,sendUserTurn,setLevel,saveSettings,resetAll,speak,paintCallStage,
   setVoice,testVoice,setRate,
+  startTodayReviews,openNextUnit,toggleRoutineLang,setRoutineFocus,setReviews,setRoutineConv,
+  renderStats,exportData,importData,setReminderOn,setReminderTime,testReminderPermission,
+  saveFirebaseConfig,cloudSave,cloudLoad,addCustomTopic,deleteCustom,submitVocabDiktat,speakVocab,showCallReport,extractCallVocab,
   renderVocab,startVocabSession,flipFlash,answerVocabMC,submitVocabWrite,submitVocabCloze,gradeVocab,quitVocab });
 
 /* start */
