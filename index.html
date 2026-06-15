@@ -357,10 +357,28 @@ body{ background:var(--paper); }
 .fc-example{font-size:13.5px;color:var(--ink-soft);margin-top:8px;line-height:1.4;max-width:320px;}
 .fc-example span{display:block;color:var(--ink-faint);font-size:12px;margin-top:3px;}
 .btn.live{background:var(--ink-faint);}
+.seg.seg-wrap{flex-wrap:wrap;}
+.seg.seg-wrap button{flex:1 1 30%;}
+/* Schnellzugriff Vokabeln */
+.fab{position:fixed;right:18px;bottom:calc(20px + var(--safe-bot));z-index:50;width:58px;height:58px;border-radius:50%;
+  background:var(--ink);color:#fff;border:none;display:flex;align-items:center;justify-content:center;
+  box-shadow:0 6px 20px rgba(20,24,40,.28);cursor:pointer;}
+.fab:active{transform:scale(.94);}
+.qoverlay{position:fixed;inset:0;z-index:60;background:rgba(20,24,40,.32);display:flex;align-items:flex-end;justify-content:center;animation:qfade .18s ease;}
+@keyframes qfade{from{opacity:0}to{opacity:1}}
+.qsheet{width:100%;max-width:520px;background:var(--card);border-radius:22px 22px 0 0;padding:14px 18px calc(22px + var(--safe-bot));
+  box-shadow:0 -10px 30px rgba(20,24,40,.18);animation:qup .22s ease;}
+@keyframes qup{from{transform:translateY(20px)}to{transform:translateY(0)}}
+.qsheet-grip{width:40px;height:4px;border-radius:99px;background:var(--line);margin:2px auto 12px;}
+.qrow{display:flex;align-items:center;gap:12px;width:100%;background:var(--card);border:1px solid var(--line);border-radius:14px;padding:12px 14px;margin-bottom:8px;cursor:pointer;text-align:left;}
+.qrow:active{background:var(--accent-tint);}
 </style>
 </head>
 <body>
 <div id="app"></div>
+<button id="fab" class="fab" style="display:none" onclick="openQuickVocab()" aria-label="Schnell Vokabeln üben">
+  <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"><rect x="3" y="6" width="13" height="14" rx="2"/><path d="M8 3h11a2 2 0 0 1 2 2v12"/></svg>
+</button>
 <div class="toast" id="toast"></div>
 
 <script>
@@ -390,6 +408,27 @@ const FALLBACK_MODULES = [
   "Arbeit, Schule & Beruf","Gesundheit & Körper","Freizeit, Hobbys & Kultur",
   "Stadt, Natur & Umwelt","Gefühle, Meinungen & Diskussion","Welt, Medien & abstrakte Themen"
 ];
+let ALLTAG = "";
+const REGISTERS = {
+  formell: { label:"Formell",
+    gen:"WICHTIG: Verwende gehobene, formelle Standardsprache (höflich, gepflegt, Schriftsprachen-Niveau). Keine Umgangssprache, keine Kurzformen, kein Slang. Beispiele aus seriösen/beruflichen Kontexten.",
+    call:"Sprich gepflegt und formell — höflich, gehobener Standard, wie in einem offiziellen oder beruflichen Gespräch. Keine saloppe Umgangssprache." },
+  neutral: { label:"Neutral",
+    gen:"WICHTIG: Verwende neutrale, klare Standardsprache — korrekt und natürlich, weder besonders formell noch besonders salopp. Beispiele aus dem normalen Leben.",
+    call:"Sprich in neutraler, klarer Standardsprache — natürlich, aber weder gestelzt noch besonders salopp." },
+  alltag: { label:"Alltag",
+    gen:"WICHTIG: Verwende natürliche, alltagsnahe Umgangssprache, wie Muttersprachler sie im echten Alltag wirklich sprechen — keine gestelzte Lehrbuchsprache. Häufige, praktische Wörter, typische Redewendungen, gängige Kurzformen, lockerer gesprochener Ton, Beispiele aus dem täglichen Leben.",
+    call:"Sprich natürliche, lockere Alltags-Umgangssprache, wie Muttersprachler im echten Alltag — gängige Alltagswörter, typische Wendungen, Kurzformen, gesprochener Ton." },
+  locker: { label:"Locker",
+    gen:"WICHTIG: Verwende deutlich lockere, sehr umgangssprachliche Sprache mit vielen typischen Wendungen, Kurzformen und Füllwörtern, wie man unter Freunden redet. Casual, aber gut verständlich.",
+    call:"Sprich sehr locker und umgangssprachlich, wie mit guten Freunden — viele gängige Wendungen, Kurzformen und Füllwörter, casual." },
+  slang: { label:"Viel Slang",
+    gen:"WICHTIG: Verwende stark saloppe Alltags- und Jugendsprache mit viel verbreitetem Slang und gängigen Szene-Ausdrücken (nicht vulgär), genau so, wie junge Muttersprachler casual unter sich reden. Erkläre Slang bei Bedarf kurz im Deutschen.",
+    call:"Sprich mit viel verbreitetem Slang und saloppen Ausdrücken (nicht vulgär), wie junge Muttersprachler casual unter sich — inkl. typischer Slang-Wörter und Füllwörter." }
+};
+function registerKey(){ return (state.settings && state.settings.register) || "alltag"; }
+function applyRegister(){ ALLTAG = (REGISTERS[registerKey()]||REGISTERS.alltag).gen; }
+function registerCallRule(){ return (REGISTERS[registerKey()]||REGISTERS.alltag).call; }
 
 /* ---- State ---- */
 const STORE_KEY = "sprichState_v1";
@@ -644,14 +683,21 @@ function sttAvailable(){ return !!SR; }
 const app = ()=>document.getElementById("app");
 
 function render(){
-  if(view.name==="call"){ renderCall(); return; }
+  closeQuickVocab();
+  if(view.name==="call"){ updateFab(); renderCall(); return; }
   if(view.name==="home"){ setAccent(null); renderHome(); }
   else if(view.name==="settings"){ setAccent(view.lang||null); renderSettings(); }
   else if(view.name==="path"){ setAccent(view.lang); renderPath(); }
   else if(view.name==="vocab"){ setAccent(view.lang); renderVocab(); }
   else if(view.name==="stats"){ setAccent(null); renderStats(); }
   else if(view.name==="lesson"){ setAccent(view.lang); renderLesson(); }
+  updateFab();
   window.scrollTo(0,0);
+}
+function updateFab(){
+  const f = document.getElementById("fab");
+  if(!f) return;
+  f.style.display = ["home","path","stats"].includes(view.name) ? "flex" : "none";
 }
 function go(name, extra={}){ view = { name, ...extra }; render(); }
 
@@ -709,7 +755,7 @@ function renderHome(){
     const lc = LANG_CONFIG[c], due = vocabStats(c).due, done = !!d.maint[c];
     return `
     <button class="task ${done?'done':''}" onclick="startTodayReviews('${c}')">
-      <span class="tk-ic">${done?'✓':c.toUpperCase()}</span>
+      <span class="tk-ic">${done?'✓':lc.flag}</span>
       <div><div class="tk-t">${lc.name}</div><div class="tk-d">${done?(due===0?"Keine fälligen Wörter":"Aufgefrischt"):`${due} Wörter fällig`}</div></div>
       ${done?'':'<span class="tk-go">›</span>'}
     </button>`;
@@ -730,7 +776,7 @@ function renderHome(){
     <button class="lang-card" onclick="openLang('${c}')" style="--lc:${lc.accent};--lct:${lc.tint};">
       <span class="stripe"></span>
       <div class="lang-head">
-        <span class="lcode">${c.toUpperCase()}</span>
+        <span class="flag">${lc.flag}</span>
         <div><div class="lang-name">${lc.name}</div><div class="lang-sub">${done} von ${total} Einheiten</div></div>
         <span class="chip">${lc.level}</span>
       </div>
@@ -757,13 +803,24 @@ function renderHome(){
       <div class="plan-hero">
         <div>
           <span class="eyebrow" style="margin:0">Fokus heute</span>
-          <div class="plan-focus"><span class="lcode sm">${focus.toUpperCase()}</span> ${fl.name}</div>
+          <div class="plan-focus">${fl.flag} ${fl.name}</div>
         </div>
         ${ringSVG(pct)}
       </div>
       ${d.goalMet?`<div class="day-goal-done">Tagesziel erreicht 🎉</div>`:""}
       ${fTaskHTML}
       ${others.length?`<div class="plan-sub">Kurz auffrischen</div>${maintHTML}`:""}
+    </div>
+
+    <p class="eyebrow">Schnell üben</p>
+    <div class="quick-vocab">
+      ${Object.keys(LANG_CONFIG).map(c=>{
+        const due = vocabStats(c).due;
+        return `<button class="qv-btn" onclick="startTodayReviews('${c}')">
+          <span class="flag">${LANG_CONFIG[c].flag}</span>
+          <span class="qv-meta">${due>0?`${due} fällig`:'üben'}</span>
+        </button>`;
+      }).join("")}
     </div>
 
     <p class="eyebrow">Deine Sprachen</p>
@@ -781,6 +838,38 @@ function ringSVG(pct){
   </svg>`;
 }
 function openLang(code){ go("path", { lang:code }); }
+
+/* Schnellzugriff Vokabeln */
+function openQuickVocab(){
+  closeQuickVocab();
+  const langs = (state.routine && state.routine.langs && state.routine.langs.length) ? state.routine.langs : Object.keys(LANG_CONFIG);
+  const rows = langs.map(c=>{
+    const vs = vocabStats(c);
+    const sub = vs.total ? `${vs.due} fällig · ${vs.total} Wörter` : "noch keine Vokabeln";
+    return `<button class="qrow" onclick="startQuickVocab('${c}')">
+      <span class="flag">${LANG_CONFIG[c].flag}</span>
+      <div style="flex:1;text-align:left"><b>${LANG_CONFIG[c].name}</b><div class="hint">${sub}</div></div>
+      <span class="tk-go">›</span></button>`;
+  }).join("");
+  const ov = document.createElement("div");
+  ov.id = "qoverlay"; ov.className = "qoverlay";
+  ov.onclick = (e)=>{ if(e.target===ov) closeQuickVocab(); };
+  ov.innerHTML = `<div class="qsheet">
+      <div class="qsheet-grip"></div>
+      <p class="eyebrow" style="margin:2px 0 12px">Schnell üben</p>
+      ${rows}
+      <button class="btn ghost" style="margin-top:12px" onclick="closeQuickVocab()">Abbrechen</button>
+    </div>`;
+  document.body.appendChild(ov);
+}
+function closeQuickVocab(){ const o=document.getElementById("qoverlay"); if(o) o.remove(); }
+async function startQuickVocab(code){
+  closeQuickVocab();
+  view = { name:"vocab", lang:code }; setAccent(code); updateFab();
+  if(vocabStats(code).total===0){ renderVocab(); return; }
+  app().innerHTML = loadingHTML("Bereite Vokabeln vor …");
+  await startVocabSession("mixed");
+}
 
 function startTodayReviews(code){
   view = { name:"vocab", lang:code }; setAccent(code);
@@ -880,7 +969,7 @@ function renderStats(){
     ${Object.keys(LANG_CONFIG).map(c=>{
       const vs=vocabStats(c);
       return `<div class="lesson-card" style="display:flex;align-items:center;gap:12px;">
-        <span class="lcode">${c.toUpperCase()}</span>
+        <span class="flag">${LANG_CONFIG[c].flag}</span>
         <div style="flex:1"><b>${LANG_CONFIG[c].name}</b><div class="hint">${vs.total} Wörter · ${vs.mastered} gefestigt · ${vs.due} fällig</div></div>
       </div>`;
     }).join("")}
@@ -896,7 +985,7 @@ async function renderPath(){
   app().innerHTML = `
     <button class="back" onclick="go('home')">‹ Sprachen</button>
     <div style="display:flex;align-items:center;gap:12px;margin-bottom:4px;">
-      <span class="lcode">${code.toUpperCase()}</span>
+      <span class="flag">${l.flag}</span>
       <h1 class="page-title" style="margin:0">${l.name}</h1>
       <span class="chip" style="--lc:${l.accent};--lct:${l.tint};margin-left:auto;background:${l.tint};color:${l.accent};">${l.level}</span>
     </div>
@@ -958,7 +1047,7 @@ async function generateModules(code){
     if(attempt) await sleep(800);
     try{
       const mt = await callAI(PATH_JSON_SYS, [{role:"user",content:
-        `Entwirf ${PATH_MODULES} thematische Module für einen umfassenden, progressiven ${l.aiName}-Kurs, der von Niveau ${lvl} schrittweise bis etwa C1 führt und insgesamt einen Wortschatz von ${WORD_GOAL_MIN}–${WORD_GOAL_MAX} Wörtern abdeckt. Von leicht nach schwer, ohne thematische Lücken. JSON-Array, jeder Eintrag {"name":"Modulname auf Deutsch"}.`
+        `Entwirf ${PATH_MODULES} thematische Module für einen umfassenden, progressiven ${l.aiName}-Kurs, der von Niveau ${lvl} schrittweise bis etwa C1 führt und insgesamt einen Wortschatz von ${WORD_GOAL_MIN}–${WORD_GOAL_MAX} Wörtern abdeckt. Fokus auf praktische Alltagssituationen, die man im echten Leben wirklich braucht. Von leicht nach schwer, ohne thematische Lücken. JSON-Array, jeder Eintrag {"name":"Modulname auf Deutsch"}. ${ALLTAG}`
       }], {maxTokens:700});
       names = extractObjects(mt).map(m=>m.name).filter(Boolean);
       if(!names.length) lastErr = "Leere Antwort vom Modell";
@@ -988,7 +1077,7 @@ async function loadModuleUnits(code, mi){
     await sleep(attempt===0 ? 350 : 900*attempt);   // Aufrufe entzerren + Backoff
     try{
       const ut = await callAI(PATH_JSON_SYS, [{role:"user",content:
-        `Modul "${mod.name}" eines ${l.aiName}-Kurses auf Niveau ${mod.level}. Erstelle ${UNITS_PER_MODULE} konkrete Einheiten zu diesem Modul, von leicht nach schwer. Jede Einheit ist ein klar abgegrenztes Wortfeld mit etwa ${WORDS_PER_UNIT} Vokabeln. JSON-Array, jeder Eintrag {"title":"kurzer deutscher Titel","theme":"konkretes Wortfeld/Situation","can_do":"Kann-Beschreibung auf Deutsch, max 8 Wörter"}.`
+        `Modul "${mod.name}" eines ${l.aiName}-Kurses auf Niveau ${mod.level}. Erstelle ${UNITS_PER_MODULE} konkrete Einheiten zu diesem Modul, von leicht nach schwer. Jede Einheit ist ein klar abgegrenztes, praktisches Alltags-Wortfeld mit etwa ${WORDS_PER_UNIT} Vokabeln. JSON-Array, jeder Eintrag {"title":"kurzer deutscher Titel","theme":"konkrete Alltagssituation/Wortfeld","can_do":"Kann-Beschreibung auf Deutsch, max 8 Wörter"}. ${ALLTAG}`
       }], {maxTokens:1600});
       arr = extractObjects(ut).filter(u=>u && (u.title||u.theme));
       if(!arr.length) lastErr = "Leere Antwort vom Modell";
@@ -1160,8 +1249,9 @@ async function vocabBatch(code, unit, partLabel, exclude){
   const exTxt = exclude.length ? `\nVermeide Dopplungen zu diesen bereits gelisteten Begriffen: ${exclude.slice(0,60).join(", ")}.` : "";
   const sys = "Du bist Wortschatz-Didaktiker:in nach GER. Antworte AUSSCHLIESSLICH mit einem gültigen JSON-Array, ohne Markdown, ohne Erklärtext.";
   const usr = `Sprache: ${l.aiName}. Niveau: ${lvl}. Thema: "${unit.theme||unit.title}". ${partLabel}.
-Liste ALLE wesentlichen Vokabeln und Wendungen dieses Teils (typisch 16-22 Einträge), gegliedert über das Feld "cat".
-JSON-Array, jeder Eintrag: {"term":"<Wort/Phrase in ${l.aiName}, ggf. mit Artikel>","de":"<deutsche Bedeutung>","cat":"<Untergruppe auf Deutsch>"}.${exTxt}`;
+Liste ALLE wesentlichen Vokabeln und Wendungen dieses Teils (typisch 16-22 Einträge), gegliedert über das Feld "cat". Bevorzuge das, was man im echten Alltag wirklich sagt und braucht.
+JSON-Array, jeder Eintrag: {"term":"<Wort/Phrase in ${l.aiName}, ggf. mit Artikel>","de":"<deutsche Bedeutung>","cat":"<Untergruppe auf Deutsch>"}.${exTxt}
+${ALLTAG}`;
   const txt = await callAI(sys, [{role:"user",content:usr}], {maxTokens:2500});
   return extractObjects(txt).filter(v=>v && v.term)
     .map(v=>({ term:String(v.term), de:String(v.de||""), cat:String(v.cat||"Wortschatz") }));
@@ -1203,7 +1293,8 @@ JSON-Array. Erlaubte Typen:
 {"type":"translate","prompt":"<deutscher Satz oder Wort>","answer":"<Übersetzung in ${l.aiName}>","alts":["<optionale gleichwertige Lösung>"]}
 {"type":"fill","sentence":"<Satz in ${l.aiName} mit ___ als Lücke>","answer":"<Lückenwort in ${l.aiName}>","hint":"<Tipp auf Deutsch>"}
 {"type":"listen","text":"<kurzer Satz in ${l.aiName}>","options":["<4 deutsche Bedeutungen>"],"answer":"<exakt eine der Optionen>"}
-Mische die Typen. Bei "answer" muss der Wert exakt einem options-Eintrag entsprechen. Niveau ${lvl}.`;
+Mische die Typen. Sätze und Beispiele aus dem echten Alltag, in natürlicher Umgangssprache. Bei "answer" muss der Wert exakt einem options-Eintrag entsprechen. Niveau ${lvl}.
+${ALLTAG}`;
   const txt = await callAI(sys, [{role:"user",content:usr}], {maxTokens:3000});
   const arr = extractObjects(txt).filter(e=>e && e.type);
   if(!arr.length) throw new Error("Keine Übungen erhalten");
@@ -1215,8 +1306,9 @@ async function generateScenarios(code, unit){
   const lvl = unit.level || state.langs[code].level;
   const sys = "Du entwirfst Gesprächssituationen für Sprachtraining. Antworte AUSSCHLIESSLICH mit einem gültigen JSON-Array, ohne Markdown.";
   const usr = `Sprache: ${l.aiName}. Niveau: ${lvl}. Thema: "${unit.theme||unit.title}".
-Entwirf 3 konkrete Gesprächssituationen zu genau diesem Thema, in denen die lernende Person den Themen-Wortschatz anwendet.
-JSON-Array, jeder Eintrag: {"t":"kurzer Titel auf Deutsch","d":"1 kurze deutsche Beschreibung","p":"Rollen-/Situationsanweisung auf Deutsch (wer bist du, wo sind wir, Ziel)"}.`;
+Entwirf 3 konkrete, realistische Alltags-Gesprächssituationen zu genau diesem Thema, in denen die lernende Person den Themen-Wortschatz natürlich anwendet.
+JSON-Array, jeder Eintrag: {"t":"kurzer Titel auf Deutsch","d":"1 kurze deutsche Beschreibung","p":"Rollen-/Situationsanweisung auf Deutsch (wer bist du, wo sind wir, Ziel) — locker und alltagsnah, mit der Anweisung, in natürlicher Umgangssprache zu sprechen"}.
+${ALLTAG}`;
   const txt = await callAI(sys, [{role:"user",content:usr}], {maxTokens:1200});
   let arr = extractObjects(txt).filter(s=>s && s.p);
   if(!arr.length) arr = SCENARIOS[code].slice(0,3);
@@ -1574,8 +1666,9 @@ async function prefetchCloze(code, cards){
   const l = LANG_CONFIG[code];
   const list = need.map(c=>c.term).join("; ");
   const sys = "Du erstellst Lückentext-Beispielsätze für Sprachlernende. Antworte AUSSCHLIESSLICH mit einem gültigen JSON-Array, ohne Markdown.";
-  const usr = `Sprache: ${l.aiName}. Erstelle für JEDES dieser Wörter einen einfachen, natürlichen Beispielsatz: ${list}.
-JSON-Array, jeder Eintrag: {"term":"<Wort exakt wie vorgegeben>","cloze":"<Satz in ${l.aiName}, in dem genau dieses Wort durch ___ ersetzt ist>","answer":"<das entfernte Wort in seiner Satzform>","de":"<deutsche Übersetzung des vollständigen Satzes>"}.`;
+  const usr = `Sprache: ${l.aiName}. Erstelle für JEDES dieser Wörter einen einfachen, natürlichen Beispielsatz aus dem echten Alltag in lockerer Umgangssprache: ${list}.
+JSON-Array, jeder Eintrag: {"term":"<Wort exakt wie vorgegeben>","cloze":"<Satz in ${l.aiName}, in dem genau dieses Wort durch ___ ersetzt ist>","answer":"<das entfernte Wort in seiner Satzform>","de":"<deutsche Übersetzung des vollständigen Satzes>"}.
+${ALLTAG}`;
   try{
     const txt = await callAI(sys, [{role:"user",content:usr}], {maxTokens:3000});
     extractObjects(txt).forEach(o=>{
@@ -1847,7 +1940,7 @@ function renderCall(){
     app().innerHTML = `
       <div class="call-screen">
         <div class="call-top">
-          <div class="call-who">${unit?esc(unit.title):l.name}<small>Call Mode · Niveau ${l.level}</small></div>
+          <div class="call-who">${l.flag} ${unit?esc(unit.title):l.name}<small>Call Mode · Niveau ${l.level}</small></div>
           <button class="call-end" onclick="endCall()" aria-label="schließen">✕</button>
         </div>
         <div class="call-stage">
@@ -1880,10 +1973,11 @@ function callSystemPrompt(l, sc){
   return `Du bist ein freundlicher, geduldiger ${l.aiName}-Gesprächspartner für eine:n Lernende:n auf Niveau ${l.level} (GER).
 SZENARIO: ${sc.p}
 REGELN:
-- Sprich AUSSCHLIESSLICH ${l.aiName}, passend zu Niveau ${l.level} (kurze, klare Sätze).
-- Antworte mit maximal 1-2 kurzen Sätzen und stelle meist eine Rückfrage, damit das Gespräch läuft.
-- Wenn die lernende Person einen deutlichen Fehler macht, hänge GANZ AM ENDE eine separate Zeile an, die exakt so beginnt: "KORREKTUR: " gefolgt von einer kurzen Erklärung AUF DEUTSCH (richtige Form + Mini-Begründung). Mache das nur bei echten Fehlern, nicht bei jeder Nachricht.
-- Bleib im Szenario und in der Rolle.`;
+- Sprich AUSSCHLIESSLICH ${l.aiName}, passend zu Niveau ${l.level}.
+- ${registerCallRule()}
+- Antworte mit maximal 1-2 kurzen Sätzen und stelle meist eine Rückfrage, damit das Gespräch locker läuft.
+- Wenn die lernende Person einen deutlichen Fehler macht, hänge GANZ AM ENDE eine separate Zeile an, die exakt so beginnt: "KORREKTUR: " gefolgt von einer kurzen Erklärung AUF DEUTSCH (natürlichere/richtige Form + Mini-Begründung, gern auch wie man es alltagssprachlich sagt). Mache das nur bei echten Fehlern, nicht bei jeder Nachricht.
+- Bleib im Szenario und in der Rolle, bleib natürlich und freundlich.`;
 }
 
 function handleTutorReply(txt){
@@ -1913,7 +2007,7 @@ function paintCallStage(){
   app().innerHTML = `
     <div class="call-screen">
       <div class="call-top">
-        <div class="call-who">${esc(call.scenario.t)}<small>${l.name} · Niveau ${l.level}</small></div>
+        <div class="call-who">${l.flag} ${esc(call.scenario.t)}<small>${l.name} · Niveau ${l.level}</small></div>
         <button class="call-end" onclick="endCall()" aria-label="auflegen">✕</button>
       </div>
       <div class="call-stage">
@@ -2038,7 +2132,7 @@ async function extractCallVocab(){
   if(box) box.innerHTML = loadingHTML("Sammle Wörter aus dem Gespräch …");
   const convo = rep.messages.map(m=>(m.role==="assistant"?"A: ":"U: ")+m.content).join("\n").slice(-3000);
   const sys = "Du extrahierst nützliche Lernvokabeln aus einem Übungsgespräch. Antworte AUSSCHLIESSLICH mit einem gültigen JSON-Array, ohne Markdown.";
-  const usr = `Aus diesem ${l.aiName}-Übungsgespräch: liste 6-10 nützliche Vokabeln/Wendungen, die die lernende Person üben sollte. JSON-Array, jeder Eintrag {"term":"<${l.aiName}>","de":"<deutsche Bedeutung>","cat":"Aus Gespräch"}.\n\n${convo}`;
+  const usr = `Aus diesem ${l.aiName}-Übungsgespräch: liste 6-10 nützliche, alltagsnahe Vokabeln/Wendungen, die die lernende Person üben sollte. JSON-Array, jeder Eintrag {"term":"<${l.aiName}>","de":"<deutsche Bedeutung>","cat":"Aus Gespräch"}. ${ALLTAG}\n\n${convo}`;
   try{
     const txt = await callAI(sys, [{role:"user",content:usr}], {maxTokens:1200});
     const arr = extractObjects(txt).filter(v=>v&&v.term).map(v=>({term:String(v.term),de:String(v.de||""),cat:"Aus Gespräch"}));
@@ -2064,7 +2158,7 @@ function voiceField(code){
   const none = matches.length ? "" : `<p class="hint">Noch keine ${esc(l.name)}-Stimme auf dem Gerät — siehe Hinweis unten zum Nachladen.</p>`;
   return `
     <div class="field">
-      <label>${l.name}</label>
+      <label>${l.flag} ${l.name}</label>
       <div class="call-row" style="gap:8px;">
         <select id="voice-${code}" onchange="setVoice('${code}', this.value)" style="flex:1;">${opts}</select>
         <button class="btn soft sm" style="width:auto;" onclick="testVoice('${code}')">🔊 Test</button>
@@ -2079,7 +2173,7 @@ function renderSettings(){
   const langLevels = Object.keys(LANG_CONFIG).map(code=>{
     const l=L(code);
     const segs = LEVELS.map(lv=>`<button class="${l.level===lv?'on':''}" onclick="setLevel('${code}','${lv}')">${lv}</button>`).join("");
-    return `<div class="field"><label>${l.name}</label><div class="seg">${segs}</div></div>`;
+    return `<div class="field"><label>${l.flag} ${l.name}</label><div class="seg">${segs}</div></div>`;
   }).join("");
   const voiceFields = Object.keys(LANG_CONFIG).map(voiceField).join("");
   const rateSeg = [["Langsam",0.8],["Normal",0.95],["Zügig",1.1]]
@@ -2087,15 +2181,17 @@ function renderSettings(){
 
   ensureRoutineState();
   const r = state.routine;
-  const langToggle = Object.keys(LANG_CONFIG).map(c=>`<button class="${r.langs.includes(c)?'on':''}" onclick="toggleRoutineLang('${c}')">${c.toUpperCase()}</button>`).join("");
+  const langToggle = Object.keys(LANG_CONFIG).map(c=>`<button class="${r.langs.includes(c)?'on':''}" onclick="toggleRoutineLang('${c}')">${LANG_CONFIG[c].flag} ${c.toUpperCase()}</button>`).join("");
   const focusSeg = [`<button class="${r.focusMode==='rotate'?'on':''}" onclick="setRoutineFocus('rotate')">Rotierend</button>`]
-    .concat(r.langs.map(c=>`<button class="${r.focusMode===c?'on':''}" onclick="setRoutineFocus('${c}')">${c.toUpperCase()}</button>`)).join("");
+    .concat(r.langs.map(c=>`<button class="${r.focusMode===c?'on':''}" onclick="setRoutineFocus('${c}')">${LANG_CONFIG[c].flag}</button>`)).join("");
   const revSeg = [10,20,30].map(n=>`<button class="${(r.reviews||20)===n?'on':''}" onclick="setReviews(${n})">${n}</button>`).join("");
   const convSeg = [["An",true],["Aus",false]].map(([t,v])=>`<button class="${(!!r.conv)===v?'on':''}" onclick="setRoutineConv(${v})">${t}</button>`).join("");
   if(!s.reminder) s.reminder = { on:false, time:"19:00" };
   if(!s.firebase) s.firebase = { config:"", lastSync:"" };
   const rem = s.reminder;
   const remOnSeg = [["An",true],["Aus",false]].map(([t,v])=>`<button class="${(!!rem.on)===v?'on':''}" onclick="setReminderOn(${v})">${t}</button>`).join("");
+  const regKey = registerKey();
+  const regSeg = Object.keys(REGISTERS).map(k=>`<button class="${regKey===k?'on':''}" onclick="setRegister('${k}')">${REGISTERS[k].label}</button>`).join("");
 
   app().innerHTML = `
     <button class="back" onclick="go('home')">‹ Zurück</button>
@@ -2105,6 +2201,10 @@ function renderSettings(){
     <p class="eyebrow">Niveau pro Sprache</p>
     ${langLevels}
     <p class="hint" style="margin:-6px 0 24px;">Niveau ändern erzeugt einen neuen Lernpfad für diese Sprache.</p>
+
+    <p class="eyebrow">Sprachstil</p>
+    <div class="field" style="margin-bottom:24px;"><div class="seg seg-wrap">${regSeg}</div>
+      <p class="hint">Steuert den Tonfall von Gesprächen und neu generierten Inhalten — von formell bis viel Slang. Gespräche wirken sofort; bereits erstellte Inhalte ändern sich erst bei Neugenerierung.</p></div>
 
     <p class="eyebrow">Tägliche Routine</p>
     <div class="field"><label>Sprachen im Plan</label><div class="seg">${langToggle}</div>
@@ -2211,6 +2311,7 @@ function toggleRoutineLang(c){
 function setRoutineFocus(v){ ensureRoutineState(); state.routine.focusMode=v; saveState(); renderSettings(); }
 function setReviews(n){ ensureRoutineState(); state.routine.reviews=n; saveState(); renderSettings(); }
 function setRoutineConv(v){ ensureRoutineState(); state.routine.conv=v; saveState(); renderSettings(); }
+function setRegister(k){ if(!state.settings) state.settings={}; state.settings.register=k; applyRegister(); saveState(); renderSettings(); }
 
 function saveSettings(){
   state.settings.endpoint = document.getElementById("setEndpoint").value.trim();
@@ -2248,7 +2349,7 @@ function importData(ev){
       const obj = JSON.parse(rd.result);
       if(!obj || !obj.langs) throw new Error("kein gültiges Backup");
       if(!confirm("Aktuelle Daten durch das Backup ersetzen?")) return;
-      state = obj; saveState(); toast("Backup importiert"); go("home");
+      state = obj; saveState(); applyRegister(); toast("Backup importiert"); go("home");
     }catch(e){ toast("Import fehlgeschlagen: "+e.message); }
   };
   rd.readAsText(file);
@@ -2329,7 +2430,7 @@ async function cloudLoad(){
     obj.settings = obj.settings || state.settings;        // Config/Endpoint lokal behalten
     obj.settings.firebase = state.settings.firebase;
     obj.settings.endpoint = state.settings.endpoint;
-    state = obj; saveState(); toast("Aus Cloud geladen"); go("home");
+    state = obj; saveState(); applyRegister(); toast("Aus Cloud geladen"); go("home");
   }catch(e){ if(st) st.textContent="Fehler: "+e.message; toast("Sync-Fehler"); }
 }
 
@@ -2346,12 +2447,14 @@ Object.assign(window,{ go,openLang,renderPath,paintUnits,toggleModule,retryModul
   answerMC,submitText,nextExercise,quitExercises,applyLevel,startCall,toggleMic,sendCallText,
   sendCallText,replayLine,endCall,sendUserTurn,setLevel,saveSettings,resetAll,speak,paintCallStage,
   setVoice,testVoice,setRate,
-  startTodayReviews,openNextUnit,toggleRoutineLang,setRoutineFocus,setReviews,setRoutineConv,
+  startTodayReviews,openNextUnit,toggleRoutineLang,setRoutineFocus,setReviews,setRoutineConv,setRegister,
+  openQuickVocab,closeQuickVocab,startQuickVocab,updateFab,
   renderStats,exportData,importData,setReminderOn,setReminderTime,testReminderPermission,
   saveFirebaseConfig,cloudSave,cloudLoad,addCustomTopic,deleteCustom,submitVocabDiktat,speakVocab,showCallReport,extractCallVocab,
   renderVocab,startVocabSession,flipFlash,answerVocabMC,submitVocabWrite,submitVocabCloze,gradeVocab,quitVocab });
 
 /* start */
+applyRegister();
 render();
 </script>
 </body>
