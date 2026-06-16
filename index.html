@@ -2,24 +2,15 @@
 <html lang="de">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, viewport-fit=cover">
-<title>sprich.</title>
-
-<!-- iOS PWA / Homescreen -->
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <meta name="apple-mobile-web-app-capable" content="yes">
-<meta name="mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="default">
-<meta name="apple-mobile-web-app-title" content="sprich.">
-<meta name="theme-color" content="#1B2237">
-<link rel="manifest" href='data:application/json,{"name":"sprich.","short_name":"sprich.","start_url":".","display":"standalone","background_color":"%23F5F4F0","theme_color":"%231B2237"}'>
-
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,400;12..96,600;12..96,800&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
-
+<meta name="apple-mobile-web-app-title" content="plan.">
+<title>plan.</title>
 <style>
-/* ============ TOKENS ============ */
 :root{
+  --safe-top:env(safe-area-inset-top,0px);
+  --safe-bot:env(safe-area-inset-bottom,0px);
   --paper:#F5F5F3;
   --card:#FFFFFF;
   --ink:#16171B;
@@ -28,780 +19,615 @@
   --line:#E3E2DE;
   --line-soft:#EDECE9;
   --ok:#16171B;
-  --bad:#9B9CA2;
-  /* accent bleibt monochrom */
   --accent:#16171B;
   --accent-tint:#EFEEEB;
-  --display:"Bricolage Grotesque", "Inter", system-ui, sans-serif;
-  --body:"Inter", system-ui, -apple-system, sans-serif;
+  --display:"Georgia","Times New Roman",serif;
   --radius:18px;
-  --radius-sm:12px;
-  --shadow:0 1px 2px rgba(20,24,40,.04), 0 6px 20px rgba(20,24,40,.05);
-  --shadow-sm:0 1px 3px rgba(20,24,40,.06);
-  --shadow-btn:0 3px 12px rgba(20,24,40,.14);
-  --safe-top:env(safe-area-inset-top,0px);
-  --safe-bot:env(safe-area-inset-bottom,0px);
 }
-
 *{box-sizing:border-box;-webkit-tap-highlight-color:transparent;}
-html,body{margin:0;padding:0;}
-body{
-  font-family:var(--body);
-  background:var(--paper);
-  color:var(--ink);
-  line-height:1.5;
-  -webkit-font-smoothing:antialiased;
-  overscroll-behavior-y:none;
-}
-button{font-family:inherit;cursor:pointer;border:none;background:none;color:inherit;}
-input{font-family:inherit;}
+html,body{margin:0;padding:0;background:var(--paper);color:var(--ink);
+  font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+  font-size:16px;line-height:1.5;-webkit-font-smoothing:antialiased;}
+#app{max-width:520px;margin:0 auto;min-height:100dvh;
+  padding:calc(var(--safe-top) + 10px) 18px calc(92px + var(--safe-bot));}
+h1,h2,h3{margin:0;}
+.topbar{display:flex;align-items:center;justify-content:space-between;margin-bottom:16px;}
+.brand{font-family:var(--display);font-weight:700;font-size:30px;letter-spacing:-.01em;}
+.iconbtn{background:none;border:none;font-size:20px;color:var(--ink-soft);cursor:pointer;padding:6px;}
+.page-title{font-family:var(--display);font-weight:700;font-size:28px;letter-spacing:-.01em;}
+.page-sub{color:var(--ink-soft);font-size:14.5px;margin:4px 0 18px;}
+.ph-title{font-family:var(--display);font-weight:700;font-size:24px;display:flex;align-items:center;gap:9px;}
+.eyebrow{font-size:11px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--ink-faint);margin:0 0 10px;}
+.back{background:none;border:none;color:var(--ink-soft);font-size:15px;cursor:pointer;padding:6px 0;margin-bottom:6px;}
+.flag{font-size:30px;line-height:1;}
 
-#app{
-  max-width:520px;
-  margin:0 auto;
-  min-height:100dvh;
-  padding:calc(var(--safe-top) + 8px) 18px calc(var(--safe-bot) + 24px);
-}
+.card{background:var(--card);border:1px solid var(--line);border-radius:var(--radius);padding:16px;margin-bottom:12px;}
+.chip{display:inline-flex;align-items:center;padding:3px 10px;border-radius:999px;background:var(--accent-tint);color:var(--ink);font-size:12px;font-weight:700;}
 
-/* ============ HEADER ============ */
-.topbar{display:flex;align-items:center;justify-content:space-between;padding:8px 2px 18px;}
-.brand{font-family:var(--display);font-weight:800;font-size:30px;letter-spacing:-.02em;}
-.brand span{color:var(--accent);}
-.iconbtn{
-  width:42px;height:42px;border-radius:50%;background:var(--card);
-  border:1px solid var(--line);display:flex;align-items:center;justify-content:center;
-  font-size:18px;transition:transform .12s ease;
-}
-.iconbtn:active{transform:scale(.92);}
+.btn{display:block;width:100%;text-align:center;background:var(--ink);color:#fff;border:none;border-radius:13px;
+  padding:14px;font-size:15.5px;font-weight:600;cursor:pointer;text-decoration:none;}
+.btn.soft{background:var(--accent-tint);color:var(--ink);}
+.btn.ghost{background:none;border:1px solid var(--line);color:var(--ink);}
+.btn.sm{padding:9px 12px;font-size:13.5px;border-radius:10px;}
+.btn:active{opacity:.85;}
+.row{display:flex;gap:8px;}
+.row .btn{flex:1;}
 
-.eyebrow{font-size:12px;font-weight:600;letter-spacing:.08em;text-transform:uppercase;color:var(--ink-faint);margin:0 2px 10px;}
-
-/* ============ LANGUAGE CARDS ============ */
-.lang-card{
-  display:block;width:100%;text-align:left;background:var(--card);
-  border:1px solid var(--line);border-radius:var(--radius);
-  padding:18px;margin-bottom:14px;position:relative;overflow:hidden;
-  transition:transform .14s ease;
-}
-.lang-card:active{transform:scale(.985);}
-.lang-card .stripe{position:absolute;left:0;top:0;bottom:0;width:5px;background:var(--lc);}
-.lang-head{display:flex;align-items:center;gap:14px;margin-bottom:14px;}
-.flag{font-size:34px;line-height:1;}
-.lang-name{font-family:var(--display);font-weight:600;font-size:21px;letter-spacing:-.01em;}
-.lang-sub{font-size:13px;color:var(--ink-soft);}
-.chip{
-  margin-left:auto;font-size:12px;font-weight:700;letter-spacing:.03em;
-  background:var(--lct);color:var(--lc);padding:5px 11px;border-radius:999px;
-}
-.bar{height:7px;background:var(--line-soft);border-radius:999px;overflow:hidden;}
-.bar>i{display:block;height:100%;background:var(--lc);border-radius:999px;transition:width .4s ease;}
-.lang-foot{display:flex;justify-content:space-between;margin-top:9px;font-size:12px;color:var(--ink-faint);}
-/* Heute-Dashboard */
-.streak-row{display:flex;align-items:center;gap:13px;background:var(--card);border:1px solid var(--line);border-radius:var(--radius);padding:15px 17px;margin-bottom:14px;}
-.streak-flame{font-size:28px;line-height:1;}
-.streak-num{font-family:var(--display);font-size:25px;font-weight:800;line-height:1;}
-.streak-lbl{font-size:11.5px;color:var(--ink-faint);margin-top:2px;}
-.week-strip{display:flex;gap:7px;margin-left:auto;}
-.wd{display:flex;flex-direction:column;align-items:center;gap:4px;font-size:9.5px;color:var(--ink-faint);}
-.wd i{width:17px;height:17px;border-radius:50%;background:var(--line-soft);display:block;border:1px solid var(--line);}
-.wd.met i{background:#2D2A55;border-color:#2D2A55;}
-.wd.today i{box-shadow:0 0 0 2px var(--paper),0 0 0 4px #2D2A55;}
-.plan-card{background:var(--card);border:1px solid var(--line);border-radius:var(--radius);padding:6px 4px;margin-bottom:20px;}
-.plan-head{display:flex;align-items:center;justify-content:space-between;padding:10px 14px 4px;}
-.plan-head .ph-lang{font-weight:600;}
-.task{display:flex;align-items:center;gap:13px;width:100%;text-align:left;padding:13px 14px;border-radius:12px;background:transparent;transition:background .12s ease;}
-.task:active{background:var(--accent-tint);}
-.task .tk-ic{width:34px;height:34px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:16px;background:var(--accent-tint);color:var(--accent);flex:0 0 auto;}
-.task.done .tk-ic{background:var(--ok);color:#fff;}
-.task .tk-t{font-weight:600;}
-.task.done .tk-t{color:var(--ink-faint);}
-.task .tk-d{font-size:12.5px;color:var(--ink-soft);}
-.task .tk-go{margin-left:auto;color:var(--accent);font-size:18px;}
-.day-goal-done{text-align:center;padding:13px;background:var(--accent-tint);border-radius:12px;margin:6px;color:var(--accent);font-weight:600;}
-
-/* ============ BUTTONS ============ */
-.btn{
-  display:inline-flex;align-items:center;justify-content:center;gap:8px;
-  background:var(--accent);color:#fff;font-weight:600;font-size:16px;
-  padding:15px 20px;border-radius:14px;width:100%;transition:transform .12s ease, opacity .2s;
-}
-.btn:active{transform:scale(.97);}
-.btn:disabled{opacity:.5;}
-.btn.ghost{background:transparent;color:var(--accent);border:1.5px solid var(--accent);}
-.btn.soft{background:var(--accent-tint);color:var(--accent);}
-.btn.sm{width:auto;padding:11px 16px;font-size:14px;border-radius:11px;}
-
-/* ============ PATH VIEW ============ */
-.back{display:inline-flex;align-items:center;gap:7px;color:var(--ink-soft);font-weight:600;font-size:15px;margin-bottom:14px;padding:6px 2px;}
-.page-title{font-family:var(--display);font-weight:800;font-size:28px;letter-spacing:-.02em;margin:0 0 4px;}
-.page-sub{color:var(--ink-soft);font-size:14px;margin:0 0 22px;}
-
-.unit{
-  display:flex;align-items:center;gap:14px;width:100%;text-align:left;
-  background:var(--card);border:1px solid var(--line);border-radius:var(--radius-sm);
-  padding:15px 16px;margin-bottom:11px;transition:transform .12s ease;
-}
-.unit:active{transform:scale(.985);}
-.unit:disabled{opacity:.55;}
-.unit-num{
-  flex:0 0 auto;width:36px;height:36px;border-radius:50%;
-  display:flex;align-items:center;justify-content:center;font-weight:700;font-size:15px;
-  background:var(--accent-tint);color:var(--accent);
-}
-.unit.done .unit-num{background:var(--accent);color:#fff;}
-.unit-body{flex:1;min-width:0;}
-.unit-title{font-weight:600;font-size:16px;}
-.unit-can{font-size:12.5px;color:var(--ink-soft);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
-.unit-state{font-size:18px;color:var(--accent);}
-.module-head{font-family:var(--display);font-weight:700;font-size:15px;color:var(--ink);margin:24px 2px 12px;letter-spacing:.01em;}
-.module-head:first-child{margin-top:2px;}
-.mh-toggle{display:flex;width:100%;align-items:center;justify-content:space-between;gap:10px;text-align:left;}
-.mh-meta{font-size:12px;font-weight:600;color:var(--ink-faint);white-space:nowrap;}
-.goal-card{background:var(--card);border:1px solid var(--line);border-radius:var(--radius-sm);padding:14px 16px;margin-bottom:14px;}
-.goal-top{display:flex;justify-content:space-between;align-items:baseline;margin-bottom:9px;}
-.goal-top b{font-size:18px;}
-.goal-top span{font-size:12.5px;color:var(--ink-faint);}
-.vgroup-label{font-size:12px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:var(--accent);margin:16px 0 2px;}
-.vgroup-label.first{margin-top:0;}
-.vocab-count{font-size:13px;color:var(--ink-faint);font-weight:500;}
-/* Vokabeltrainer */
-.vstats{display:flex;gap:9px;margin-bottom:18px;}
-.vstat{flex:1;background:var(--card);border:1px solid var(--line);border-radius:var(--radius-sm);padding:13px 8px;text-align:center;}
-.vstat b{display:block;font-family:var(--display);font-size:23px;line-height:1.1;}
-.vstat span{font-size:11px;color:var(--ink-faint);letter-spacing:.02em;}
-.mode-btn{display:flex;align-items:center;gap:13px;width:100%;text-align:left;background:var(--card);border:1px solid var(--line);border-radius:var(--radius-sm);padding:15px 16px;margin-bottom:10px;transition:transform .12s ease;}
-.mode-btn:active{transform:scale(.985);}
-.mode-btn:disabled{opacity:.5;}
-.mode-btn .mi{font-size:22px;flex:0 0 auto;}
-.mode-btn .mt{font-weight:600;}
-.mode-btn .md{font-size:12.5px;color:var(--ink-soft);}
-.flashcard{background:var(--card);border:1px solid var(--line);border-radius:var(--radius);padding:34px 22px;text-align:center;min-height:170px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:13px;margin-bottom:16px;}
-.fc-term{font-family:var(--display);font-size:29px;font-weight:600;color:var(--accent);letter-spacing:-.01em;}
-.fc-cat{font-size:11px;color:var(--ink-faint);text-transform:uppercase;letter-spacing:.06em;}
-.fc-back{font-size:21px;font-weight:500;}
-.fc-divider{width:40px;height:2px;background:var(--line);border-radius:2px;}
-.grade-row{display:flex;gap:8px;}
-.grade-row button{flex:1;padding:14px 0;border-radius:12px;font-weight:600;font-size:15px;border:1.5px solid var(--line);background:var(--card);transition:transform .1s ease;}
-.grade-row button:active{transform:scale(.96);}
-.grade-row button.again{border-color:var(--bad);color:var(--bad);}
-.grade-row button.good{border-color:var(--accent);color:var(--accent);}
-.grade-row button.easy{border-color:var(--ok);color:var(--ok);}
-
-/* ============ LESSON ============ */
-.lesson-card{background:var(--card);border:1px solid var(--line);border-radius:var(--radius);padding:20px;margin-bottom:16px;}
-.lesson-card h3{font-family:var(--display);font-weight:600;font-size:17px;margin:0 0 12px;letter-spacing:-.01em;}
-.vocab-row{display:flex;justify-content:space-between;align-items:center;padding:9px 0;border-bottom:1px solid var(--line-soft);gap:12px;}
-.vocab-row:last-child{border-bottom:none;}
-.vocab-term{font-weight:600;}
-.vocab-term button{margin-left:7px;color:var(--accent);font-size:14px;}
-.vocab-de{color:var(--ink-soft);font-size:14px;text-align:right;}
-.grammar-note{background:var(--accent-tint);border-radius:var(--radius-sm);padding:14px;font-size:14px;color:var(--ink);}
-
-.ex-progress{display:flex;gap:6px;margin-bottom:18px;}
-.ex-progress i{flex:1;height:5px;border-radius:999px;background:var(--line);}
-.ex-progress i.on{background:var(--accent);}
-.q-prompt{font-size:13px;color:var(--ink-faint);font-weight:600;letter-spacing:.05em;text-transform:uppercase;margin-bottom:8px;}
-.q-text{font-family:var(--display);font-size:22px;font-weight:600;letter-spacing:-.01em;margin-bottom:20px;line-height:1.3;}
-.q-text.target{color:var(--accent);}
-.opt{
-  display:block;width:100%;text-align:left;background:var(--card);
-  border:1.5px solid var(--line);border-radius:13px;padding:15px 16px;margin-bottom:10px;
-  font-size:16px;transition:all .12s ease;
-}
-.opt:active{transform:scale(.98);}
-.opt.correct{border-color:var(--ok);background:#EAF6F1;color:#1f6b50;font-weight:600;}
-.opt.wrong{border-color:var(--bad);background:#FBECE9;color:#9e3a2c;}
-.opt.dim{opacity:.5;}
-.ans-input{
-  width:100%;background:var(--card);border:1.5px solid var(--line);border-radius:13px;
-  padding:15px 16px;font-size:17px;color:var(--ink);outline:none;
-}
-.ans-input:focus{border-color:var(--accent);}
-.feedback{margin-top:16px;padding:14px 16px;border-radius:13px;font-size:14.5px;}
-.feedback.ok{background:#EAF6F1;color:#1f6b50;}
-.feedback.no{background:#FBECE9;color:#9e3a2c;}
-.feedback b{display:block;margin-bottom:3px;}
-
-/* ============ CALL MODE ============ */
-.call-screen{
-  position:fixed;inset:0;z-index:50;background:linear-gradient(170deg, var(--accent) 0%, #14182b 100%);
-  color:#fff;display:flex;flex-direction:column;
-  padding:calc(var(--safe-top) + 16px) 22px calc(var(--safe-bot) + 22px);
-}
-.call-top{display:flex;align-items:center;justify-content:space-between;}
-.call-who{font-weight:600;}
-.call-who small{display:block;opacity:.7;font-weight:400;font-size:12.5px;}
-.call-end{background:#ff4d4d;width:44px;height:44px;border-radius:50%;font-size:20px;display:flex;align-items:center;justify-content:center;}
-.call-stage{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;gap:26px;}
-.orb{
-  width:130px;height:130px;border-radius:50%;
-  background:radial-gradient(circle at 35% 30%, rgba(255,255,255,.55), rgba(255,255,255,.08));
-  box-shadow:0 0 0 0 rgba(255,255,255,.25);display:flex;align-items:center;justify-content:center;
-  font-size:46px;transition:transform .3s ease;
-}
-.orb.speaking{animation:pulse 1.3s ease-in-out infinite;}
-.orb.listening{animation:listen 1s ease-in-out infinite;box-shadow:0 0 0 8px rgba(255,255,255,.12);}
-@keyframes pulse{0%,100%{transform:scale(1);box-shadow:0 0 0 0 rgba(255,255,255,.3);}50%{transform:scale(1.08);box-shadow:0 0 0 26px rgba(255,255,255,0);}}
-@keyframes listen{0%,100%{transform:scale(1);}50%{transform:scale(1.04);}}
-.call-line{font-family:var(--display);font-size:23px;font-weight:600;line-height:1.32;letter-spacing:-.01em;max-width:380px;min-height:62px;}
-.call-status{opacity:.75;font-size:14px;min-height:20px;}
-.correction{
-  background:rgba(255,255,255,.14);border:1px solid rgba(255,255,255,.2);
-  border-radius:13px;padding:11px 14px;font-size:13.5px;max-width:380px;backdrop-filter:blur(6px);
-}
-.correction b{display:block;font-size:11px;letter-spacing:.08em;text-transform:uppercase;opacity:.8;margin-bottom:3px;}
-.call-controls{display:flex;flex-direction:column;gap:12px;}
-.call-row{display:flex;gap:10px;align-items:center;}
-.mic{
-  flex:1;height:60px;border-radius:16px;background:#fff;color:var(--accent);
-  font-weight:700;font-size:16px;display:flex;align-items:center;justify-content:center;gap:9px;
-  transition:transform .12s ease;
-}
-.mic:active{transform:scale(.97);}
-.mic.live{background:#ff4d4d;color:#fff;}
-.mic-icon{width:42px;height:60px;border-radius:16px;background:rgba(255,255,255,.16);display:flex;align-items:center;justify-content:center;font-size:20px;}
-.call-textin{
-  width:100%;background:rgba(255,255,255,.12);border:1px solid rgba(255,255,255,.22);
-  border-radius:14px;padding:14px 16px;color:#fff;font-size:16px;outline:none;
-}
-.call-textin::placeholder{color:rgba(255,255,255,.6);}
-.scenario-pick{display:flex;flex-direction:column;gap:10px;max-width:380px;margin:0 auto;width:100%;}
-.scenario-pick button{
-  background:rgba(255,255,255,.1);border:1px solid rgba(255,255,255,.2);border-radius:14px;
-  padding:16px;color:#fff;text-align:left;font-size:15px;transition:transform .12s ease;
-}
-.scenario-pick button:active{transform:scale(.98);}
-.scenario-pick button b{display:block;font-family:var(--display);font-size:17px;margin-bottom:2px;}
-.scenario-pick button span{opacity:.7;font-size:13px;}
-
-/* ============ SETTINGS / MODAL ============ */
-.field{margin-bottom:18px;}
-.field label{display:block;font-weight:600;font-size:14px;margin-bottom:7px;}
-.field .hint{font-size:12.5px;color:var(--ink-soft);margin-top:6px;}
-.field input,.field select{
-  width:100%;background:var(--card);border:1.5px solid var(--line);border-radius:12px;
-  padding:13px 14px;font-size:15px;color:var(--ink);outline:none;
-}
-.field input:focus,.field select:focus{border-color:var(--accent);}
-.seg{display:flex;gap:8px;flex-wrap:wrap;}
-.seg button{
-  flex:1;min-width:54px;padding:11px 0;border:1.5px solid var(--line);border-radius:11px;
-  font-weight:600;background:var(--card);
-}
-.seg button.on{background:var(--accent);color:#fff;border-color:var(--accent);}
-
-/* ============ MISC ============ */
-.loading{display:flex;flex-direction:column;align-items:center;gap:16px;padding:50px 0;color:var(--ink-soft);}
-.spin{width:34px;height:34px;border:3px solid var(--line);border-top-color:var(--accent);border-radius:50%;animation:spin .8s linear infinite;}
-@keyframes spin{to{transform:rotate(360deg);}}
-.err{background:#FBECE9;color:#9e3a2c;border-radius:13px;padding:14px 16px;font-size:14px;margin:10px 0;}
-.toast{
-  position:fixed;left:50%;bottom:calc(var(--safe-bot) + 24px);transform:translateX(-50%) translateY(20px);
-  background:var(--ink);color:#fff;padding:12px 18px;border-radius:999px;font-size:14px;font-weight:500;
-  opacity:0;transition:all .3s ease;pointer-events:none;z-index:99;white-space:nowrap;
-}
-.toast.show{opacity:1;transform:translateX(-50%) translateY(0);}
-.center-actions{margin-top:22px;}
-@media (prefers-reduced-motion: reduce){
-  *{animation-duration:.001ms !important;}
-}
-
-/* ============ DESIGN-POLISH (schwarz-weiß, minimal) ============ */
-body{ background:var(--paper); }
-.brand{font-size:32px;}
-.brand span{color:var(--ink);}
-.lang-card,.plan-card,.streak-row,.goal-card,.lesson-card,.vstat,.mode-btn,.unit,.flashcard,.iconbtn{
-  box-shadow:none;
-  border-color:var(--line);
-}
-.lang-card{border-radius:18px;}
-.btn{box-shadow:none;}
-.streak-row{ background:var(--card); border-radius:18px; }
-.task .tk-ic{box-shadow:none;background:transparent;border:1.5px solid var(--line);color:var(--ink);}
-.task.done .tk-ic{background:var(--ink);color:#fff;border-color:var(--ink);}
-.task{border-radius:12px;}
-.plan-card{padding:8px 6px;border-radius:18px;}
-.plan-hero{display:flex;align-items:center;justify-content:space-between;gap:14px;padding:14px 14px 6px;}
-.plan-focus{font-family:var(--display);font-weight:700;font-size:21px;letter-spacing:-.01em;margin-top:4px;display:flex;align-items:center;gap:9px;}
-.goal-ring{flex:0 0 auto;}
-.plan-sub{font-size:11px;font-weight:700;letter-spacing:.07em;text-transform:uppercase;color:var(--ink-faint);padding:16px 16px 4px;}
-.module-head{margin:26px 4px 12px;}
-.page-title{font-size:30px;}
-.lang-card .stripe{width:0;}
-/* Sprach-Kürzel statt Flagge */
-.lcode{display:inline-flex;align-items:center;justify-content:center;width:40px;height:40px;border:1.5px solid var(--ink);border-radius:11px;font-family:var(--display);font-weight:700;font-size:13px;letter-spacing:.04em;flex:0 0 auto;}
-.lcode.sm{width:auto;height:auto;min-width:0;padding:3px 8px;border-radius:7px;font-size:12px;}
-/* Wochenleiste monochrom */
-.wd.met i{background:var(--ink);border-color:var(--ink);}
+.streak-row{display:flex;align-items:center;justify-content:space-between;gap:14px;background:var(--card);
+  border:1px solid var(--line);border-radius:var(--radius);padding:16px;margin-bottom:14px;cursor:pointer;}
+.streak-num{font-family:var(--display);font-weight:700;font-size:34px;line-height:1;}
+.streak-lbl{font-size:12.5px;color:var(--ink-soft);margin-top:2px;}
+.week-strip{display:flex;gap:7px;}
+.wd{display:flex;flex-direction:column;align-items:center;gap:5px;}
+.wd i{width:9px;height:9px;border-radius:50%;background:var(--line);display:block;}
+.wd.met i{background:var(--ink);}
 .wd.today i{box-shadow:0 0 0 2px var(--paper),0 0 0 4px var(--ink);}
-/* Feedback monochrom */
-.opt.correct{border-color:var(--ink);background:#F1F1EF;color:var(--ink);font-weight:600;}
-.opt.wrong{border-color:var(--ink-faint);background:transparent;color:var(--ink-faint);text-decoration:line-through;}
-.feedback.ok{background:#F1F1EF;color:var(--ink);}
-.feedback.no{background:#F1F1EF;color:var(--ink-soft);}
-.ans-input:focus,.field input:focus,.field select:focus,.opt:active{border-color:var(--ink);}
-/* Call-Screen dunkel & monochrom */
-.call-screen{background:linear-gradient(170deg,#26272B 0%, #0E0F12 100%);filter:grayscale(1);}
-/* verbleibende Emojis entsättigen */
-.mode-btn .mi,.orb,.streak-flame,.day-goal-done,.big-emoji{filter:grayscale(1);}
-/* Statistik */
-.sb-chart{display:flex;align-items:flex-end;gap:5px;height:84px;}
-.sb-col{flex:1;display:flex;align-items:flex-end;justify-content:center;}
-.sb-bar{width:70%;min-height:2px;background:var(--ink);border-radius:3px 3px 0 0;}
-.heatmap{display:flex;gap:5px;}
-.hm-col{display:flex;flex-direction:column;gap:5px;flex:1;}
-.hm-cell{aspect-ratio:1;border-radius:3px;background:var(--line-soft);border:1px solid var(--line);}
-.hm-1{background:#BFBFBC;border-color:#BFBFBC;}
-.hm-2{background:var(--ink);border-color:var(--ink);}
-.hm-future{opacity:.35;}
-.fc-example{font-size:13.5px;color:var(--ink-soft);margin-top:8px;line-height:1.4;max-width:320px;}
-.fc-example span{display:block;color:var(--ink-faint);font-size:12px;margin-top:3px;}
-.btn.live{background:var(--ink-faint);}
-.seg.seg-wrap{flex-wrap:wrap;}
-.seg.seg-wrap button{flex:1 1 30%;}
-/* Untere Tab-Leiste */
+.wd span{font-size:9.5px;color:var(--ink-faint);}
+
+.task{display:flex;align-items:center;gap:12px;width:100%;background:var(--card);border:1px solid var(--line);
+  border-radius:13px;padding:13px 14px;margin-bottom:9px;cursor:pointer;text-align:left;}
+.task .tk-ic{width:34px;height:34px;border-radius:50%;border:1.5px solid var(--line);display:flex;
+  align-items:center;justify-content:center;font-size:16px;flex:0 0 auto;}
+.task.done .tk-ic{background:var(--ink);color:#fff;border-color:var(--ink);}
+.tk-t{font-weight:600;font-size:15px;}
+.tk-d{font-size:12.5px;color:var(--ink-soft);}
+.tk-go{margin-left:auto;color:var(--ink-faint);font-size:20px;}
+
+.module-head{font-family:var(--display);font-weight:700;font-size:17px;margin:24px 2px 10px;}
+.unit{display:flex;align-items:center;gap:12px;width:100%;background:var(--card);border:1px solid var(--line);
+  border-radius:13px;padding:12px 14px;margin-bottom:8px;cursor:pointer;text-align:left;}
+.unit.done{opacity:.62;}
+.unit-num{width:30px;height:30px;border-radius:8px;border:1.5px solid var(--line);display:flex;align-items:center;
+  justify-content:center;font-size:13px;font-weight:700;flex:0 0 auto;}
+.unit.done .unit-num{background:var(--ink);color:#fff;border-color:var(--ink);}
+.unit-title{font-weight:600;font-size:14.5px;}
+.unit-can{font-size:12px;color:var(--ink-soft);}
+.unit-state{margin-left:auto;color:var(--ink-faint);}
+.mod-toggle{display:flex;align-items:center;gap:10px;width:100%;background:none;border:none;cursor:pointer;
+  padding:8px 2px;text-align:left;}
+.mod-toggle .mt-name{font-family:var(--display);font-weight:700;font-size:16px;flex:1;}
+.mod-toggle .mt-x{color:var(--ink-faint);font-size:13px;}
+
+.word{display:flex;justify-content:space-between;gap:12px;padding:9px 0;border-bottom:1px solid var(--line-soft);}
+.word:last-child{border-bottom:none;}
+.word b{font-weight:600;}
+.word span{color:var(--ink-soft);text-align:right;}
+
+.brief-prompt{background:var(--accent-tint);border-radius:12px;padding:14px;font-size:14.5px;line-height:1.5;white-space:pre-wrap;}
+.success li{margin-bottom:5px;}
+
+input,textarea,select{width:100%;border:1px solid var(--line);border-radius:12px;padding:12px 14px;font:inherit;
+  font-size:15px;background:var(--card);color:var(--ink);box-sizing:border-box;}
+textarea{resize:vertical;}
+input:focus,textarea:focus,select:focus{outline:none;border-color:var(--ink);}
+.field{margin-bottom:14px;}
+.field label{display:block;font-size:12.5px;font-weight:700;color:var(--ink-soft);margin-bottom:6px;}
+.hint{font-size:12.5px;color:var(--ink-faint);line-height:1.45;}
+.seg{display:flex;flex-wrap:wrap;gap:6px;}
+.seg button{flex:1 1 28%;background:var(--card);border:1px solid var(--line);border-radius:10px;padding:9px 6px;
+  font-size:13px;font-weight:600;color:var(--ink-soft);cursor:pointer;}
+.seg button.on{background:var(--ink);color:#fff;border-color:var(--ink);}
+
+.loading{display:flex;flex-direction:column;align-items:center;gap:14px;padding:60px 0;color:var(--ink-soft);}
+.spin{width:34px;height:34px;border:3px solid var(--line);border-top-color:var(--ink);border-radius:50%;animation:sp 1s linear infinite;}
+@keyframes sp{to{transform:rotate(360deg);}}
+.err{background:var(--accent-tint);border-radius:12px;padding:14px;color:var(--ink-soft);font-size:14px;}
+
+.toast{position:fixed;left:50%;bottom:calc(96px + var(--safe-bot));transform:translateX(-50%) translateY(12px);
+  background:var(--ink);color:#fff;padding:11px 18px;border-radius:999px;font-size:14px;opacity:0;transition:all .25s;
+  pointer-events:none;z-index:80;white-space:nowrap;}
+.toast.show{opacity:1;transform:translateX(-50%) translateY(0);}
+
 .tabbar{position:fixed;left:0;right:0;bottom:0;z-index:50;display:flex;background:var(--card);
   border-top:1px solid var(--line);padding:6px 4px calc(6px + var(--safe-bot));max-width:520px;margin:0 auto;}
-.tab{flex:1;background:none;border:none;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;
-  padding:5px 2px;color:var(--ink-faint);cursor:pointer;font:inherit;min-width:0;}
+.tab{flex:1;background:none;border:none;display:flex;flex-direction:column;align-items:center;justify-content:center;
+  gap:3px;padding:5px 2px;color:var(--ink-faint);cursor:pointer;font:inherit;min-width:0;}
 .tab .tab-ic{height:22px;display:flex;align-items:center;justify-content:center;font-size:19px;line-height:1;}
 .tab .tab-lb{font-size:10.5px;font-weight:600;max-width:100%;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
 .tab.on{color:var(--ink);}
 .tab.on .tab-lb{font-weight:800;}
-#app{padding-bottom:calc(88px + var(--safe-bot));}
-/* Sprach-Header & Werkzeuge */
-.ph-title{font-family:var(--display);font-weight:700;font-size:24px;display:flex;align-items:center;gap:9px;}
-.tool-row{display:flex;gap:8px;margin-top:10px;}
-.tool-row .btn{flex:1;margin-top:0;}
-/* Songtext-Analyse */
-textarea{width:100%;border:1px solid var(--line);border-radius:12px;padding:12px 14px;font:inherit;font-size:15px;background:var(--card);color:var(--ink);resize:vertical;box-sizing:border-box;}
-textarea:focus{outline:none;border-color:var(--ink);}
-.song-line{display:flex;align-items:center;justify-content:space-between;gap:10px;font-weight:600;font-size:15.5px;}
+
+.song-seg .song-line{display:flex;align-items:center;justify-content:space-between;gap:10px;font-weight:600;font-size:15px;}
 .song-de{color:var(--ink-soft);font-size:14px;margin-top:5px;}
 .song-vocab{margin-top:10px;border-top:1px solid var(--line-soft);padding-top:6px;}
-.song-gram{margin-top:8px;font-size:13.5px;color:var(--ink-soft);line-height:1.45;}
-.song-gram b{color:var(--ink);margin-right:4px;}
-.song-context{margin-top:8px;padding-top:8px;border-top:1px solid var(--line-soft);font-size:13.5px;color:var(--ink-soft);line-height:1.5;}
-.song-context b{color:var(--ink);margin-right:4px;}
+.song-gram,.song-context{margin-top:8px;font-size:13.5px;color:var(--ink-soft);line-height:1.5;}
+.song-context{border-top:1px solid var(--line-soft);padding-top:8px;}
+.song-gram b,.song-context b{color:var(--ink);margin-right:4px;}
+@media (prefers-reduced-motion: reduce){*{animation-duration:.001ms !important;}}
 </style>
 </head>
 <body>
 <div id="app"></div>
 <nav id="tabbar" class="tabbar" style="display:none"></nav>
-<div class="toast" id="toast"></div>
 
 <script>
 "use strict";
 
 /* =========================================================
-   sprich. — Sprachlern-PWA
-   Single-file. State in localStorage. KI via Anthropic-Endpoint.
+   Konfiguration
    ========================================================= */
-
-/* ---- statische Sprach-Konfiguration ---- */
+const STORE_KEY = "lernplanState_v1";
 const LANG_CONFIG = {
-  es: { name:"Spanisch",   flag:"🇪🇸", speak:"es-ES", aiName:"Spanisch",   accent:"#16171B", tint:"#EFEEEB", defLevel:"A2" },
-  fr: { name:"Französisch",flag:"🇫🇷", speak:"fr-FR", aiName:"Französisch",accent:"#16171B", tint:"#EFEEEB", defLevel:"A1" },
-  sv: { name:"Schwedisch", flag:"🇸🇪", speak:"sv-SE", aiName:"Schwedisch", accent:"#16171B", tint:"#EFEEEB", defLevel:"B1" },
+  es: { name:"Spanisch",    flag:"🇪🇸", aiName:"Spanisch",    defLevel:"A2" },
+  fr: { name:"Französisch", flag:"🇫🇷", aiName:"Französisch", defLevel:"A1" },
+  sv: { name:"Schwedisch",  flag:"🇸🇪", aiName:"Schwedisch",  defLevel:"B1" },
 };
 const LEVELS = ["A1","A2","B1","B2","C1","C2"];
+const PLAN_MODULES = 12;     // Module pro Sprache
+const UNITS_PER_MODULE = 7;  // Einheiten pro Modul
 
-/* Wortschatz-Ziel & Pfad-Größe */
-const WORD_GOAL_MIN = 6000, WORD_GOAL_MAX = 8000;
-const WORDS_PER_UNIT = 50;          // Zielgröße Wortschatz je Einheit
-const PATH_MODULES = 12;            // Anzahl Module
-const UNITS_PER_MODULE = 11;        // Einheiten je Modul  -> ~132 Einheiten -> ~6600 Wörter
-const FALLBACK_MODULES = [
-  "Erste Schritte & Begrüßung","Alltag & Tagesablauf","Zuhause & Wohnen",
-  "Menschen, Familie & Beziehungen","Essen, Trinken & Einkaufen","Unterwegs & Reisen",
-  "Arbeit, Schule & Beruf","Gesundheit & Körper","Freizeit, Hobbys & Kultur",
-  "Stadt, Natur & Umwelt","Gefühle, Meinungen & Diskussion","Welt, Medien & abstrakte Themen"
-];
 let ALLTAG = "";
 const REGISTERS = {
-  formell: { label:"Formell",
-    gen:"WICHTIG: Verwende gehobene, formelle Standardsprache (höflich, gepflegt, Schriftsprachen-Niveau). Keine Umgangssprache, keine Kurzformen, kein Slang. Beispiele aus seriösen/beruflichen Kontexten.",
-    call:"Sprich gepflegt und formell — höflich, gehobener Standard, wie in einem offiziellen oder beruflichen Gespräch. Keine saloppe Umgangssprache." },
-  neutral: { label:"Neutral",
-    gen:"WICHTIG: Verwende neutrale, klare Standardsprache — korrekt und natürlich, weder besonders formell noch besonders salopp. Beispiele aus dem normalen Leben.",
-    call:"Sprich in neutraler, klarer Standardsprache — natürlich, aber weder gestelzt noch besonders salopp." },
-  alltag: { label:"Alltag",
-    gen:"WICHTIG: Verwende natürliche, alltagsnahe Umgangssprache, wie Muttersprachler sie im echten Alltag wirklich sprechen — keine gestelzte Lehrbuchsprache. Häufige, praktische Wörter, typische Redewendungen, gängige Kurzformen, lockerer gesprochener Ton, Beispiele aus dem täglichen Leben.",
-    call:"Sprich natürliche, lockere Alltags-Umgangssprache, wie Muttersprachler im echten Alltag — gängige Alltagswörter, typische Wendungen, Kurzformen, gesprochener Ton." },
-  locker: { label:"Locker",
-    gen:"WICHTIG: Verwende deutlich lockere, sehr umgangssprachliche Sprache mit vielen typischen Wendungen, Kurzformen und Füllwörtern, wie man unter Freunden redet. Casual, aber gut verständlich.",
-    call:"Sprich sehr locker und umgangssprachlich, wie mit guten Freunden — viele gängige Wendungen, Kurzformen und Füllwörter, casual." },
-  slang: { label:"Viel Slang",
-    gen:"WICHTIG: Verwende stark saloppe Alltags- und Jugendsprache mit viel verbreitetem Slang und gängigen Szene-Ausdrücken (nicht vulgär), genau so, wie junge Muttersprachler casual unter sich reden. Erkläre Slang bei Bedarf kurz im Deutschen.",
-    call:"Sprich mit viel verbreitetem Slang und saloppen Ausdrücken (nicht vulgär), wie junge Muttersprachler casual unter sich — inkl. typischer Slang-Wörter und Füllwörter." }
+  neutral:{ label:"Neutral", gen:"Verwende natürliche Standardsprache, klar und korrekt." },
+  alltag: { label:"Alltag",  gen:"Verwende natürliche, alltagsnahe Umgangssprache, wie Muttersprachler im echten Alltag sprechen. Häufige, praktische Wörter und typische Wendungen." },
+  locker: { label:"Locker",  gen:"Verwende lockere, sehr umgangssprachliche Sprache mit typischen Wendungen und Kurzformen, wie unter Freunden." },
 };
 function registerKey(){ return (state.settings && state.settings.register) || "alltag"; }
-function applyRegister(){ ALLTAG = (REGISTERS[registerKey()]||REGISTERS.alltag).gen; }
-function registerCallRule(){ return (REGISTERS[registerKey()]||REGISTERS.alltag).call; }
+function applyRegister(){ ALLTAG = "WICHTIG: " + (REGISTERS[registerKey()]||REGISTERS.alltag).gen + " Wähle Themen und Beispiele aus dem echten täglichen Leben."; }
 
-/* ---- State ---- */
-const STORE_KEY = "sprichState_v1";
-let state = loadState();
-let view = { name:"home" };          // {name, lang?, unitId?}
-let call = null;                     // Call-Mode Laufzeitobjekt
+/* =========================================================
+   State
+   ========================================================= */
+let state, view = { name:"home" };
 
+function defaultState(){
+  const langs = {};
+  Object.keys(LANG_CONFIG).forEach(c=>{
+    langs[c] = { level:LANG_CONFIG[c].defLevel, plan:null, units:{}, briefs:{}, progress:{}, custom:[] };
+  });
+  return {
+    settings:{ endpoint:"https://api.anthropic.com/v1/messages", model:"claude-sonnet-4-6", register:"alltag" },
+    langs,
+    routine:{ langs:Object.keys(LANG_CONFIG), focusMode:"rotate" },
+    streak:{ current:0, longest:0, lastDate:null },
+    daily:null,
+    history:{}
+  };
+}
 function loadState(){
   try{
     const raw = localStorage.getItem(STORE_KEY);
-    if(raw) return JSON.parse(raw);
+    if(raw){ const s = JSON.parse(raw); return migrate(s); }
   }catch(e){}
-  // Default-State mit vorbelegten Niveaus
-  const langs = {};
-  for(const code in LANG_CONFIG){
-    langs[code] = { level:LANG_CONFIG[code].defLevel, xp:0, mastery:0.5, path:null, progress:{}, recent:[], lessons:{}, voiceURI:null };
-  }
-  return {
-    settings:{
-      endpoint:"https://api.anthropic.com/v1/messages",
-      model:"claude-sonnet-4-6",
-      rate:0.95
-    },
-    routine:{ langs:Object.keys(LANG_CONFIG), focusMode:"rotate", reviews:20, conv:true },
-    streak:{ current:0, longest:0, lastDate:null },
-    daily:null,
-    history:{},
-    langs
-  };
+  return defaultState();
+}
+function migrate(s){
+  const d = defaultState();
+  s.settings = Object.assign(d.settings, s.settings||{});
+  s.routine = Object.assign(d.routine, s.routine||{});
+  s.streak = s.streak || d.streak;
+  s.history = s.history || {};
+  s.langs = s.langs || d.langs;
+  Object.keys(LANG_CONFIG).forEach(c=>{
+    s.langs[c] = Object.assign({ level:LANG_CONFIG[c].defLevel, plan:null, units:{}, briefs:{}, progress:{}, custom:[] }, s.langs[c]||{});
+  });
+  return s;
 }
 function saveState(){ try{ localStorage.setItem(STORE_KEY, JSON.stringify(state)); }catch(e){} }
+state = loadState();
 
-/* Routine-/Streak-Felder für bestehende (ältere) States nachrüsten */
-function ensureRoutineState(){
-  if(!state.routine) state.routine = { langs:Object.keys(LANG_CONFIG), focusMode:"rotate", reviews:20, conv:true };
-  if(!Array.isArray(state.routine.langs) || !state.routine.langs.length) state.routine.langs = Object.keys(LANG_CONFIG);
-  if(!state.routine.focusMode) state.routine.focusMode = (state.routine.mode==="focus" && state.routine.focus) ? state.routine.focus : "rotate";
-  if(typeof state.routine.reviews!=="number") state.routine.reviews = 20;
-  if(typeof state.routine.conv!=="boolean") state.routine.conv = true;
-  if(!state.streak) state.streak = { current:0, longest:0, lastDate:null };
-  if(!state.history) state.history = {};
-}
-
-function L(code){ return { ...LANG_CONFIG[code], code, ...state.langs[code] }; }
-
-/* ---- Tages-/Wochen-Routine ---- */
+/* =========================================================
+   Helfer
+   ========================================================= */
+function app(){ return document.getElementById("app"); }
+function esc(s){ return String(s==null?"":s).replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;").replace(/"/g,"&quot;"); }
+function L(c){ return Object.assign({}, LANG_CONFIG[c], state.langs[c]); }
+function sleep(ms){ return new Promise(r=>setTimeout(r,ms)); }
+function loadingHTML(msg){ return `<div class="loading"><div class="spin"></div><div>${esc(msg)}</div></div>`; }
 function todayStr(d){ d=d||new Date(); return d.getFullYear()+"-"+String(d.getMonth()+1).padStart(2,"0")+"-"+String(d.getDate()).padStart(2,"0"); }
-function dateFromStr(s){ return new Date(s+"T00:00:00"); }
-
-function routineFocusForDate(t){
-  const r = state.routine;
-  const langs = (r.langs&&r.langs.length) ? r.langs : Object.keys(LANG_CONFIG);
-  if(r.focusMode && r.focusMode!=="rotate" && langs.includes(r.focusMode)) return r.focusMode;
-  const epochDay = Math.floor(dateFromStr(t).getTime()/86400000);
-  return langs[((epochDay % langs.length)+langs.length)%langs.length];
+function dateFromStr(s){ const [y,m,d]=s.split("-").map(Number); return new Date(y,m-1,d); }
+let toastT;
+function toast(msg){
+  let t = document.querySelector(".toast");
+  if(!t){ t=document.createElement("div"); t.className="toast"; document.body.appendChild(t); }
+  t.textContent=msg; t.classList.add("show");
+  clearTimeout(toastT); toastT=setTimeout(()=>t.classList.remove("show"),2200);
+}
+function copyText(txt){
+  const t = String(txt==null?"":txt);
+  if(navigator.clipboard && navigator.clipboard.writeText){
+    navigator.clipboard.writeText(t).then(()=>toast("Kopiert")).catch(()=>fallbackCopy(t));
+  }else fallbackCopy(t);
+}
+function fallbackCopy(t){
+  const ta=document.createElement("textarea"); ta.value=t; ta.style.position="fixed"; ta.style.opacity="0";
+  document.body.appendChild(ta); ta.focus(); ta.select();
+  try{ document.execCommand("copy"); toast("Kopiert"); }catch(e){ toast("Kopieren nicht möglich"); }
+  ta.remove();
 }
 
-function ensureToday(){
-  ensureRoutineState();
-  const t = todayStr();
-  if(!state.daily || state.daily.date!==t){
-    if(state.daily && state.daily.date){
-      state.history[state.daily.date] = {
-        goalMet:!!state.daily.goalMet, xp:state.daily.xp||0,
-        reviews:state.daily.reviews||0, lessonDone:!!state.daily.lessonDone, conv:state.daily.convDone?1:0
-      };
-    }
-    state.daily = { date:t, focus:routineFocusForDate(t), reviews:0,
-                    lessonDone:false, convDone:false, maint:{}, xp:0, goalMet:false };
-    saveState();
+function parseJSON(text){
+  let t = String(text||"").trim();
+  t = t.replace(/^```(json)?/i,"").replace(/```$/,"").trim();
+  return JSON.parse(t);
+}
+function extractObjects(text){
+  const out=[]; let depth=0, start=-1;
+  const s = String(text||"");
+  for(let i=0;i<s.length;i++){
+    const ch=s[i];
+    if(ch==="{"){ if(depth===0) start=i; depth++; }
+    else if(ch==="}"){ depth--; if(depth===0 && start>=0){ try{ out.push(JSON.parse(s.slice(start,i+1))); }catch(e){} start=-1; } }
   }
-  return state.daily;
-}
-
-function dailyTargetsMet(){
-  const r = state.routine, d = state.daily, f = d.focus;
-  const need = [ !!d.maint[f], d.lessonDone ];
-  if(r.conv) need.push(d.convDone);
-  r.langs.forEach(c=>{ if(c!==f) need.push(!!d.maint[c]); });
-  return need.every(Boolean);
-}
-function recomputeDaily(){
-  if(dailyTargetsMet() && !state.daily.goalMet){
-    state.daily.goalMet = true;
-    updateStreak();
-    saveState();
-    toast("Tagesziel erreicht! Streak "+state.streak.current);
-  }else{ saveState(); }
-}
-function updateStreak(){
-  const s = state.streak, t = state.daily.date;
-  if(s.lastDate===t) return;
-  const yesterday = todayStr(new Date(Date.now()-86400000));
-  s.current = (s.lastDate===yesterday) ? s.current+1 : 1;
-  s.lastDate = t;
-  s.longest = Math.max(s.longest||0, s.current);
-}
-
-/* Hooks aus den Lern-Aktivitäten */
-function recordReview(code, n){
-  ensureToday();
-  state.daily.reviews += (n||0);
-  state.daily.maint[code] = true;           // Auffrischung dieser Sprache erledigt
-  recomputeDaily();
-}
-function recordLessonDone(code){
-  ensureToday();
-  if(code===state.daily.focus) state.daily.lessonDone = true;
-  recomputeDaily();
-}
-function recordConv(code){
-  ensureToday();
-  if(code===state.daily.focus) state.daily.convDone = true;
-  recomputeDaily();
-}
-
-/* Wochenleiste: Mo–So der aktuellen Woche */
-function weekDates(){
-  const now = new Date();
-  const dow = (now.getDay()+6)%7; // Mo=0
-  const monday = new Date(now); monday.setDate(now.getDate()-dow);
-  const out=[]; for(let i=0;i<7;i++){ const d=new Date(monday); d.setDate(monday.getDate()+i); out.push(todayStr(d)); }
   return out;
 }
 
-/* ---- Akzentfarbe setzen ---- */
-function setAccent(code){
-  const root = document.documentElement.style;
-  root.setProperty("--accent", "#16171B");
-  root.setProperty("--accent-tint", "#EFEEEB");
-}
-
 /* =========================================================
-   KI-Aufruf
+   KI-Aufruf (über den Cloudflare-Worker / Anthropic-API)
    ========================================================= */
 async function callAI(system, messages, opts={}){
+  const endpoint = (state.settings.endpoint||"").trim() || "https://api.anthropic.com/v1/messages";
   const body = {
-    model: state.settings.model || "claude-sonnet-4-6",
-    max_tokens: opts.maxTokens || 1500,
+    model: (state.settings.model||"claude-sonnet-4-6").trim(),
+    max_tokens: opts.maxTokens || 2000,
     system,
     messages
   };
-  const res = await fetch(state.settings.endpoint, {
+  const res = await fetch(endpoint, {
     method:"POST",
     headers:{ "Content-Type":"application/json" },
     body: JSON.stringify(body)
   });
   if(!res.ok){
-    let detail="";
-    try{ detail = (await res.json()).error?.message || ""; }catch(e){}
-    throw new Error("API "+res.status+(detail?": "+detail:""));
+    if(res.status===401) throw new Error("Kein Zugriff (401) — Worker-Endpoint in den Einstellungen prüfen");
+    if(res.status===429) throw new Error("Zu viele Anfragen (429) — kurz warten");
+    throw new Error("Serverfehler "+res.status);
   }
   const data = await res.json();
-  const text = (data.content||[]).filter(b=>b.type==="text").map(b=>b.text).join("\n").trim();
+  const text = (data.content||[]).filter(b=>b.type==="text").map(b=>b.text).join("\n");
+  if(!text) throw new Error("Leere Antwort");
   return text;
 }
-
-/* robuste JSON-Extraktion */
-function parseJSON(text){
-  if(!text) throw new Error("Leere Antwort");
-  let t = text.replace(/```json/gi,"").replace(/```/g,"").trim();
-  try{ return JSON.parse(t); }catch(e){}
-  // erstes/letztes Klammerpaar herausschneiden
-  const firstObj = t.indexOf("{"), firstArr = t.indexOf("[");
-  let start = -1, openCh="{", closeCh="}";
-  if(firstArr!==-1 && (firstObj===-1 || firstArr<firstObj)){ start=firstArr; openCh="["; closeCh="]"; }
-  else if(firstObj!==-1){ start=firstObj; }
-  if(start>=0){
-    const end = t.lastIndexOf(closeCh);
-    if(end>start){
-      let sub = t.slice(start, end+1).replace(/,\s*([}\]])/g,"$1");
-      return JSON.parse(sub);
-    }
+async function callAIRetry(system, messages, opts={}){
+  let last;
+  for(let a=0;a<3;a++){
+    if(a) await sleep(600*a + Math.floor(Math.random()*300));
+    try{ return await callAI(system, messages, opts); }catch(e){ last=e; }
   }
-  throw new Error("Konnte JSON nicht lesen");
-}
-
-/* extrahiert ALLE vollständigen {…}-Objekte aus dem ersten [ … ]-Array,
-   auch wenn die Antwort abgeschnitten wurde */
-function extractObjects(text){
-  if(!text) return [];
-  const t = text.replace(/```json/gi,"").replace(/```/g,"");
-  const start = t.indexOf("[");
-  const from = start>=0 ? start : 0;
-  let inStr=false, escp=false, objStart=-1, depth=0;
-  const out=[];
-  for(let i=from;i<t.length;i++){
-    const c=t[i];
-    if(inStr){ if(escp) escp=false; else if(c==="\\") escp=true; else if(c==='"') inStr=false; continue; }
-    if(c==='"'){ inStr=true; continue; }
-    if(c==="{"){ if(objStart<0){ objStart=i; depth=1; } else depth++; }
-    else if(c==="}"){ if(objStart>=0){ depth--; if(depth===0){ try{ out.push(JSON.parse(t.slice(objStart,i+1))); }catch(e){} objStart=-1; } } }
-    else if(c==="]" && objStart<0 && start>=0){ break; }
-  }
-  return out;
+  throw last;
 }
 
 /* =========================================================
-   Sprachausgabe (TTS) + Spracherkennung (STT)
+   Lehrplan (fest hinterlegt) — Module → Lektionen
+   Tupel: [Titel, Thema/Situation, Kann-Ziel, Grammatik-Fokus]
    ========================================================= */
-let voicesReady = false, _voiceCount = -1;
-function loadVoices(){
-  if(!window.speechSynthesis) return;
-  const n = speechSynthesis.getVoices().length;
-  voicesReady = true;
-  if(n !== _voiceCount){
-    _voiceCount = n;
-    if(typeof view!=="undefined" && view && view.name==="settings") renderSettings();
-  }
-}
-if(window.speechSynthesis){
-  loadVoices();
-  speechSynthesis.onvoiceschanged = loadVoices;
-}
-function pickVoice(speakCode){
-  if(!window.speechSynthesis) return null;
-  const vs = speechSynthesis.getVoices();
-  if(!vs.length) return null;
-  const pref = speakCode.toLowerCase();
-  const base = pref.split("-")[0];
-  const exact = vs.filter(v=>v.lang.toLowerCase()===pref);
-  const loose = vs.filter(v=>v.lang.toLowerCase().startsWith(base));
-  const pool = exact.length ? exact : loose;
-  if(!pool.length) return null;
-  // hochwertige Stimmen bevorzugen (Enhanced/Premium/Neural/Siri), Kompakt meiden
-  const GOOD = /(enhanced|premium|neural|siri|natural|hd)/i;
-  const BAD  = /(compact|eloquence)/i;
-  return pool.find(v=>GOOD.test(v.name))
-      || pool.find(v=>!BAD.test(v.name))
-      || pool[0];
-}
-function resolveVoice(speakCode){
-  if(!window.speechSynthesis) return null;
-  const vs = speechSynthesis.getVoices();
-  const code = speakCode.split("-")[0].toLowerCase();
-  const saved = state.langs[code] && state.langs[code].voiceURI;
-  if(saved){ const m = vs.find(v=>v.voiceURI===saved); if(m) return m; }
-  return pickVoice(speakCode);
-}
-function speak(text, speakCode, onend){
-  if(!window.speechSynthesis){ if(onend) onend(); return; }
-  speechSynthesis.cancel();
-  const u = new SpeechSynthesisUtterance(text);
-  u.lang = speakCode;
-  const v = resolveVoice(speakCode);
-  if(v){ u.voice = v; u.lang = v.lang || speakCode; }
-  u.rate = state.settings.rate || 0.95;
-  u.pitch = 1.0;
-  if(onend){ u.onend = onend; u.onerror = onend; }
-  speechSynthesis.speak(u);
-}
-function stopSpeak(){ if(window.speechSynthesis) speechSynthesis.cancel(); }
+const CURRICULUM = {
+  fr: [
+    ["Erste Kontakte", [
+      ["Begrüßung & Verabschiedung","sich begrüßen und verabschieden","Kann jemanden begrüßen und sich verabschieden","être, höfliche Floskeln",["Begrüßungsformeln","Verabschiedung","Tageszeiten","Höflichkeit (s'il vous plaît, merci)"]],
+      ["Sich vorstellen","Name, Herkunft, Beruf nennen","Kann sich kurz vorstellen","s'appeler, venir de, Präsens",["Name & Buchstabieren","Herkunftsländer","Berufe","Sprachen"]],
+      ["Zahlen & Kontaktdaten","Alter, Telefonnummer, E-Mail","Kann Zahlen und Kontaktdaten nennen","Zahlen 0–100, avoir (l'âge)",["Zahlen 0–100","Alter","Telefon & E-Mail","Adresse"]],
+      ["Höflicher Smalltalk","bitte/danke, wie geht's","Kann höflich Smalltalk führen","Fragen mit est-ce que",["Befinden (ça va)","Höflichkeitsfloskeln","Dank & Entschuldigung","Abschiedswünsche"]],
+    ]],
+    ["Im Café & Essen", [
+      ["Im Café bestellen","ein Getränk/Snack bestellen","Kann im Café bestellen","je voudrais, Teilungsartikel (du/de la)",["Heißgetränke","Kaltgetränke","Snacks & Gebäck","Bestellfloskeln"]],
+      ["Im Restaurant","Speisekarte, bestellen, zahlen","Kann im Restaurant bestellen und zahlen","prendre/vouloir, l'addition",["Vor-/Haupt-/Nachspeise","Geschirr & Besteck","Bestellen","Bezahlen & Trinkgeld"]],
+      ["Lebensmittel einkaufen","Mengen und Preise","Kann Lebensmittel einkaufen","combien, Mengenangaben",["Obst & Gemüse","Mengen & Verpackungen","Preise","Geschäfte"]],
+      ["Über Essen sprechen","mögen / nicht mögen","Kann Vorlieben beim Essen ausdrücken","aimer/adorer/détester + Nomen",["Geschmack","Vorlieben & Abneigungen","Mahlzeiten","Allergien & Diät"]],
+    ]],
+    ["Orientierung & Wege", [
+      ["Nach dem Weg fragen","Richtung erfragen und verstehen","Kann nach dem Weg fragen","où est, Ortspräpositionen",["Richtungen","Ortsangaben","Entfernung","Wegmarken"]],
+      ["Öffentliche Verkehrsmittel","Ticket, Bus, Metro","Kann ein Ticket kaufen und fahren","prendre, aller à",["Verkehrsmittel","Ticket & Fahrkarte","Bahnhof & Haltestelle","Fahrplan & Zeiten"]],
+      ["In der Stadt","Orte benennen","Kann Orte in der Stadt benennen","il y a, bestimmte Artikel",["Gebäude & Orte","Geschäfte","Sehenswürdigkeiten","Stadtmöblierung"]],
+    ]],
+    ["Alltag & Tagesablauf", [
+      ["Mein Tagesablauf","den Tag beschreiben","Kann den Tagesablauf beschreiben","reflexive Verben (se lever)",["Morgenroutine","Tätigkeiten am Tag","Abendroutine","Reflexivverben"]],
+      ["Uhrzeit & Termine","Uhrzeit sagen, verabreden","Kann die Uhrzeit sagen und sich verabreden","quelle heure, à … heures",["Uhrzeit","Tageszeiten","Verabreden","Kalender"]],
+      ["Routinen & Häufigkeit","regelmäßige Aktivitäten","Kann über Gewohnheiten sprechen","Häufigkeitsadverbien",["Wochentage","Häufigkeitsadverbien","Hausarbeit","Freizeitroutinen"]],
+    ]],
+    ["Wohnen & Umgebung", [
+      ["Meine Wohnung","Zimmer und Möbel","Kann die Wohnung beschreiben","il y a, Ortspräpositionen",["Zimmer","Möbel","Haushaltsgeräte","Ortspräpositionen"]],
+      ["Wo ich wohne","Wohnort beschreiben","Kann den Wohnort beschreiben","habiter à/en, Ländernamen",["Wohnformen","Stadtteile","Nachbarschaft","Land vs. Stadt"]],
+    ]],
+    ["Einkaufen & Service", [
+      ["Kleidung kaufen","Größen und Farben","Kann Kleidung kaufen","Adjektiv-Angleichung, ce/cette",["Kleidungsstücke","Farben","Größen","Materialien"]],
+      ["Beim Bäcker & Markt","einkaufen mit Smalltalk","Kann einkaufen und höflich fragen","höflicher Imperativ",["Backwaren","Marktstände","Mengen","Bezahlen"]],
+    ]],
+    ["Freizeit & Menschen", [
+      ["Hobbys & Freizeit","über Hobbys sprechen","Kann über Freizeit sprechen","faire de / jouer à/de",["Sportarten","Freizeitaktivitäten","Musik & Spiele","faire/jouer"]],
+      ["Familie & Freunde","Personen beschreiben","Kann Personen beschreiben","Possessivbegleiter (mon/ma/mes)",["Familienmitglieder","Beziehungen","Aussehen","Charakter"]],
+      ["Wochenendpläne","Pläne nennen","Kann Pläne für das Wochenende nennen","futur proche (aller + Infinitiv)",["Freizeitorte","Verabredungen","Wetter","Vorhaben"]],
+    ]],
+    ["Unterwegs & Notfall", [
+      ["Im Hotel","einchecken, Zimmer","Kann im Hotel einchecken","höfliche Bitten (je voudrais)",["Unterkunftsarten","Zimmer & Ausstattung","Einchecken","Service & Beschwerden"]],
+      ["Beim Arzt & Apotheke","Beschwerden schildern","Kann Beschwerden beschreiben","avoir mal à, Körperteile",["Körperteile","Symptome","Medikamente","Termin & Praxis"]],
+      ["Um Hilfe bitten","kleine Notfälle","Kann um Hilfe bitten","Imperativ, pouvoir",["Notfallwörter","Hilfe holen","Probleme beschreiben","wichtige Nummern"]],
+    ]],
+  ],
+  es: [
+    ["Alltag auffrischen", [
+      ["Sich & andere vorstellen","Personen vorstellen","Kann sich und andere vorstellen","ser vs. estar",["Personalien","Nationalitäten","Berufe","Charakteradjektive"]],
+      ["Tagesablauf & Routinen","den Alltag schildern","Kann Routinen beschreiben","reflexive Verben, unregelm. Präsens",["Tagesablauf","Reflexivverben","Hausarbeit","Zeitangaben"]],
+      ["Vorlieben & Meinungen","mögen, finden","Kann Vorlieben ausdrücken","gustar-Konstruktion erweitert",["Hobbys","gustar-Wortschatz","Bewertungen","Häufigkeit"]],
+    ]],
+    ["Vergangenes erzählen", [
+      ["Letztes Wochenende","Erlebtes erzählen","Kann von gestern/letzter Woche erzählen","pretérito indefinido (regelmäßig)",["Freizeitaktivitäten","Zeitausdrücke (Vergangenheit)","Orte","Alltagsverben"]],
+      ["Eine Reise erzählen","Reiseerlebnis schildern","Kann eine Reise nacherzählen","indefinido unregelmäßig (ir/ser/hacer)",["Reisewortschatz","Transport","Unterkunft","Erlebnisverben"]],
+      ["Wie es früher war","Gewohnheiten in der Vergangenheit","Kann beschreiben, wie es früher war","imperfecto",["Kindheit","frühere Gewohnheiten","Schule","Beschreibungen"]],
+      ["Erzählen & beschreiben","Geschichte mit Hintergrund","Kann eine Geschichte erzählen","indefinido vs. imperfecto",["Verbindungswörter","Gefühle im Rückblick","Wetter & Umfeld","Zeitmarker"]],
+    ]],
+    ["Essen & Ausgehen", [
+      ["Im Restaurant","bestellen, empfehlen","Kann bestellen und nachfragen","höfliche Formen, pedir",["Gerichte & Tapas","Getränke","Bestellen","Bezahlen"]],
+      ["Kochen & Rezept","Anweisungen geben","Kann ein Rezept erklären","Imperativ (Anweisungen)",["Zutaten","Küchenverben","Mengen","Küchengeräte"]],
+      ["Einladung & Verabredung","sich verabreden","Kann sich verabreden","quedar, ir a + Infinitiv",["Verabredungsfloskeln","Orte","Zeitabsprachen","Zu-/Absagen"]],
+    ]],
+    ["Stadt, Reisen, Unterkunft", [
+      ["Weg & Verkehr","sich orientieren","Kann nach dem Weg fragen und ihn erklären","Imperativ, estar + Ort",["Richtungen","Verkehrsmittel","Ortspräpositionen","Tickets"]],
+      ["Hotel & Unterkunft","einchecken, Probleme","Kann eine Unterkunft regeln","condicional höflich (querría)",["Unterkunft","Zimmer & Ausstattung","Probleme melden","Service"]],
+      ["Reisepläne","Zukunft planen","Kann Reisepläne erklären","futuro simple",["Reiseziele","Buchung","Zukunftsausdrücke","Gepäck"]],
+    ]],
+    ["Arbeit & Studium", [
+      ["Über meinen Job","Beruf beschreiben","Kann über die Arbeit sprechen","llevar + Zeitdauer, Berufe",["Berufe","Arbeitsplatz","Aufgaben","Arbeitszeiten"]],
+      ["Termine & Absprachen","Verpflichtungen nennen","Kann Termine und Pflichten ausdrücken","tener que / deber",["Kalender","Verpflichtungen","Absprachen","Prioritäten"]],
+      ["Formell am Telefon","höfliche Kommunikation","Kann formell telefonieren/mailen","usted-Formen",["Telefonfloskeln","E-Mail-Formeln","Höflichkeit (usted)","Vereinbarungen"]],
+    ]],
+    ["Gesundheit & Wohlbefinden", [
+      ["Beim Arzt","Beschwerden schildern","Kann Beschwerden beschreiben","doler (wie gustar), Körperteile",["Körperteile","Symptome","doler-Wortschatz","Behandlung"]],
+      ["Gesund leben","Ratschläge geben","Kann Empfehlungen geben","deberías + Infinitiv",["Ernährung","Sport","Gewohnheiten","Ratschläge"]],
+    ]],
+    ["Meinungen & Gefühle", [
+      ["Meinung sagen","zustimmen/ablehnen","Kann seine Meinung äußern","creo que / me parece que",["Meinungsfloskeln","Zustimmung/Ablehnung","Argumente","Verbindungswörter"]],
+      ["Über Gefühle sprechen","Stimmungen ausdrücken","Kann Gefühle ausdrücken","estar + Adjektiv, ponerse",["Emotionen","estar + Adjektiv","Reaktionen","Befinden"]],
+      ["Wünsche & Pläne","Vorhaben nennen","Kann Wünsche ausdrücken","querer/esperar + Infinitiv",["Wunschverben","Zukunftspläne","Zeitangaben","Ziele"]],
+    ]],
+    ["Erweiterte Situationen", [
+      ["Einkaufen & reklamieren","umtauschen, sich beschweren","Kann reklamieren","Objektpronomen (lo/la/le)",["Geschäfte","Reklamation","Objektpronomen","Preise & Zahlung"]],
+      ["Smalltalk & Kultur","Vergleiche ziehen","Kann vergleichen und plaudern","comparativos (más … que)",["Smalltalk-Themen","Vergleiche","Feste & Bräuche","Wetter"]],
+      ["Was ist passiert","jüngste Ereignisse","Kann von kürzlich Geschehenem berichten","pretérito perfecto (he hecho)",["aktuelle Ereignisse","perfecto-Marker","Neuigkeiten","Reaktionen"]],
+    ]],
+  ],
+  sv: [
+    ["Über mich & andere", [
+      ["Ausführlich vorstellen","sich genauer vorstellen","Kann sich ausführlich vorstellen","Wortstellung (V2)",["Personalien","Werdegang","Interessen","Wortstellung"]],
+      ["Personen beschreiben","Charakter & Beziehungen","Kann Personen und Beziehungen beschreiben","Adjektivkomparation",["Charakter","Aussehen","Beziehungen","Komparation"]],
+      ["Gewohnheiten","Alltag und Häufigkeit","Kann über Gewohnheiten sprechen","Präsens + Häufigkeitsadverbien",["Alltag","Häufigkeitsadverbien","Freizeit","Routinen"]],
+    ]],
+    ["Erzählen & Vergangenheit", [
+      ["Eine Geschichte erzählen","Erlebtes schildern","Kann zusammenhängend erzählen","preteritum vs. perfekt",["Erzählverben","Verbindungswörter","Zeitausdrücke","Ereignisse"]],
+      ["Kindheit & früher","von früher berichten","Kann von der Vergangenheit erzählen","preteritum, brukade",["Kindheit","Schule","frühere Gewohnheiten","Erinnerungen"]],
+      ["Pläne & Zukunft","Vorhaben erklären","Kann über die Zukunft sprechen","ska / kommer att",["Zukunftsausdrücke","Vorhaben","Ziele","Zeitangaben"]],
+    ]],
+    ["Arbeit & Studium", [
+      ["Mein Arbeitsalltag","Beruf und Aufgaben","Kann den Arbeitsalltag beschreiben","Nebensätze mit att/som",["Beruf","Arbeitsplatz","Aufgaben","Nebensatzwörter"]],
+      ["Bewerbung & Gespräch","Vorstellungsgespräch","Kann sich beruflich präsentieren","bisatsordföljd (inte-Stellung)",["Bewerbung","Stärken & Schwächen","Vorstellungsgespräch","Lebenslauf"]],
+      ["Formelle Kommunikation","höfliche Anliegen","Kann formell kommunizieren","skulle (höflich/konditional)",["E-Mail-Formeln","Höflichkeit","Anliegen","Vereinbarungen"]],
+    ]],
+    ["Meinungen & Diskussion", [
+      ["Meinung begründen","Standpunkt vertreten","Kann Meinungen begründen","eftersom / därför att",["Meinungsverben","Kausalwörter","Argumente","Beispiele"]],
+      ["Zustimmen & widersprechen","Diskussion führen","Kann zustimmen und widersprechen","tycker/tror/anser",["Zustimmung","Widerspruch","Einschränkung","Diskussionsfloskeln"]],
+      ["Aktuelle Themen","über Themen diskutieren","Kann über aktuelle Themen sprechen","Passiv (-s-Form)",["Gesellschaftsthemen","Passivverben","Medienwortschatz","Statistik & Trends"]],
+    ]],
+    ["Alltag & Gesellschaft", [
+      ["Wohnen & Nachbarschaft","Wohnsituation","Kann Wohnen und Umgebung beschreiben","Relativsätze (som)",["Wohnen","Stadt & Land","Nachbarschaft","Relativsätze"]],
+      ["Einkaufen & reklamieren","umtauschen, beschweren","Kann reklamieren","Konditional (om … så)",["Geschäfte","Reklamation","Konditional","Bezahlen"]],
+      ["Gesundheit","Wohlbefinden, Ratschläge","Kann über Gesundheit sprechen","Modalverben (måste/borde)",["Körper","Symptome","Modalverben","Ratschläge"]],
+    ]],
+    ["Reisen & Erlebnisse", [
+      ["Reise planen & buchen","Buchung, Organisation","Kann eine Reise planen","Futur, Zeitausdrücke",["Reise","Buchung","Transport","Zeitausdrücke"]],
+      ["Von einer Reise erzählen","Erlebnisse schildern","Kann von Reisen erzählen","perfekt, sedan / för … sedan",["Erlebnisse","perfekt","sedan/för…sedan","Sehenswürdigkeiten"]],
+      ["Unerwartetes & Probleme","mit Problemen umgehen","Kann über Probleme berichten","Nebensätze, om/ifall",["Probleme","Nebensätze (om/ifall)","Reaktionen","Lösungen"]],
+    ]],
+    ["Kultur & Medien", [
+      ["Film & Buch besprechen","Inhalte wiedergeben","Kann Inhalte zusammenfassen","indirekte Rede, Relativsätze",["Genres","Handlung","indirekte Rede","Bewertung"]],
+      ["Schwedische Kultur","Gewohnheiten & Codes","Kann über Kultur sprechen","Komparation, generelles man",["Bräuche","Feste","generelles man","Vergleiche"]],
+    ]],
+    ["Feinheiten & Nuancen", [
+      ["Gefühle differenziert","Stimmungen genau ausdrücken","Kann Gefühle nuanciert ausdrücken","Partikelverben",["Emotionen","Partikelverben","Nuancen","Intensität"]],
+      ["Smalltalk & soziale Codes","lockerer Austausch","Kann sozial angemessen plaudern","lagom, Höflichkeitsstrategien",["Smalltalk","lagom","Höflichkeit","Small-Talk-Themen"]],
+      ["Spontan reagieren","schnell antworten","Kann spontan reagieren","Diskursmarker (ju/väl/ändå)",["Diskursmarker","Reaktionsfloskeln","Rückfragen","Füllwörter"]],
+    ]],
+  ],
+};
 
-const SR = window.SpeechRecognition || window.webkitSpeechRecognition;
-function sttAvailable(){ return !!SR; }
+
+let _modCache = {};
+function getModules(code){
+  if(_modCache[code]) return _modCache[code];
+  const mods = (CURRICULUM[code]||[]).map((m,mi)=>({
+    name: m[0],
+    units: m[1].map((u,ui)=>({
+      id: code+"-"+mi+"-"+ui, module:m[0],
+      title:u[0], theme:u[1], can_do:u[2], grammar:u[3]
+    }))
+  }));
+  _modCache[code] = mods;
+  return mods;
+}
+function registerPhrase(){
+  const k = registerKey();
+  if(k==="neutral") return "in natürlicher Standardsprache";
+  if(k==="locker")  return "sehr umgangssprachlich, wie unter Freunden";
+  return "in lockerer, natürlicher Alltagssprache";
+}
+function buildLanguaPrompt(code, unit){
+  const l = L(code);
+  return `Lass uns auf ${l.aiName} üben (mein Niveau: ${l.level}).
+Thema: ${unit.theme}. Ziel: ${unit.can_do}.
+Mach bitte ein realistisches Rollenspiel bzw. Gespräch dazu und bring typische Alltagswörter und Wendungen zu diesem Thema ein.
+Übe gezielt diesen Grammatik-Fokus mit mir: ${unit.grammar}.
+Sprich ${registerPhrase()}, korrigiere meine Fehler kurz und stell mir Rückfragen.`;
+}
+function buildBrief(code, unit){
+  return {
+    prompt: buildLanguaPrompt(code, unit),
+    grammar: unit.grammar,
+    success: [
+      "Ich kann das Thema 2–3 Minuten am Stück bestreiten.",
+      "Ich wende den Grammatik-Fokus ("+unit.grammar+") mehrmals korrekt an.",
+      "Ich habe neue Wörter in Langua gespeichert."
+    ]
+  };
+}
 
 /* =========================================================
-   Render-Router
+   Wortschatz-Themen (dezidiert pro Sprache, niveaukalibriert)
    ========================================================= */
-const app = ()=>document.getElementById("app");
+const VOCAB_TOPICS = {
+  fr: [
+    "Begrüßung & Höflichkeit","Zahlen, Datum & Uhrzeit","Farben & Formen","Familie & Personen",
+    "Körper & Gesundheit","Kleidung","Essen & Getränke","Im Café & Restaurant","Lebensmittel einkaufen",
+    "Haus, Zimmer & Möbel","Bad & Küche","Wetter & Jahreszeiten","Wochentage & Monate",
+    "Hobbys & Freizeit","Sport","Stadt & Gebäude","Wegbeschreibung & Richtungen","Verkehrsmittel",
+    "Reisen & Urlaub","Schule & Lernen","Arbeit & Berufe","Tiere","Natur","Gefühle (Basis)"
+  ],
+  es: [
+    "Vorstellung & persönliche Infos","Familie & Beziehungen","Tagesablauf & Routinen","Essen & Restaurant",
+    "Einkaufen & Geschäfte","Kleidung & Mode","Wohnen & Haushalt","Stadt & Orientierung","Reisen & Verkehr",
+    "Im Hotel","Gesundheit & Arztbesuch","Körper & Wohlbefinden","Wetter & Klima","Freizeit & Hobbys",
+    "Sport & Fitness","Arbeit & Beruf","Studium & Bildung","Technik & Handy","Gefühle & Charakter",
+    "Feste & Traditionen","Natur & Umwelt","Medien & Unterhaltung","Geld & Bank","Notfälle & Probleme"
+  ],
+  sv: [
+    "Persönlichkeit & Beziehungen","Arbeitswelt & Karriere","Bewerbung & Büro","Studium & Bildung",
+    "Gesundheit & Lebensstil","Wohnen & Einrichtung","Stadt & Gesellschaft","Reisen & Erlebnisse",
+    "Essen & Restaurantkultur","Einkaufen & Konsum","Geld & Wirtschaft (Alltag)","Technik & Digitales",
+    "Medien & Nachrichten","Umwelt & Natur","Politik & Gesellschaft","Gefühle & Stimmungen (nuanciert)",
+    "Meinungen & Argumentieren","Redewendungen & Alltagssprache","Schwedische Kultur","Feste & Feiertage",
+    "Verkehr & Mobilität","Freizeit & Sport","Soziales & Beziehungen","Konflikte & Probleme lösen"
+  ],
+};
+function vocabId(code, idx){ return "v-"+code+"-"+idx; }
+function vocabProgress(code){
+  const list = VOCAB_TOPICS[code]||[];
+  let done=0; list.forEach((_,i)=>{ if(unitDone(code, vocabId(code,i))) done++; });
+  return { total:list.length, done };
+}
+function buildVocabPrompt(code, topic){
+  const l = L(code);
+  return `Bring mir den wichtigsten Wortschatz zum Thema "${topic}" auf ${l.aiName} bei (mein Niveau: ${l.level}).
+Gib mir die ~15–20 nützlichsten Wörter und Wendungen, jeweils mit kurzer deutscher Bedeutung und einem Beispielsatz, ${registerPhrase()}.
+Speichere die Wörter in Langua, damit wir sie in Karten und Gesprächen üben. Frag mich danach ein paar davon spielerisch ab.`;
+}
 
+/* =========================================================
+   Tracking / Streak
+   ========================================================= */
+function routineFocusForDate(t){
+  const r = state.routine;
+  const langs = (r.langs&&r.langs.length)? r.langs : Object.keys(LANG_CONFIG);
+  if(r.focusMode && r.focusMode!=="rotate" && langs.includes(r.focusMode)) return r.focusMode;
+  const epochDay = Math.floor(dateFromStr(t).getTime()/86400000);
+  return langs[((epochDay % langs.length)+langs.length)%langs.length];
+}
+function ensureToday(){
+  const t = todayStr();
+  if(!state.daily || state.daily.date!==t){
+    if(state.daily && state.daily.date) state.history[state.daily.date] = { done:!!state.daily.done, sessions:state.daily.sessions||0 };
+    state.daily = { date:t, focus:routineFocusForDate(t), done:false, sessions:0 };
+    saveState();
+  }
+  return state.daily;
+}
+function updateStreak(){
+  const s=state.streak, t=state.daily.date;
+  if(s.lastDate===t) return;
+  const yest = todayStr(new Date(Date.now()-86400000));
+  s.current = (s.lastDate===yest)? s.current+1 : 1;
+  s.lastDate=t; s.longest=Math.max(s.longest||0,s.current);
+}
+function recordSessionDone(code, unitId){
+  ensureToday();
+  state.langs[code].progress[unitId] = "done";
+  state.daily.sessions += 1;
+  if(!state.daily.done){ state.daily.done=true; updateStreak(); }
+  saveState();
+}
+function unitDone(code, unitId){ return state.langs[code].progress[unitId]==="done"; }
+function findUnit(code, id){
+  for(const m of getModules(code)){ const u=m.units.find(x=>x.id===id); if(u) return u; }
+  return (state.langs[code].custom||[]).find(x=>x.id===id) || null;
+}
+function langProgress(code){
+  let total=0, done=0;
+  getModules(code).forEach(m=>m.units.forEach(u=>{ total++; if(unitDone(code,u.id)) done++; }));
+  (state.langs[code].custom||[]).forEach(u=>{ total++; if(unitDone(code,u.id)) done++; });
+  return { total, done };
+}
+
+/* =========================================================
+   Router
+   ========================================================= */
+function go(name, extra={}){ view = { name, ...extra }; render(); }
 function render(){
-  closeQuickVocab();
-  if(view.name==="call"){ updateFab(); renderCall(); return; }
-  if(view.name==="home"){ setAccent(null); renderHome(); }
-  else if(view.name==="settings"){ setAccent(view.lang||null); renderSettings(); }
-  else if(view.name==="path"){ setAccent(view.lang); renderPath(); }
-  else if(view.name==="vocab"){ setAccent(view.lang); renderVocab(); }
-  else if(view.name==="stats"){ setAccent(null); renderStats(); }
-  else if(view.name==="lesson"){ setAccent(view.lang); renderLesson(); }
-  else if(view.name==="song"){ setAccent(view.lang); renderSong(); }
-  updateFab();
+  applyRegister();
+  if(view.name==="home") renderHome();
+  else if(view.name==="lang") renderLang();
+  else if(view.name==="unit") renderUnit();
+  else if(view.name==="song") renderSong();
+  else if(view.name==="vocab") renderVocabList();
+  else if(view.name==="vocabitem") renderVocabItem();
+  else if(view.name==="stats") renderStats();
+  else if(view.name==="settings") renderSettings();
+  else renderHome();
+  updateTabs();
   window.scrollTo(0,0);
 }
-function updateFab(){
-  const bar = document.getElementById("tabbar");
-  if(!bar) return;
-  const hide = ["call","lesson"].includes(view.name);
-  if(hide){ bar.style.display="none"; return; }
-  bar.style.display = "flex";
-  const langs = (state.routine && state.routine.langs && state.routine.langs.length) ? state.routine.langs : Object.keys(LANG_CONFIG);
+function updateTabs(){
+  const bar = document.getElementById("tabbar"); if(!bar) return;
+  bar.style.display="flex";
+  const langs = (state.routine.langs&&state.routine.langs.length)? state.routine.langs : Object.keys(LANG_CONFIG);
   const isHome = view.name==="home";
   const homeIc = `<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 11l9-7 9 7"/><path d="M5 10v9h14v-9"/></svg>`;
   let tabs = `<button class="tab ${isHome?'on':''}" onclick="go('home')"><span class="tab-ic">${homeIc}</span><span class="tab-lb">Heute</span></button>`;
   langs.forEach(c=>{
     const active = !isHome && view.lang===c;
-    tabs += `<button class="tab ${active?'on':''}" onclick="go('path',{lang:'${c}'})"><span class="tab-ic">${LANG_CONFIG[c].flag}</span><span class="tab-lb">${LANG_CONFIG[c].name}</span></button>`;
+    tabs += `<button class="tab ${active?'on':''}" onclick="go('lang',{lang:'${c}'})"><span class="tab-ic">${LANG_CONFIG[c].flag}</span><span class="tab-lb">${LANG_CONFIG[c].name}</span></button>`;
   });
   bar.innerHTML = tabs;
 }
-function go(name, extra={}){ view = { name, ...extra }; render(); }
-
-function toast(msg){
-  const t = document.getElementById("toast");
-  t.textContent = msg; t.classList.add("show");
-  clearTimeout(t._t); t._t = setTimeout(()=>t.classList.remove("show"), 2200);
-}
 
 /* =========================================================
-   HOME
+   HEUTE
    ========================================================= */
+function weekDates(){
+  const now=new Date(), dow=(now.getDay()+6)%7, mon=new Date(now); mon.setDate(now.getDate()-dow);
+  const out=[]; for(let i=0;i<7;i++){ const d=new Date(mon); d.setDate(mon.getDate()+i); out.push(todayStr(d)); }
+  return out;
+}
+function nextUnit(code){
+  for(const m of getModules(code)){
+    for(const u of m.units){ if(!unitDone(code,u.id)) return { unit:u }; }
+  }
+  return null;
+}
 function renderHome(){
   const d = ensureToday();
-  const r = state.routine;
-  const focus = d.focus || routineFocusForDate(d.date) || Object.keys(LANG_CONFIG)[0];
-  const fl = L(focus);
-  setAccent(focus);
-
-  // 0-fällige Sprachen gelten automatisch als aufgefrischt
-  r.langs.forEach(c=>{ if(vocabStats(c).due===0 && !d.maint[c]) d.maint[c]=true; });
-  recomputeDaily();
-  maybeRemind();
-
-  const dueFocus = vocabStats(focus).due;
-
-  // Wochenleiste
-  const wk = weekDates(), t = d.date, dayLbls = ["M","D","M","D","F","S","S"];
+  const focus = d.focus;
+  const wk=weekDates(), t=d.date, lbl=["M","D","M","D","F","S","S"];
   const strip = wk.map((ds,i)=>{
-    const h = state.history[ds];
-    const met = ds===t ? d.goalMet : (h && h.goalMet);
-    return `<div class="wd ${met?'met':''} ${ds===t?'today':''}"><i></i><span>${dayLbls[i]}</span></div>`;
+    const h=state.history[ds]; const met = ds===t? d.done : (h&&h.done);
+    return `<div class="wd ${met?'met':''} ${ds===t?'today':''}"><i></i><span>${lbl[i]}</span></div>`;
   }).join("");
 
-  // Fokus-Aufgaben
-  const fTasks = [
-    { done:!!d.maint[focus], t:"Vokabeln wiederholen",
-      d:d.maint[focus]?(dueFocus===0?"Keine fälligen Wörter":"Erledigt"):`${dueFocus} fällig`,
-      onclick:`startTodayReviews('${focus}')` },
-    { done:d.lessonDone, t:"Neue Einheit lernen",
-      d:d.lessonDone?"Erledigt":"Nächste Einheit im Lernpfad", onclick:`openNextUnit('${focus}')` }
-  ];
-  if(r.conv) fTasks.push({ done:d.convDone, t:"Konversation üben",
-      d:d.convDone?"Erledigt":"Ein kurzes Gespräch", onclick:`go('call',{lang:'${focus}'})` });
-  const fTaskHTML = fTasks.map((tk,i)=>`
-    <button class="task ${tk.done?'done':''}" onclick="${tk.onclick}">
-      <span class="tk-ic">${tk.done?'✓':(i+1)}</span>
-      <div><div class="tk-t">${tk.t}</div><div class="tk-d">${tk.d}</div></div>
-      ${tk.done?'':'<span class="tk-go">›</span>'}
-    </button>`).join("");
+  const fl = LANG_CONFIG[focus];
+  const nx = nextUnit(focus);
+  let focusCard;
+  if(nx && nx.unit){
+    const u=nx.unit;
+    focusCard = `<button class="task" onclick="openUnit('${focus}','${u.id}')">
+      <span class="tk-ic">▸</span>
+      <div><div class="tk-t">${esc(u.title)}</div><div class="tk-d">${fl.name} · ${esc(u.can_do||u.theme)}</div></div>
+      <span class="tk-go">›</span></button>`;
+  }else{
+    focusCard = `<div class="card"><div class="tk-t">${fl.flag} ${fl.name}</div><p class="hint" style="margin-top:6px">Alle Einheiten erledigt 🎉</p></div>`;
+  }
 
-  // Auffrischung der übrigen Sprachen
-  const others = r.langs.filter(c=>c!==focus);
-  const maintHTML = others.map(c=>{
-    const lc = LANG_CONFIG[c], due = vocabStats(c).due, done = !!d.maint[c];
-    return `
-    <button class="task ${done?'done':''}" onclick="startTodayReviews('${c}')">
-      <span class="tk-ic">${done?'✓':lc.flag}</span>
-      <div><div class="tk-t">${lc.name}</div><div class="tk-d">${done?(due===0?"Keine fälligen Wörter":"Aufgefrischt"):`${due} Wörter fällig`}</div></div>
-      ${done?'':'<span class="tk-go">›</span>'}
-    </button>`;
+  const others = (state.routine.langs||Object.keys(LANG_CONFIG)).filter(c=>c!==focus);
+  const otherLinks = others.map(c=>{
+    const p=langProgress(c);
+    return `<button class="task" onclick="go('lang',{lang:'${c}'})">
+      <span class="tk-ic">${LANG_CONFIG[c].flag}</span>
+      <div><div class="tk-t">${LANG_CONFIG[c].name}</div><div class="tk-d">${p.done}/${p.total} Einheiten</div></div>
+      <span class="tk-go">›</span></button>`;
   }).join("");
-
-  // Tagesziel-Ring
-  const totalTasks = fTasks.length + others.length;
-  const doneTasks = fTasks.filter(x=>x.done).length + others.filter(c=>!!d.maint[c]).length;
-  const pct = totalTasks ? Math.round(doneTasks/totalTasks*100) : 0;
 
   app().innerHTML = `
     <div class="topbar">
-      <div class="brand">sprich<span>.</span></div>
+      <div class="brand">plan<span>.</span></div>
       <button class="iconbtn" onclick="go('settings')" aria-label="Einstellungen">⚙</button>
     </div>
 
-    <div class="streak-row" onclick="go('stats')" style="cursor:pointer">
+    <div class="streak-row" onclick="go('stats')">
       <div>
         <div class="streak-num">${state.streak.current}</div>
         <div class="streak-lbl">Tage in Folge${state.streak.longest>state.streak.current?` · Rekord ${state.streak.longest}`:''}</div>
@@ -809,1818 +635,398 @@ function renderHome(){
       <div class="week-strip">${strip}</div>
     </div>
 
-    <div class="plan-card">
-      <div class="plan-hero">
-        <div>
-          <span class="eyebrow" style="margin:0">Fokus heute</span>
-          <div class="plan-focus">${fl.flag} ${fl.name}</div>
-        </div>
-        ${ringSVG(pct)}
-      </div>
-      ${d.goalMet?`<div class="day-goal-done">Tagesziel erreicht 🎉</div>`:""}
-      ${fTaskHTML}
-      ${others.length?`<div class="plan-sub">Kurz auffrischen</div>${maintHTML}`:""}
-    </div>
+    <p class="eyebrow">Fokus heute · ${fl.name}</p>
+    ${focusCard}
 
-    <p class="hint" style="text-align:center;margin-top:18px">Wähle unten eine Sprache für Lektionen, Vokabeln, Songtexte und Gespräche.</p>
+    ${otherLinks?`<p class="eyebrow" style="margin-top:22px">Weitere Sprachen</p>${otherLinks}`:""}
+
+    <p class="hint" style="text-align:center;margin-top:18px">Öffne eine Einheit, kopiere den Langua-Auftrag und übe dort. Danach „erledigt" antippen.</p>
   `;
 }
 
-function ringSVG(pct){
-  const R=24, C=2*Math.PI*R, off=C*(1-pct/100);
-  return `<svg class="goal-ring" width="60" height="60" viewBox="0 0 60 60" aria-hidden="true">
-    <circle cx="30" cy="30" r="${R}" fill="none" stroke="var(--line)" stroke-width="6"/>
-    <circle cx="30" cy="30" r="${R}" fill="none" stroke="var(--accent)" stroke-width="6" stroke-linecap="round"
-      stroke-dasharray="${C.toFixed(1)}" stroke-dashoffset="${off.toFixed(1)}" transform="rotate(-90 30 30)"/>
-    <text x="30" y="35" text-anchor="middle" font-size="15" font-weight="800" fill="var(--ink)" style="font-family:var(--display)">${pct}%</text>
-  </svg>`;
-}
-function openLang(code){ go("path", { lang:code }); }
-
-/* Schnellzugriff Vokabeln */
-function openQuickVocab(){
-  closeQuickVocab();
-  const langs = (state.routine && state.routine.langs && state.routine.langs.length) ? state.routine.langs : Object.keys(LANG_CONFIG);
-  const rows = langs.map(c=>{
-    const vs = vocabStats(c);
-    const sub = vs.total ? `${vs.due} fällig · ${vs.total} Wörter` : "noch keine Vokabeln";
-    return `<button class="qrow" onclick="startQuickVocab('${c}')">
-      <span class="flag">${LANG_CONFIG[c].flag}</span>
-      <div style="flex:1;text-align:left"><b>${LANG_CONFIG[c].name}</b><div class="hint">${sub}</div></div>
-      <span class="tk-go">›</span></button>`;
-  }).join("");
-  const ov = document.createElement("div");
-  ov.id = "qoverlay"; ov.className = "qoverlay";
-  ov.onclick = (e)=>{ if(e.target===ov) closeQuickVocab(); };
-  ov.innerHTML = `<div class="qsheet">
-      <div class="qsheet-grip"></div>
-      <p class="eyebrow" style="margin:2px 0 12px">Schnell üben</p>
-      ${rows}
-      <button class="btn ghost" style="margin-top:12px" onclick="closeQuickVocab()">Abbrechen</button>
-    </div>`;
-  document.body.appendChild(ov);
-}
-function closeQuickVocab(){ const o=document.getElementById("qoverlay"); if(o) o.remove(); }
-async function startQuickVocab(code){
-  closeQuickVocab();
-  view = { name:"vocab", lang:code }; setAccent(code); updateFab();
-  if(vocabStats(code).total===0){ renderVocab(); return; }
-  app().innerHTML = loadingHTML("Bereite Vokabeln vor …");
-  await startVocabSession("mixed");
-}
-
-function startTodayReviews(code){
-  view = { name:"vocab", lang:code }; setAccent(code);
-  if(vocabStats(code).total===0) renderVocab();
-  else startVocabSession("mixed");
-}
-function openNextUnit(code){
-  const path = state.langs[code].path || [];
-  const prog = state.langs[code].progress || {};
-  const next = path.find(u=>prog[u.id]!=="done");
-  if(next) go("lesson", { lang:code, unitId:next.id });
-  else go("path", { lang:code });
-}
-function findUnit(code, id){
-  return (state.langs[code].path||[]).find(u=>u.id===id)
-      || (state.langs[code].custom||[]).find(u=>u.id===id) || null;
-}
-function addCustomTopic(code){
-  const theme = prompt("Worüber möchtest du lernen? (z. B. Im Krankenhaus, Klinische Studien, Wandern in den Alpen)");
-  if(!theme || !theme.trim()) return;
-  const u = { id:"custom-"+Date.now(), module:"Eigene Themen", level:state.langs[code].level,
-              title:theme.trim(), theme:theme.trim(), can_do:"Eigenes Thema" };
-  state.langs[code].custom = state.langs[code].custom || [];
-  state.langs[code].custom.unshift(u);
-  saveState();
-  go("lesson", { lang:code, unitId:u.id });
-}
-function deleteCustom(code, id){
-  state.langs[code].custom = (state.langs[code].custom||[]).filter(u=>u.id!==id);
-  saveState(); go("path",{lang:code});
-}
-
 /* =========================================================
-   STATISTIK
+   SPRACHE (Tab)
    ========================================================= */
-function dayRecord(ds){
-  if(state.daily && state.daily.date===ds) return { goalMet:state.daily.goalMet, reviews:state.daily.reviews, xp:state.daily.xp };
-  return state.history[ds] || null;
-}
-function renderStats(){
-  ensureToday();
-  // 14-Tage-Balken (Wiederholungen)
-  const days = []; for(let i=13;i>=0;i--) days.push(todayStr(new Date(Date.now()-i*86400000)));
-  const reviews = days.map(ds=>{ const r=dayRecord(ds); return r?(r.reviews||0):0; });
-  const maxR = Math.max(10, ...reviews);
-  const bars = reviews.map((v,i)=>{
-    const h = Math.round(v/maxR*72);
-    return `<div class="sb-col"><div class="sb-bar" style="height:${h}px;opacity:${v?1:.12}"></div></div>`;
-  }).join("");
-
-  // Heatmap: 8 Wochen (Mo-So)
-  const now = new Date(); const dow=(now.getDay()+6)%7;
-  const monday = new Date(now); monday.setDate(now.getDate()-dow-7*7);
-  let cols = "";
-  for(let w=0; w<8; w++){
-    let cells = "";
-    for(let dd=0; dd<7; dd++){
-      const dt = new Date(monday); dt.setDate(monday.getDate()+w*7+dd);
-      const ds = todayStr(dt); const rec = dayRecord(ds);
-      const future = dt > now;
-      const lvl = !rec ? 0 : (rec.goalMet ? 2 : (rec.reviews>0?1:0));
-      cells += `<div class="hm-cell hm-${lvl} ${future?'hm-future':''}" title="${ds}"></div>`;
-    }
-    cols += `<div class="hm-col">${cells}</div>`;
-  }
-
-  const totWords = Object.keys(LANG_CONFIG).reduce((s,c)=>s+buildVocabPool(c).length,0);
-  const totMastered = Object.keys(LANG_CONFIG).reduce((s,c)=>s+vocabStats(c).mastered,0);
-  const activeDays = Object.keys(state.history).filter(k=>state.history[k].goalMet).length + (state.daily.goalMet?1:0);
-  const totXp = Object.keys(LANG_CONFIG).reduce((s,c)=>s+(state.langs[c].xp||0),0);
-
-  app().innerHTML = `
-    <button class="back" onclick="go('home')">‹ Zurück</button>
-    <h1 class="page-title">Statistik</h1>
-    <p class="page-sub">Dein Verlauf auf einen Blick</p>
-
-    <div class="vstats">
-      <div class="vstat"><b>${state.streak.current}</b><span>STREAK</span></div>
-      <div class="vstat"><b>${state.streak.longest||0}</b><span>REKORD</span></div>
-      <div class="vstat"><b>${activeDays}</b><span>AKTIVE TAGE</span></div>
-    </div>
-    <div class="vstats">
-      <div class="vstat"><b>${totWords}</b><span>WÖRTER</span></div>
-      <div class="vstat"><b>${totMastered}</b><span>GEFESTIGT</span></div>
-      <div class="vstat"><b>${totXp}</b><span>XP</span></div>
-    </div>
-
-    <p class="eyebrow" style="margin-top:24px">Wiederholungen · 14 Tage</p>
-    <div class="lesson-card"><div class="sb-chart">${bars}</div></div>
-
-    <p class="eyebrow" style="margin-top:8px">Aktivität · 8 Wochen</p>
-    <div class="lesson-card"><div class="heatmap">${cols}</div>
-      <p class="hint" style="margin:10px 0 0;">Gefüllt = Tagesziel erreicht · halb = geübt</p>
-    </div>
-
-    <p class="eyebrow" style="margin-top:8px">Pro Sprache</p>
-    ${Object.keys(LANG_CONFIG).map(c=>{
-      const vs=vocabStats(c);
-      return `<div class="lesson-card" style="display:flex;align-items:center;gap:12px;">
-        <span class="flag">${LANG_CONFIG[c].flag}</span>
-        <div style="flex:1"><b>${LANG_CONFIG[c].name}</b><div class="hint">${vs.total} Wörter · ${vs.mastered} gefestigt · ${vs.due} fällig</div></div>
-      </div>`;
-    }).join("")}
-  `;
-}
-
-
-/* =========================================================
-   PATH (Lernpfad)
-   ========================================================= */
-async function renderPath(){
+function openLang(code){ go("lang",{lang:code}); }
+async function renderLang(){
   const code = view.lang, l = L(code);
-  const isFocus = view.lang===ensureToday().focus;
+  const p = langProgress(code);
   app().innerHTML = `
     <div class="topbar">
       <div class="ph-title">${l.flag} ${l.name}</div>
       <button class="iconbtn" onclick="go('settings')" aria-label="Einstellungen">⚙</button>
     </div>
     <div style="display:flex;align-items:center;gap:8px;margin:0 0 16px;">
-      <span class="chip" style="background:var(--accent-tint);color:var(--ink);">Niveau ${l.level}</span>
-      ${isFocus?`<span class="chip">★ Fokus heute</span>`:""}
+      <span class="chip">Niveau ${l.level}</span>
+      ${p.total?`<span class="chip">${p.done}/${p.total} erledigt</span>`:""}
     </div>
 
     <p class="eyebrow">Werkzeuge</p>
-    <button class="btn" onclick="go('vocab',{lang:'${code}'})">Vokabeltrainer</button>
-    <div class="tool-row">
-      <button class="btn soft sm" onclick="go('call',{lang:'${code}'})">Gespräch</button>
+    <button class="btn soft" onclick="go('vocab',{lang:'${code}'})">Wortschatz-Themen</button>
+    <div class="row" style="margin:10px 0">
       <button class="btn soft sm" onclick="go('song',{lang:'${code}'})">Songtext</button>
       <button class="btn soft sm" onclick="addCustomTopic('${code}')">Eigenes Thema</button>
     </div>
+    <a class="btn ghost" href="https://languatalk.com" target="_blank" rel="noopener">Langua öffnen ↗</a>
 
-    <p class="eyebrow" style="margin-top:24px">Lernpfad</p>
-    <div id="pathBody"></div>
+    <p class="eyebrow" style="margin-top:24px">Lernplan</p>
+    <div id="planBody"></div>
   `;
-  // Module einmalig erzeugen (1 Aufruf). Alte Pfade ohne Modul-Liste werden migriert.
-  if(!Array.isArray(state.langs[code].modules) || !state.langs[code].modules.length){
-    state.langs[code].path = [];
-    state.langs[code].progress = {};
-    const setLoad = (m)=>{ const b=document.getElementById("pathBody"); if(b) b.innerHTML = loadingHTML(m); };
-    setLoad("Plane den Kurs …");
-    try{
-      state.langs[code].modules = await generateModules(code);
-      saveState();
-    }catch(e){
-      const hint = apiHint(e.message);
-      document.getElementById("pathBody").innerHTML =
-        `<div class="err">Kurs konnte nicht erstellt werden.<br>${esc(e.message)}${hint?`<br><br>${esc(hint)}`:""}</div>
-         <button class="btn ghost" onclick="renderPath()">Erneut versuchen</button>
-         <button class="btn soft" style="margin-top:10px" onclick="go('settings')">Zu den Einstellungen</button>`;
-      return;
-    }
-  }
-  openModuleIdx = null; moduleLoading = {}; moduleErr = {}; moduleErrMsg = {};
-  paintUnits();
+  paintPlan(code);
 }
-
-let openModuleIdx = null;
-let moduleLoading = {};
-let moduleErr = {};
-let moduleErrMsg = {};
-
-function sleep(ms){ return new Promise(r=>setTimeout(r, ms)); }
-
-function apiHint(msg){
-  msg = String(msg||"");
-  if(/401|403|unauthor|authentic|api key/i.test(msg))
-    return "Kein gültiger API-Zugang. Wenn du die App außerhalb von claude.ai nutzt (eigene Datei oder GitHub Pages), ruft sie direkt api.anthropic.com auf und das verlangt einen Schlüssel. Trag in den Einstellungen (Zahnrad) beim API-Endpoint deinen Cloudflare-Worker ein.";
-  if(/429|rate|too many/i.test(msg))
-    return "Rate-Limit erreicht. Kurz warten und erneut versuchen.";
-  return "";
-}
-
-function wordsLearned(code){
-  const lessons = state.langs[code].lessons || {};
-  let n = 0;
-  for(const k in lessons){ const v = lessons[k] && lessons[k].vocab; if(Array.isArray(v)) n += v.length; }
-  return n;
-}
-
-const PATH_JSON_SYS = "Du bist Kursdesigner:in für Sprachen nach GER (CEFR). Antworte AUSSCHLIESSLICH mit einem gültigen JSON-Array, ohne Markdown, ohne Erklärtext.";
-
-async function generateModules(code){
-  const l = LANG_CONFIG[code];
-  const lvl = state.langs[code].level;
-  let names = [], lastErr = "";
-  for(let attempt=0; attempt<2 && !names.length; attempt++){
-    if(attempt) await sleep(800);
-    try{
-      const mt = await callAI(PATH_JSON_SYS, [{role:"user",content:
-        `Entwirf ${PATH_MODULES} thematische Module für einen umfassenden, progressiven ${l.aiName}-Kurs, der von Niveau ${lvl} schrittweise bis etwa C1 führt und insgesamt einen Wortschatz von ${WORD_GOAL_MIN}–${WORD_GOAL_MAX} Wörtern abdeckt. Fokus auf praktische Alltagssituationen, die man im echten Leben wirklich braucht. Von leicht nach schwer, ohne thematische Lücken. JSON-Array, jeder Eintrag {"name":"Modulname auf Deutsch"}. ${ALLTAG}`
-      }], {maxTokens:700});
-      names = extractObjects(mt).map(m=>m.name).filter(Boolean);
-      if(!names.length) lastErr = "Leere Antwort vom Modell";
-    }catch(e){ lastErr = e.message; }
-  }
-  if(!names.length) throw new Error(lastErr || "Keine Module erhalten");
-  // bei Teilerfolg mit Standardmodulen auffüllen
-  names = names.slice(0, PATH_MODULES);
-  let i = 0;
-  while(names.length < PATH_MODULES && FALLBACK_MODULES[i]){ if(!names.includes(FALLBACK_MODULES[i])) names.push(FALLBACK_MODULES[i]); i++; }
-
-  const startIdx = Math.max(0, LEVELS.indexOf(lvl));
-  const endIdx = LEVELS.indexOf("C1");
-  return names.map((name,mi)=>({
-    name,
-    level: LEVELS[Math.min(LEVELS.length-1, Math.round(startIdx + (endIdx-startIdx) * mi / Math.max(1, names.length-1)))],
-    loaded: false
-  }));
-}
-
-async function loadModuleUnits(code, mi){
-  const mod = state.langs[code].modules[mi];
-  if(!mod || mod.loaded) return true;
-  const l = LANG_CONFIG[code];
-  let arr = [], lastErr = "";
-  for(let attempt=0; attempt<3 && !arr.length; attempt++){
-    await sleep(attempt===0 ? 350 : 900*attempt);   // Aufrufe entzerren + Backoff
-    try{
-      const ut = await callAI(PATH_JSON_SYS, [{role:"user",content:
-        `Modul "${mod.name}" eines ${l.aiName}-Kurses auf Niveau ${mod.level}. Erstelle ${UNITS_PER_MODULE} konkrete Einheiten zu diesem Modul, von leicht nach schwer. Jede Einheit ist ein klar abgegrenztes, praktisches Alltags-Wortfeld mit etwa ${WORDS_PER_UNIT} Vokabeln. JSON-Array, jeder Eintrag {"title":"kurzer deutscher Titel","theme":"konkrete Alltagssituation/Wortfeld","can_do":"Kann-Beschreibung auf Deutsch, max 8 Wörter"}. ${ALLTAG}`
-      }], {maxTokens:1600});
-      arr = extractObjects(ut).filter(u=>u && (u.title||u.theme));
-      if(!arr.length) lastErr = "Leere Antwort vom Modell";
-    }catch(e){ lastErr = e.message; }
-  }
-  if(!arr.length){ moduleErrMsg[mi] = lastErr; return false; }
-  const units = arr.map((u,ui)=>({
-    id:`m${mi}-u${ui+1}`,
-    module:mod.name,
-    level:mod.level,
-    title:u.title||("Einheit "+(ui+1)),
-    theme:u.theme||u.title||"",
-    can_do:u.can_do||""
-  }));
-  state.langs[code].path = (state.langs[code].path||[]).filter(u=>u.module!==mod.name).concat(units);
-  mod.loaded = true;
-  saveState();
-  return true;
-}
-
-function paintUnits(){
-  const code = view.lang, l = L(code);
-  const modules = state.langs[code].modules || [];
-  const path = state.langs[code].path || [];
-  const progress = state.langs[code].progress || {};
-  if(openModuleIdx===null) openModuleIdx = 0;
-
-  const learned = wordsLearned(code);
-  const goalPct = Math.min(100, Math.round(learned / WORD_GOAL_MIN * 100));
-  const estWords = PATH_MODULES * UNITS_PER_MODULE * WORDS_PER_UNIT;
-  const doneCount = Object.values(progress).filter(s=>s==="done").length;
-
-  let html = `
-    <div class="goal-card" style="--lc:${l.accent};">
-      <div class="goal-top">
-        <b>${learned} Wörter</b>
-        <span>Ziel ${WORD_GOAL_MIN.toLocaleString('de-DE')}–${WORD_GOAL_MAX.toLocaleString('de-DE')}</span>
-      </div>
-      <div class="bar"><i style="width:${goalPct}%"></i></div>
-      <p class="hint" style="margin:9px 0 0;">${modules.length} Module · ${doneCount} Einheiten abgeschlossen · Kurs deckt ~${estWords.toLocaleString('de-DE')} Wörter ab</p>
-    </div>
-    <div style="text-align:right;margin:0 0 12px;">
-      <button class="btn soft sm" style="width:auto" onclick="regeneratePath('${code}')">↻ Pfad neu erstellen</button>
-    </div>`;
-
-  // Eigene Themen
-  const custom = state.langs[code].custom || [];
-  if(custom.length){
+function paintPlan(code){
+  const lang = state.langs[code], box = document.getElementById("planBody");
+  if(!box) return;
+  const mods = getModules(code);
+  let html = "";
+  if((lang.custom||[]).length){
     html += `<div class="module-head">Eigene Themen</div>`;
-    custom.forEach(u=>{
-      const st = progress[u.id];
-      html += `
-      <button class="unit ${st==='done'?'done':''}" onclick="openUnit('${u.id}')">
-        <span class="unit-num">${st==='done'?'✓':'★'}</span>
-        <div class="unit-body">
-          <div class="unit-title">${esc(u.title)}</div>
-          <div class="unit-can">Eigenes Thema · ${u.level||''}</div>
-        </div>
-        <span class="unit-state">›</span>
-      </button>`;
+    lang.custom.forEach(u=>{
+      html += `<button class="unit ${unitDone(code,u.id)?'done':''}" onclick="openUnit('${code}','${u.id}')">
+        <span class="unit-num">${unitDone(code,u.id)?'✓':'★'}</span>
+        <div><div class="unit-title">${esc(u.title)}</div><div class="unit-can">${esc(u.can_do||u.theme)}</div></div>
+        <span class="unit-state">›</span></button>`;
     });
   }
-
-  modules.forEach((mod,mi)=>{
-    const mUnits = path.filter(u=>u.module===mod.name);
-    const gDone = mUnits.filter(u=>progress[u.id]==="done").length;
-    const isOpen = mi===openModuleIdx;
-    html += `<button class="module-head mh-toggle" onclick="toggleModule(${mi})">
-        <span>${esc(mod.name)} <span class="hint" style="font-weight:400">· ${mod.level}</span></span>
-        <span class="mh-meta">${mod.loaded?`${gDone}/${mUnits.length}`:'…'} ${isOpen?'▴':'▾'}</span>
+  mods.forEach((mod,mi)=>{
+    const open = lang._open===mi;
+    const doneCount = mod.units.filter(u=>unitDone(code,u.id)).length;
+    html += `<button class="mod-toggle" onclick="toggleModule('${code}',${mi})">
+        <span class="mt-name">${mi+1}. ${esc(mod.name)}</span>
+        <span class="mt-x">${doneCount}/${mod.units.length} ${open?'▲':'▾'}</span>
       </button>`;
-    if(isOpen){
-      if(!mod.loaded){
-        html += moduleErr[mi]
-          ? `<div class="err">Einheiten konnten nicht geladen werden.${moduleErrMsg[mi]?`<br><span style="opacity:.8">${esc(moduleErrMsg[mi])}</span>`:""}${apiHint(moduleErrMsg[mi])?`<br><br>${esc(apiHint(moduleErrMsg[mi]))}`:""}</div>
-             <button class="btn ghost" onclick="retryModule(${mi})">Erneut versuchen</button>`
-          : loadingHTML("Lade Einheiten …");
-      }else{
-        mUnits.forEach((u,idx)=>{
-          const st = progress[u.id];
-          const prevDone = idx===0 || progress[mUnits[idx-1].id]==="done";
-          const locked = !prevDone && st!=="done";
-          html += `
-          <button class="unit ${st==='done'?'done':''}" ${locked?'disabled':''} onclick="openUnit('${u.id}')">
-            <span class="unit-num">${st==='done'?'✓':(idx+1)}</span>
-            <div class="unit-body">
-              <div class="unit-title">${esc(u.title)}</div>
-              <div class="unit-can">${esc(u.can_do||u.theme||"")}${u.level?` · ${u.level}`:""}</div>
-            </div>
-            <span class="unit-state">${locked?'🔒':(st==='done'?'':'›')}</span>
-          </button>`;
-        });
-      }
+    if(open){
+      mod.units.forEach((u,k)=>{
+        html += `<button class="unit ${unitDone(code,u.id)?'done':''}" onclick="openUnit('${code}','${u.id}')">
+          <span class="unit-num">${unitDone(code,u.id)?'✓':(k+1)}</span>
+          <div><div class="unit-title">${esc(u.title)}</div><div class="unit-can">${esc(u.can_do||u.theme)} · ${esc(u.grammar)}</div></div>
+          <span class="unit-state">›</span></button>`;
+      });
     }
   });
-
-  document.getElementById("pathBody").innerHTML = html;
-
-  // offenes, noch nicht geladenes Modul nachladen
-  const openMod = modules[openModuleIdx];
-  if(openMod && !openMod.loaded && !moduleLoading[openModuleIdx] && !moduleErr[openModuleIdx]){
-    moduleLoading[openModuleIdx] = true;
-    const targetIdx = openModuleIdx;
-    loadModuleUnits(code, targetIdx).then(ok=>{
-      moduleLoading[targetIdx] = false;
-      if(!ok) moduleErr[targetIdx] = true;
-      if(view.name==="path") paintUnits();
-    });
-  }
+  box.innerHTML = html;
 }
-function toggleModule(i){ openModuleIdx = (openModuleIdx===i ? -1 : i); paintUnits(); }
-function retryModule(mi){ moduleErr[mi] = false; moduleErrMsg[mi] = ""; paintUnits(); }
-function regeneratePath(code){
-  if(!confirm("Neuen Kurs für diese Sprache erstellen? Der bisherige Fortschritt dieser Sprache wird dabei zurückgesetzt.")) return;
-  state.langs[code].modules = null;
-  state.langs[code].path = [];
-  state.langs[code].progress = {};
-  state.langs[code].lessons = {};
+function toggleModule(code, mi){
+  const lang = state.langs[code];
+  lang._open = (lang._open===mi)? undefined : mi;
+  paintPlan(code);
+}
+function addCustomTopic(code){
+  const theme = prompt("Eigenes Thema (z. B. Beim Arzt, Klinische Studien, Wohnung mieten):");
+  if(!theme || !theme.trim()) return;
+  const grammar = prompt("Grammatik-Fokus (optional, z. B. Perfekt, Konjunktiv):") || "";
+  const u = { id:"custom-"+Date.now(), module:"Eigene Themen", title:theme.trim(), theme:theme.trim(), can_do:"Eigenes Thema", grammar:(grammar.trim()||"frei") };
+  state.langs[code].custom = state.langs[code].custom||[];
+  state.langs[code].custom.unshift(u);
   saveState();
-  go("path", { lang:code });
+  openUnit(code, u.id);
 }
-function openUnit(id){ go("lesson", { lang:view.lang, unitId:id }); }
 
 /* =========================================================
-   LESSON: Wortschatz -> Übungen -> Konversationen
-   lessons[unitId] = { vocab:[{term,de,cat}], exercises:[...]|null, scenarios:[...]|null }
+   EINHEIT / SESSION-BRIEF
    ========================================================= */
-let lessonRT = null; // {ex, step, correct, answered}
-
-function ensureLesson(code, unitId){
-  if(!state.langs[code].lessons[unitId]) state.langs[code].lessons[unitId] = { vocab:null, exercises:null, scenarios:null };
-  return state.langs[code].lessons[unitId];
+function openUnit(code, unitId){ go("unit",{lang:code, unitId}); }
+function renderUnit(){
+  const code=view.lang, unitId=view.unitId, l=L(code);
+  const unit = findUnit(code, unitId);
+  if(!unit){ app().innerHTML=`<button class="back" onclick="go('lang',{lang:'${code}'})">‹ Zurück</button><div class="err">Einheit nicht gefunden.</div>`; return; }
+  paintBrief(code, unit, buildBrief(code, unit));
 }
-
-async function renderLesson(){
-  const code = view.lang, l = L(code);
-  const unit = findUnit(code, view.unitId);
+function paintBrief(code, unit, brief){
+  const l = L(code), done = unitDone(code, unit.id);
+  const success = brief.success.length? `<ul class="success">${brief.success.map(s=>`<li>${esc(s)}</li>`).join("")}</ul>` : "";
   app().innerHTML = `
-    <button class="back" onclick="go('path',{lang:'${code}'})">‹ ${esc(l.name)}</button>
+    <button class="back" onclick="go('lang',{lang:'${code}'})">‹ ${esc(l.name)}</button>
     <h1 class="page-title">${esc(unit.title)}</h1>
-    <p class="page-sub">${esc(unit.can_do||unit.theme||"")}</p>
-    <div id="lessonBody"></div>
-  `;
-  const lesson = ensureLesson(code, unit.id);
-  if(!lesson.vocab){
-    document.getElementById("lessonBody").innerHTML = loadingHTML("Stelle den kompletten Wortschatz zusammen …");
-    try{
-      lesson.vocab = await generateVocab(code, unit);
-      saveState();
-    }catch(e){
-      document.getElementById("lessonBody").innerHTML =
-        `<div class="err">Wortschatz konnte nicht geladen werden.<br>${esc(e.message)}</div>
-         <button class="btn ghost" onclick="renderLesson()">Erneut versuchen</button>`;
-      return;
-    }
-  }
-  paintLessonIntro(lesson, unit);
-}
+    <p class="page-sub">${esc(unit.theme)} · Niveau ${l.level}</p>
 
-async function vocabBatch(code, unit, partLabel, exclude){
-  const l = LANG_CONFIG[code];
-  const lvl = unit.level || state.langs[code].level;
-  const exTxt = exclude.length ? `\nVermeide Dopplungen zu diesen bereits gelisteten Begriffen: ${exclude.slice(0,60).join(", ")}.` : "";
-  const sys = "Du bist Wortschatz-Didaktiker:in nach GER. Antworte AUSSCHLIESSLICH mit einem gültigen JSON-Array, ohne Markdown, ohne Erklärtext.";
-  const usr = `Sprache: ${l.aiName}. Niveau: ${lvl}. Thema: "${unit.theme||unit.title}". ${partLabel}.
-Liste ALLE wesentlichen Vokabeln und Wendungen dieses Teils (typisch 16-22 Einträge), gegliedert über das Feld "cat". Bevorzuge das, was man im echten Alltag wirklich sagt und braucht.
-JSON-Array, jeder Eintrag: {"term":"<Wort/Phrase in ${l.aiName}, ggf. mit Artikel>","de":"<deutsche Bedeutung>","cat":"<Untergruppe auf Deutsch>"}.${exTxt}
-${ALLTAG}`;
-  const txt = await callAI(sys, [{role:"user",content:usr}], {maxTokens:2500});
-  return extractObjects(txt).filter(v=>v && v.term)
-    .map(v=>({ term:String(v.term), de:String(v.de||""), cat:String(v.cat||"Wortschatz") }));
-}
+    <p class="eyebrow">Grammatik-Fokus</p>
+    <div class="card"><b>${esc(unit.grammar)}</b><div class="hint" style="margin-top:4px">${esc(unit.can_do)}</div></div>
 
-async function generateVocab(code, unit){
-  const setLoad = (m)=>{ const b=document.getElementById("lessonBody"); if(b) b.innerHTML=loadingHTML(m); };
-  const parts = [
-    "Teil 1: zentrale Substantive des Themas",
-    "Teil 2: wichtige Verben und Adjektive des Themas",
-    "Teil 3: nützliche Wendungen, Redemittel und weiterer themenspezifischer Wortschatz"
-  ];
-  const seen = new Set(), all = [];
-  for(let i=0;i<parts.length;i++){
-    setLoad(`Stelle den Wortschatz zusammen (${i+1}/${parts.length}) …`);
-    let batch = [];
-    try{ batch = await vocabBatch(code, unit, parts[i], all.map(v=>v.term)); }catch(e){}
-    let added = 0;
-    batch.forEach(v=>{ const k=v.term.toLowerCase(); if(!seen.has(k)){ seen.add(k); all.push(v); added++; } });
-    if(i>=1 && added<4) break;   // genug Wortschatz beisammen
-  }
-  if(!all.length) throw new Error("Leere Vokabelliste");
-  // nach Gruppe clustern, Reihenfolge des ersten Auftretens beibehalten
-  const order=[], map={};
-  all.forEach(v=>{ const c=v.cat||"Wortschatz"; if(!map[c]){ map[c]=[]; order.push(c);} map[c].push(v); });
-  const out=[]; order.forEach(c=>map[c].forEach(v=>out.push(v)));
-  return out;
-}
-
-async function generateExercises(code, unit, vocab){
-  const l = LANG_CONFIG[code];
-  const lvl = unit.level || state.langs[code].level;
-  const terms = (vocab||[]).slice(0,40).map(v=>v.term+" = "+v.de).join("; ");
-  const sys = "Du erstellst Sprachübungen nach GER. Antworte AUSSCHLIESSLICH mit einem gültigen JSON-Array, ohne Markdown, ohne Erklärtext.";
-  const usr = `Sprache: ${l.aiName}. Niveau: ${lvl}. Thema: "${unit.theme||unit.title}".
-Erstelle 10 abwechslungsreiche Übungen, die GENAU diesen Wortschatz testen: ${terms}
-JSON-Array. Erlaubte Typen:
-{"type":"mc","q":"Frage auf Deutsch","options":["<4 Optionen in ${l.aiName}>"],"answer":"<exakt eine der Optionen>","explain":"kurz Deutsch"}
-{"type":"translate","prompt":"<deutscher Satz oder Wort>","answer":"<Übersetzung in ${l.aiName}>","alts":["<optionale gleichwertige Lösung>"]}
-{"type":"fill","sentence":"<Satz in ${l.aiName} mit ___ als Lücke>","answer":"<Lückenwort in ${l.aiName}>","hint":"<Tipp auf Deutsch>"}
-{"type":"listen","text":"<kurzer Satz in ${l.aiName}>","options":["<4 deutsche Bedeutungen>"],"answer":"<exakt eine der Optionen>"}
-Mische die Typen. Sätze und Beispiele aus dem echten Alltag, in natürlicher Umgangssprache. Bei "answer" muss der Wert exakt einem options-Eintrag entsprechen. Niveau ${lvl}.
-${ALLTAG}`;
-  const txt = await callAI(sys, [{role:"user",content:usr}], {maxTokens:3000});
-  const arr = extractObjects(txt).filter(e=>e && e.type);
-  if(!arr.length) throw new Error("Keine Übungen erhalten");
-  return arr;
-}
-
-async function generateScenarios(code, unit){
-  const l = LANG_CONFIG[code];
-  const lvl = unit.level || state.langs[code].level;
-  const sys = "Du entwirfst Gesprächssituationen für Sprachtraining. Antworte AUSSCHLIESSLICH mit einem gültigen JSON-Array, ohne Markdown.";
-  const usr = `Sprache: ${l.aiName}. Niveau: ${lvl}. Thema: "${unit.theme||unit.title}".
-Entwirf 3 konkrete, realistische Alltags-Gesprächssituationen zu genau diesem Thema, in denen die lernende Person den Themen-Wortschatz natürlich anwendet.
-JSON-Array, jeder Eintrag: {"t":"kurzer Titel auf Deutsch","d":"1 kurze deutsche Beschreibung","p":"Rollen-/Situationsanweisung auf Deutsch (wer bist du, wo sind wir, Ziel) — locker und alltagsnah, mit der Anweisung, in natürlicher Umgangssprache zu sprechen"}.
-${ALLTAG}`;
-  const txt = await callAI(sys, [{role:"user",content:usr}], {maxTokens:1200});
-  let arr = extractObjects(txt).filter(s=>s && s.p);
-  if(!arr.length) arr = SCENARIOS[code].slice(0,3);
-  return arr.map(s=>({ t:s.t||"Gespräch", d:s.d||"", p:s.p }));
-}
-
-function paintLessonIntro(lesson, unit){
-  const code = view.lang, l = L(code);
-  // nach Gruppe rendern
-  let html = "", lastCat = null, first = true;
-  lesson.vocab.forEach(v=>{
-    const cat = v.cat || "Wortschatz";
-    if(cat!==lastCat){
-      lastCat = cat;
-      html += `<div class="vgroup-label${first?' first':''}">${esc(cat)}</div>`;
-      first = false;
-    }
-    html += `
-      <div class="vocab-row">
-        <div class="vocab-term">${esc(v.term)}
-          <button onclick="speak(${esc(JSON.stringify(v.term))},'${l.speak}')" aria-label="anhören">🔊</button>
-        </div>
-        <div class="vocab-de">${esc(v.de)}</div>
-      </div>`;
-  });
-  const done = state.langs[code].progress[unit.id]==="done";
-  document.getElementById("lessonBody").innerHTML = `
-    <div class="lesson-card">
-      <h3>Wortschatz <span class="vocab-count">· ${lesson.vocab.length} Einträge</span></h3>
-      ${html}
-    </div>
-    <button class="btn" onclick="startExercises()">Übungen starten</button>
-    <button class="btn ghost" style="margin-top:10px" onclick="startUnitConversation()">Konversation zum Thema üben</button>
-    ${done?`<p class="hint" style="text-align:center;margin-top:12px">✓ Übungen dieser Einheit bereits abgeschlossen</p>`:""}
-  `;
-}
-
-async function startExercises(){
-  const code = view.lang, unitId = view.unitId;
-  const lesson = ensureLesson(code, unitId);
-  if(!lesson.exercises){
-    document.getElementById("lessonBody").innerHTML = loadingHTML("Erstelle Übungen zum Wortschatz …");
-    const unit = findUnit(code, unitId);
-    try{
-      lesson.exercises = await generateExercises(code, unit, lesson.vocab);
-      saveState();
-    }catch(e){
-      document.getElementById("lessonBody").innerHTML =
-        `<div class="err">Übungen konnten nicht geladen werden.<br>${esc(e.message)}</div>
-         <button class="btn ghost" onclick="renderLesson()">Zurück</button>`;
-      return;
-    }
-  }
-  lessonRT = { ex:lesson.exercises, step:0, correct:0, answered:false };
-  paintExercise();
-}
-
-async function startUnitConversation(){
-  const code = view.lang, unitId = view.unitId;
-  const lesson = ensureLesson(code, unitId);
-  if(!lesson.scenarios){
-    document.getElementById("lessonBody").innerHTML = loadingHTML("Bereite Gesprächssituationen vor …");
-    const unit = findUnit(code, unitId);
-    try{
-      lesson.scenarios = await generateScenarios(code, unit);
-      saveState();
-    }catch(e){
-      lesson.scenarios = SCENARIOS[code].slice(0,3);
-    }
-  }
-  go("call", { lang:code, unitId });
-}
-
-function paintExercise(){
-  const code = view.lang, l = L(code);
-  const rt = lessonRT, ex = rt.ex[rt.step];
-  const dots = rt.ex.map((_,i)=>`<i class="${i<=rt.step?'on':''}"></i>`).join("");
-  let bodyHTML = "";
-
-  if(ex.type==="mc" || ex.type==="listen"){
-    const prompt = ex.type==="listen" ? "Hörverstehen" : "Wähle die richtige Antwort";
-    const qHTML = ex.type==="listen"
-      ? `<div class="q-text"><button class="btn soft sm" onclick="speak(${esc(JSON.stringify(ex.text))},'${l.speak}')">🔊 Nochmal hören</button></div>
-         <p style="color:var(--ink-soft);font-size:14px;margin:-8px 0 16px;">Was bedeutet der Satz?</p>`
-      : `<div class="q-text">${esc(ex.q)}</div>`;
-    const opts = (ex.options||[]).map((o,i)=>`<button class="opt" data-i="${i}" onclick="answerMC(${i})">${esc(o)}</button>`).join("");
-    bodyHTML = `<p class="q-prompt">${prompt}</p>${qHTML}<div id="opts">${opts}</div>`;
-    if(ex.type==="listen") setTimeout(()=>speak(ex.text, l.speak), 350);
-  }
-  else if(ex.type==="translate" || ex.type==="fill"){
-    const prompt = ex.type==="translate" ? "Übersetze ins "+l.name : "Ergänze die Lücke";
-    const q = ex.type==="translate" ? esc(ex.prompt) : esc(ex.sentence);
-    const cls = ex.type==="fill" ? "q-text target" : "q-text";
-    bodyHTML = `
-      <p class="q-prompt">${prompt}</p>
-      <div class="${cls}">${q}</div>
-      <input class="ans-input" id="ansInput" placeholder="${ex.type==='fill'?'Lückenwort':'Deine Übersetzung'}…" autocomplete="off" autocapitalize="off" autocorrect="off"
-        onkeydown="if(event.key==='Enter')submitText()">
-      ${ex.hint?`<p style="font-size:13px;color:var(--ink-faint);margin-top:8px;">💡 ${esc(ex.hint)}</p>`:""}
-      <button class="btn" style="margin-top:18px" onclick="submitText()">Prüfen</button>
-    `;
-  }
-
-  app().innerHTML = `
-    <button class="back" onclick="quitExercises()">‹ Abbrechen</button>
-    <div class="ex-progress">${dots}</div>
-    <p style="font-size:13px;color:var(--ink-faint);margin:0 0 16px;">Übung ${rt.step+1} von ${rt.ex.length}</p>
-    <div id="exBody">${bodyHTML}</div>
-    <div id="exFeedback"></div>
-  `;
-}
-
-function answerMC(i){
-  if(lessonRT.answered) return;
-  lessonRT.answered = true;
-  const ex = lessonRT.ex[lessonRT.step];
-  const correctIdx = (ex.options||[]).findIndex(o=>norm(o)===norm(ex.answer));
-  const ok = i===correctIdx;
-  document.querySelectorAll(".opt").forEach((b,bi)=>{
-    b.onclick=null;
-    if(bi===correctIdx) b.classList.add("correct");
-    else if(bi===i) b.classList.add("wrong");
-    else b.classList.add("dim");
-  });
-  showFeedback(ok, ex.answer, ex.explain);
-}
-
-function submitText(){
-  if(lessonRT.answered) return;
-  const ex = lessonRT.ex[lessonRT.step];
-  const val = (document.getElementById("ansInput").value||"").trim();
-  if(!val){ toast("Bitte etwas eintippen"); return; }
-  lessonRT.answered = true;
-  const candidates = [ex.answer, ...(ex.alts||[])].filter(Boolean);
-  const ok = candidates.some(c=>norm(c)===norm(val) || stripAccents(norm(c))===stripAccents(norm(val)));
-  const inp = document.getElementById("ansInput");
-  inp.style.borderColor = ok ? "var(--ok)" : "var(--bad)";
-  inp.disabled = true;
-  showFeedback(ok, ex.answer, ex.explain);
-}
-
-function showFeedback(ok, answer, explain){
-  if(ok) lessonRT.correct++;
-  const code = view.lang, l = L(code);
-  const last = lessonRT.step === lessonRT.ex.length-1;
-  const fb = document.getElementById("exFeedback");
-  fb.innerHTML = `
-    <div class="feedback ${ok?'ok':'no'}">
-      <b>${ok?'Richtig! 🎉':'Nicht ganz'}</b>
-      ${!ok?`Richtig wäre: <strong>${esc(answer)}</strong><br>`:''}
-      ${explain?esc(explain):''}
-      ${!ok?`<button class="btn soft sm" style="margin-top:10px" onclick="speak(${esc(JSON.stringify(answer))},'${l.speak}')">🔊 anhören</button>`:''}
-    </div>
-    <button class="btn" style="margin-top:14px" onclick="nextExercise()">${last?'Lektion abschließen':'Weiter'}</button>
-  `;
-  fb.scrollIntoView({behavior:"smooth", block:"center"});
-}
-
-function nextExercise(){
-  if(lessonRT.step < lessonRT.ex.length-1){
-    lessonRT.step++; lessonRT.answered=false; paintExercise();
-  }else{
-    finishLesson();
-  }
-}
-function quitExercises(){ stopSpeak(); go("lesson", {lang:view.lang, unitId:view.unitId}); }
-
-function finishLesson(){
-  stopSpeak();
-  const code = view.lang, l = state.langs[code];
-  const total = lessonRT.ex.length;
-  const score = lessonRT.correct/total;
-  const firstTime = l.progress[view.unitId] !== "done";
-  l.progress[view.unitId] = "done";
-  if(firstTime) l.xp += 20 + Math.round(score*30);
-  // gleitender Mastery-Wert
-  l.mastery = +(l.mastery*0.6 + score*0.4).toFixed(3);
-  saveState();
-  if(firstTime){ ensureToday(); state.daily.xp += 20 + Math.round(score*30); recordLessonDone(code); }
-
-  const lvlSuggest = suggestLevel(code);
-  app().innerHTML = `
-    <div style="text-align:center;padding:40px 0;">
-      <div class="big-emoji" style="font-size:64px;margin-bottom:8px;">${score>=0.8?'🌟':score>=0.5?'👍':'💪'}</div>
-      <h1 class="page-title">Lektion geschafft</h1>
-      <p class="page-sub">${lessonRT.correct} von ${total} richtig · +${firstTime?(20+Math.round(score*30)):0} XP</p>
-      <div class="lesson-card" style="text-align:left;">
-        <div class="vocab-row"><span>Trefferquote</span><b>${Math.round(score*100)}%</b></div>
-        <div class="vocab-row"><span>Gesamtfortschritt (Mastery)</span><b>${Math.round(l.mastery*100)}%</b></div>
+    <p class="eyebrow" style="margin-top:20px">Auftrag für Langua</p>
+    <div class="card">
+      <div class="brief-prompt">${esc(brief.prompt)}</div>
+      <div class="row" style="margin-top:12px">
+        <button class="btn sm" onclick="copyText(${esc(JSON.stringify(brief.prompt))})">Prompt kopieren</button>
+        <a class="btn ghost sm" href="https://languatalk.com" target="_blank" rel="noopener" style="line-height:1.4">Langua öffnen ↗</a>
       </div>
-      ${lvlSuggest?`<div class="grammar-note" style="text-align:left;margin-bottom:16px;">${lvlSuggest.msg}
-        <button class="btn sm" style="margin-top:10px" onclick="applyLevel('${code}','${lvlSuggest.level}')">Auf ${lvlSuggest.level} wechseln</button></div>`:""}
-      <button class="btn" onclick="startUnitConversation()">Konversation zum Thema</button>
-      <button class="btn ghost" style="margin-top:10px" onclick="go('path',{lang:'${code}'})">Weiter im Lernpfad</button>
+      <p class="hint" style="margin:10px 0 0">In Langua einfügen, sprechen, und die neuen Wörter dort speichern — Langua webt sie dann in Karten und Gespräche ein.</p>
     </div>
+
+    ${success?`<p class="eyebrow" style="margin-top:20px">Geschafft, wenn …</p><div class="card">${success}</div>`:""}
+
+    <button class="btn ${done?'ghost':''}" style="margin-top:8px" onclick="markUnit('${code}','${unit.id}')">${done?'✓ Erledigt — nochmal markieren':'Als erledigt markieren'}</button>
   `;
 }
-
-/* Niveau-Adaption: Vorschlag auf Basis von Mastery */
-function suggestLevel(code){
-  const l = state.langs[code];
-  const idx = LEVELS.indexOf(l.level);
-  const doneCount = Object.values(l.progress).filter(s=>s==="done").length;
-  if(l.mastery>0.85 && idx<LEVELS.length-1 && doneCount>=2){
-    return { level:LEVELS[idx+1], msg:`Stark — deine Trefferquote ist hoch. Bereit für Niveau <b>${LEVELS[idx+1]}</b>?` };
-  }
-  if(l.mastery<0.4 && idx>0){
-    return { level:LEVELS[idx-1], msg:`Das war fordernd. Möchtest du auf <b>${LEVELS[idx-1]}</b> wechseln, um sicherer zu werden?` };
-  }
-  return null;
-}
-function applyLevel(code, level){
-  state.langs[code].level = level;
-  state.langs[code].path = null;       // neuen Pfad fürs neue Niveau erzeugen
-  state.langs[code].progress = {};
-  state.langs[code].lessons = {};
-  state.langs[code].mastery = 0.5;
-  saveState();
-  toast("Niveau auf "+level+" gesetzt");
-  go("path", {lang:code});
+function markUnit(code, unitId){
+  const was = unitDone(code, unitId);
+  if(was){ state.langs[code].progress[unitId]=undefined; saveState(); toast("Markierung entfernt"); }
+  else { recordSessionDone(code, unitId); toast("Erledigt 🎉 Streak "+state.streak.current); }
+  const unit=findUnit(code,unitId);
+  if(unit) paintBrief(code, unit, buildBrief(code, unit));
 }
 
 /* =========================================================
-   VOKABELTRAINER (Spaced Repetition)
-   srs[key] = { ease, interval(Tage), reps, lapses, due(ts) }
-   clozeCache[key] = { cloze, answer, de }
+   WORTSCHATZ-THEMEN
    ========================================================= */
-const DAY = 86400000;
-let vocabRT = null; // {code, mode, queue, pos, reviewed, correct}
-
-function srsStore(code){ return state.langs[code].srs || (state.langs[code].srs = {}); }
-function clozeStore(code){ return state.langs[code].clozeCache || (state.langs[code].clozeCache = {}); }
-function srsKey(term){ return norm(term); }
-
-/* Alle freigeschalteten Vokabeln einer Sprache, dedupliziert */
-function buildVocabPool(code){
-  const lessons = state.langs[code].lessons || {};
-  const seen = new Set(), pool = [];
-  for(const k in lessons){
-    const v = lessons[k] && lessons[k].vocab;
-    if(!Array.isArray(v)) continue;
-    v.forEach(it=>{
-      const key = srsKey(it.term);
-      if(it.term && !seen.has(key)){ seen.add(key); pool.push({ term:it.term, de:it.de, cat:it.cat||"" }); }
-    });
-  }
-  return pool;
-}
-function getRec(code, term){ return srsStore(code)[srsKey(term)] || null; }
-
-function scheduleRec(code, term, grade){
-  const s = srsStore(code), k = srsKey(term);
-  let r = s[k] || { ease:2.3, interval:0, reps:0, lapses:0, due:0 };
-  const now = Date.now();
-  if(grade==="again"){
-    r.reps = 0; r.lapses++; r.ease = Math.max(1.3, r.ease - 0.2); r.interval = 0; r.due = now;
-  }else{
-    r.reps++;
-    if(r.reps===1) r.interval = (grade==="easy") ? 3 : 1;
-    else if(r.reps===2) r.interval = (grade==="easy") ? 7 : 3;
-    else r.interval = Math.round(r.interval * r.ease * (grade==="hard"?0.7 : grade==="easy"?1.3 : 1));
-    if(grade==="hard") r.ease = Math.max(1.3, r.ease - 0.15);
-    if(grade==="easy") r.ease = r.ease + 0.15;
-    r.interval = Math.max(1, r.interval);
-    r.due = now + r.interval*DAY;
-  }
-  s[k] = r; return r;
-}
-
-function vocabStats(code){
-  const pool = buildVocabPool(code), now = Date.now();
-  let due=0, fresh=0, mastered=0;
-  pool.forEach(v=>{
-    const r = getRec(code, v.term);
-    if(!r) fresh++;
-    else { if(r.due<=now) due++; if(r.interval>=21) mastered++; }
-  });
-  return { total:pool.length, due, fresh, mastered };
-}
-
-function shuffle(a){ for(let i=a.length-1;i>0;i--){ const j=Math.floor(Math.random()*(i+1)); [a[i],a[j]]=[a[j],a[i]]; } return a; }
-
-function renderVocab(){
-  const code = view.lang, l = L(code);
-  const st = vocabStats(code);
+function renderVocabList(){
+  const code=view.lang, l=L(code), list=VOCAB_TOPICS[code]||[], p=vocabProgress(code);
+  const rows = list.map((t,i)=>{
+    const done = unitDone(code, vocabId(code,i));
+    return `<button class="unit ${done?'done':''}" onclick="go('vocabitem',{lang:'${code}',idx:${i}})">
+      <span class="unit-num">${done?'✓':(i+1)}</span>
+      <div><div class="unit-title">${esc(t)}</div></div>
+      <span class="unit-state">›</span></button>`;
+  }).join("");
   app().innerHTML = `
-    <button class="back" onclick="go('path',{lang:'${code}'})">‹ ${esc(l.name)}</button>
-    <h1 class="page-title">Vokabeltrainer</h1>
-    <p class="page-sub">Spaced Repetition · ${l.name}</p>
-    <div id="vocabBody"></div>
-  `;
-  const body = document.getElementById("vocabBody");
-  if(st.total===0){
-    body.innerHTML = `<div class="lesson-card" style="text-align:center;">
-      <p style="margin:0;color:var(--ink-soft);font-size:14.5px;">Noch keine Vokabeln gesammelt. Öffne im Lernpfad ein paar Einheiten — der dort geladene Wortschatz landet automatisch hier im Trainer.</p>
-    </div>
-    <button class="btn" onclick="go('path',{lang:'${code}'})">Zum Lernpfad</button>`;
-    return;
-  }
-  body.innerHTML = `
-    <div class="vstats">
-      <div class="vstat"><b>${st.total}</b><span>WÖRTER</span></div>
-      <div class="vstat"><b>${st.due}</b><span>FÄLLIG</span></div>
-      <div class="vstat"><b>${st.fresh}</b><span>NEU</span></div>
-      <div class="vstat"><b>${st.mastered}</b><span>GEFESTIGT</span></div>
-    </div>
-    <button class="btn" onclick="startVocabSession('mixed')">${st.due>0?`${st.due} fällige üben`:'Üben starten'} →</button>
-    <p class="eyebrow" style="margin:24px 0 12px">Methode wählen</p>
-    <button class="mode-btn" onclick="startVocabSession('flash')"><span class="mi">🎴</span><div><div class="mt">Karteikarten</div><div class="md">Umdrehen, Beispielsatz, selbst bewerten</div></div></button>
-    <button class="mode-btn" onclick="startVocabSession('mc')"><span class="mi">🔤</span><div><div class="mt">Multiple Choice</div><div class="md">Richtige Bedeutung wählen</div></div></button>
-    <button class="mode-btn" onclick="startVocabSession('write')"><span class="mi">⌨️</span><div><div class="mt">Schreiben</div><div class="md">Übersetzung eintippen</div></div></button>
-    <button class="mode-btn" onclick="startVocabSession('cloze')"><span class="mi">📝</span><div><div class="mt">Lückentext</div><div class="md">Wort im Beispielsatz ergänzen</div></div></button>
-    <button class="mode-btn" onclick="startVocabSession('listen')"><span class="mi">🎧</span><div><div class="mt">Hören</div><div class="md">Gesprochenes Wort zuordnen</div></div></button>
-    <button class="mode-btn" onclick="startVocabSession('diktat')"><span class="mi">✍️</span><div><div class="mt">Diktat</div><div class="md">Wort hören und schreiben</div></div></button>
-    <button class="mode-btn" onclick="startVocabSession('speak')"><span class="mi">🎙️</span><div><div class="mt">Aussprache</div><div class="md">Wort laut sprechen, Erkennung prüft</div></div></button>
-    <button class="mode-btn" onclick="startVocabSession('leech')"><span class="mi">🧩</span><div><div class="mt">Schwierige Wörter</div><div class="md">Gezielt deine häufigsten Fehler</div></div></button>
+    <button class="back" onclick="go('lang',{lang:'${code}'})">‹ ${esc(l.name)}</button>
+    <h1 class="page-title">${l.flag} Wortschatz</h1>
+    <p class="page-sub">Themenliste für ${l.name} · Niveau ${l.level} · ${p.done}/${p.total}</p>
+    <p class="hint" style="margin:-8px 0 16px">Tippe ein Thema, kopiere den Auftrag und lass dir die Wörter in Langua beibringen und speichern.</p>
+    ${rows}
   `;
 }
-
-function buildSession(code, limit, opts){
-  opts = opts || {};
-  const pool = buildVocabPool(code), now = Date.now();
-  if(opts.leech){
-    const leeches = pool.filter(v=>{ const r=getRec(code,v.term); return r && (r.lapses>=2 || r.ease<=1.8); });
-    shuffle(leeches);
-    return leeches.slice(0, limit).map(v=>({ ...v, _again:0, _mode:null, _done:false }));
-  }
-  const due=[], fresh=[], later=[];
-  pool.forEach(v=>{ const r=getRec(code,v.term); if(!r) fresh.push(v); else if(r.due<=now) due.push(v); else later.push(v); });
-  shuffle(due); shuffle(fresh); shuffle(later);
-  let q = due.concat(fresh).slice(0, limit);
-  if(q.length<limit) q = q.concat(later).slice(0, limit);
-  return q.map(v=>({ ...v, _again:0, _mode:null, _done:false }));
-}
-
-async function startVocabSession(mode){
-  const code = view.lang;
-  const limit = state.routine && state.routine.reviews ? state.routine.reviews : 20;
-  const queue = buildSession(code, limit, { leech: mode==="leech" });
-  if(!queue.length){ toast(mode==="leech"?"Noch keine schwierigen Wörter":"Keine Vokabeln verfügbar"); return; }
-  vocabRT = { code, mode, queue, pos:0, reviewed:0, correct:0 };
-  // Modi, die Beispielsätze brauchen
-  if(["cloze","mixed","flash","leech"].includes(mode)){
-    const b = document.getElementById("vocabBody");
-    if(b) b.innerHTML = loadingHTML("Bereite Beispielsätze vor …");
-    await prefetchCloze(code, queue);
-  }
-  paintVocabCard();
-}
-
-async function prefetchCloze(code, cards){
-  const cache = clozeStore(code);
-  const need = cards.filter(c=>!cache[srsKey(c.term)]).slice(0,16);
-  if(!need.length) return;
-  const l = LANG_CONFIG[code];
-  const list = need.map(c=>c.term).join("; ");
-  const sys = "Du erstellst Lückentext-Beispielsätze für Sprachlernende. Antworte AUSSCHLIESSLICH mit einem gültigen JSON-Array, ohne Markdown.";
-  const usr = `Sprache: ${l.aiName}. Erstelle für JEDES dieser Wörter einen einfachen, natürlichen Beispielsatz aus dem echten Alltag in lockerer Umgangssprache: ${list}.
-JSON-Array, jeder Eintrag: {"term":"<Wort exakt wie vorgegeben>","cloze":"<Satz in ${l.aiName}, in dem genau dieses Wort durch ___ ersetzt ist>","answer":"<das entfernte Wort in seiner Satzform>","de":"<deutsche Übersetzung des vollständigen Satzes>"}.
-${ALLTAG}`;
-  try{
-    const txt = await callAI(sys, [{role:"user",content:usr}], {maxTokens:3000});
-    extractObjects(txt).forEach(o=>{
-      if(o && o.term && o.cloze) cache[srsKey(o.term)] = { cloze:String(o.cloze), answer:String(o.answer||o.term), de:String(o.de||"") };
-    });
-    saveState();
-  }catch(e){}
-}
-
-function pickMode(code, card){
-  if(vocabRT.mode==="leech") return "flash";
-  if(vocabRT.mode!=="mixed") return vocabRT.mode;
-  const opts = ["mc","write","listen"];
-  if(clozeStore(code)[srsKey(card.term)]) opts.push("cloze");
-  return opts[Math.floor(Math.random()*opts.length)];
-}
-
-function distractors(code, correctDe, n){
-  const pool = buildVocabPool(code).map(v=>v.de).filter(d=>d && norm(d)!==norm(correctDe));
-  shuffle(pool);
-  const out=[]; const seen=new Set([norm(correctDe)]);
-  for(const d of pool){ const k=norm(d); if(!seen.has(k)){ seen.add(k); out.push(d); } if(out.length>=n) break; }
-  return out;
-}
-
-function paintVocabCard(){
-  const rt = vocabRT, code = rt.code, l = L(code);
-  if(rt.pos>=rt.queue.length){ finishVocab(); return; }
-  const card = rt.queue[rt.pos];
-  if(!card._mode) card._mode = pickMode(code, card);
-  const m = card._mode;
-  const remaining = rt.queue.length - rt.pos;
-  let body = "";
-
-  if(m==="flash"){
-    body = `
-      <div class="flashcard">
-        <div class="fc-cat">${esc(card.cat||"")}</div>
-        <div class="fc-term">${esc(card.term)} <button onclick="speak(${esc(JSON.stringify(card.term))},'${l.speak}')" style="font-size:18px">🔊</button></div>
-        <div id="fcReveal"></div>
-      </div>
-      <button class="btn" id="fcFlip" onclick="flipFlash()">Umdrehen</button>`;
-  }
-  else if(m==="mc" || m==="listen"){
-    const opts = shuffle([card.de, ...distractors(code, card.de, 3)]);
-    const head = m==="listen"
-      ? `<div class="q-text"><button class="btn soft sm" onclick="speak(${esc(JSON.stringify(card.term))},'${l.speak}')">🔊 Wort anhören</button></div>
-         <p style="color:var(--ink-soft);font-size:14px;margin:-8px 0 16px;">Was bedeutet das Wort?</p>`
-      : `<div class="q-text target">${esc(card.term)}</div>`;
-    body = `<p class="q-prompt">${m==="listen"?"Hören":"Bedeutung wählen"}</p>${head}
-      <div id="opts">${opts.map(o=>`<button class="opt" onclick="answerVocabMC(this, ${esc(JSON.stringify(o))})">${esc(o)}</button>`).join("")}</div>`;
-    if(m==="listen") setTimeout(()=>speak(card.term, l.speak), 350);
-  }
-  else if(m==="write"){
-    body = `<p class="q-prompt">Übersetze ins ${l.name}</p>
-      <div class="q-text">${esc(card.de)}</div>
-      <input class="ans-input" id="vAns" placeholder="Wort auf ${l.name}…" autocomplete="off" autocapitalize="off" autocorrect="off"
-        onkeydown="if(event.key==='Enter')submitVocabWrite()">
-      <button class="btn" style="margin-top:18px" onclick="submitVocabWrite()">Prüfen</button>`;
-  }
-  else if(m==="cloze"){
-    const c = clozeStore(code)[srsKey(card.term)];
-    if(!c){ card._mode="write"; paintVocabCard(); return; }
-    body = `<p class="q-prompt">Lücke ergänzen</p>
-      <div class="q-text target">${esc(c.cloze)}</div>
-      ${c.de?`<p style="font-size:13px;color:var(--ink-faint);margin:-8px 0 14px">${esc(c.de)}</p>`:""}
-      <input class="ans-input" id="vAns" placeholder="fehlendes Wort…" autocomplete="off" autocapitalize="off" autocorrect="off"
-        onkeydown="if(event.key==='Enter')submitVocabCloze()">
-      <button class="btn" style="margin-top:18px" onclick="submitVocabCloze()">Prüfen</button>`;
-  }
-  else if(m==="diktat"){
-    body = `<p class="q-prompt">Diktat — hören und schreiben</p>
-      <div class="q-text"><button class="btn soft sm" onclick="speak(${esc(JSON.stringify(card.term))},'${l.speak}')">🔊 Nochmal hören</button></div>
-      <input class="ans-input" id="vAns" placeholder="Gehörtes Wort tippen…" autocomplete="off" autocapitalize="off" autocorrect="off"
-        onkeydown="if(event.key==='Enter')submitVocabDiktat()">
-      <button class="btn" style="margin-top:18px" onclick="submitVocabDiktat()">Prüfen</button>`;
-    setTimeout(()=>speak(card.term, l.speak), 350);
-  }
-  else if(m==="speak"){
-    const canSpeak = sttAvailable();
-    body = `<p class="q-prompt">Aussprache — sprich das Wort</p>
-      <div class="q-text target">${esc(card.term)} <button class="btn soft sm" style="vertical-align:middle" onclick="speak(${esc(JSON.stringify(card.term))},'${l.speak}')">🔊</button></div>
-      <p style="font-size:13px;color:var(--ink-faint);margin:-8px 0 16px">${esc(card.de)}</p>
-      ${canSpeak
-        ? `<button class="btn" id="spkBtn" onclick="speakVocab()">🎙️ Antippen & sprechen</button>`
-        : `<p class="hint">Spracherkennung hier nicht verfügbar — als Homescreen-App nutzbar. Bewerte dich selbst:</p>
-           <div class="grade-row" style="margin-top:10px"><button class="again" onclick="gradeVocab('again')">Nochmal</button><button class="good" onclick="gradeVocab('good')">Gut</button><button class="easy" onclick="gradeVocab('easy')">Leicht</button></div>`}`;
-  }
-
+function renderVocabItem(){
+  const code=view.lang, l=L(code), idx=view.idx, topic=(VOCAB_TOPICS[code]||[])[idx];
+  if(topic==null){ app().innerHTML=`<button class="back" onclick="go('vocab',{lang:'${code}'})">‹ Zurück</button><div class="err">Thema nicht gefunden.</div>`; return; }
+  const id=vocabId(code,idx), done=unitDone(code,id), prompt=buildVocabPrompt(code,topic);
   app().innerHTML = `
-    <button class="back" onclick="quitVocab()">‹ Beenden</button>
-    <div class="vbar-top" style="display:flex;align-items:center;gap:10px;margin-bottom:14px;">
-      <div class="bar" style="flex:1;--lc:var(--accent)"><i style="width:${Math.round(rt.pos/rt.queue.length*100)}%"></i></div>
-      <span class="hint">${remaining} übrig</span>
+    <button class="back" onclick="go('vocab',{lang:'${code}'})">‹ Wortschatz</button>
+    <h1 class="page-title">${esc(topic)}</h1>
+    <p class="page-sub">${l.name} · Niveau ${l.level}</p>
+
+    <p class="eyebrow">Auftrag für Langua</p>
+    <div class="card">
+      <div class="brief-prompt">${esc(prompt)}</div>
+      <div class="row" style="margin-top:12px">
+        <button class="btn sm" onclick="copyText(${esc(JSON.stringify(prompt))})">Prompt kopieren</button>
+        <a class="btn ghost sm" href="https://languatalk.com" target="_blank" rel="noopener" style="line-height:1.4">Langua öffnen ↗</a>
+      </div>
+      <p class="hint" style="margin:10px 0 0">In Langua einfügen — du bekommst die Wörter mit Beispielen und kannst sie dort speichern.</p>
     </div>
-    <div id="vBody">${body}</div>
-    <div id="vFeedback"></div>
+
+    <button class="btn ${done?'ghost':''}" style="margin-top:16px" onclick="markVocab('${code}',${idx})">${done?'✓ Erledigt — nochmal markieren':'Als erledigt markieren'}</button>
   `;
 }
-
-function flipFlash(){
-  const code = vocabRT.code, card = vocabRT.queue[vocabRT.pos];
-  const c = clozeStore(code)[srsKey(card.term)];
-  const example = c ? `<div class="fc-example">„${esc((c.cloze||"").replace(/_{2,}/, card.term))}"${c.de?`<span>${esc(c.de)}</span>`:""}</div>` : "";
-  document.getElementById("fcReveal").innerHTML = `<div class="fc-divider"></div><div class="fc-back">${esc(card.de)}</div>${example}`;
-  const flip = document.getElementById("fcFlip");
-  flip.outerHTML = `<div class="grade-row">
-      <button class="again" onclick="gradeVocab('again')">Nochmal</button>
-      <button class="good" onclick="gradeVocab('good')">Gut</button>
-      <button class="easy" onclick="gradeVocab('easy')">Leicht</button>
-    </div>`;
-}
-
-function answerVocabMC(btn, choice){
-  const card = vocabRT.queue[vocabRT.pos];
-  const ok = norm(choice)===norm(card.de);
-  document.querySelectorAll("#opts .opt").forEach(b=>{
-    b.onclick=null;
-    if(norm(b.textContent)===norm(card.de)) b.classList.add("correct");
-    else if(b===btn) b.classList.add("wrong");
-    else b.classList.add("dim");
-  });
-  vocabFeedback(ok, card.de, ok?null:`${card.term} = ${card.de}`);
-}
-
-function submitVocabWrite(){
-  const card = vocabRT.queue[vocabRT.pos];
-  const val = (document.getElementById("vAns").value||"").trim();
-  if(!val){ toast("Bitte etwas eintippen"); return; }
-  const ok = norm(val)===norm(card.term) || stripAccents(norm(val))===stripAccents(norm(card.term));
-  const inp = document.getElementById("vAns"); inp.disabled=true; inp.style.borderColor = ok?"var(--ok)":"var(--bad)";
-  vocabFeedback(ok, card.term, ok?null:`Richtig: ${card.term}`);
-}
-
-function submitVocabCloze(){
-  const code = vocabRT.code, card = vocabRT.queue[vocabRT.pos];
-  const c = clozeStore(code)[srsKey(card.term)];
-  const ans = (c && c.answer) || card.term;
-  const val = (document.getElementById("vAns").value||"").trim();
-  if(!val){ toast("Bitte etwas eintippen"); return; }
-  const ok = norm(val)===norm(ans) || stripAccents(norm(val))===stripAccents(norm(ans));
-  const inp = document.getElementById("vAns"); inp.disabled=true; inp.style.borderColor = ok?"var(--ok)":"var(--bad)";
-  vocabFeedback(ok, ans, ok?null:`Richtig: ${ans}`);
-}
-
-function submitVocabDiktat(){
-  const card = vocabRT.queue[vocabRT.pos];
-  const val = (document.getElementById("vAns").value||"").trim();
-  if(!val){ toast("Bitte etwas eintippen"); return; }
-  const ok = norm(val)===norm(card.term) || stripAccents(norm(val))===stripAccents(norm(card.term));
-  const inp = document.getElementById("vAns"); inp.disabled=true; inp.style.borderColor = ok?"var(--ok)":"var(--bad)";
-  vocabFeedback(ok, card.term, ok?`${card.term} — ${card.de}`:`Richtig: ${card.term}`);
-}
-
-function speakVocab(){
-  if(!SR){ toast("Spracherkennung nicht verfügbar"); return; }
-  const card = vocabRT.queue[vocabRT.pos], code = vocabRT.code;
-  stopSpeak();
-  const rec = new SR();
-  rec.lang = LANG_CONFIG[code].speak; rec.interimResults=false; rec.maxAlternatives=3;
-  const btn = document.getElementById("spkBtn");
-  if(btn){ btn.textContent="⏹ Zuhören…"; btn.classList.add("live"); }
-  rec.onresult = (e)=>{
-    const alts = []; for(let i=0;i<e.results[0].length;i++) alts.push(e.results[0][i].transcript);
-    const target = norm(card.term);
-    const ok = alts.some(a=> norm(a)===target || stripAccents(norm(a))===stripAccents(target) || norm(a).includes(target));
-    vocabFeedback(ok, card.term, `Erkannt: „${esc(alts[0]||"")}"`);
-  };
-  rec.onerror = ()=>{ if(btn){ btn.textContent="🎙️ Antippen & sprechen"; btn.classList.remove("live"); } toast("Nicht erkannt — nochmal"); };
-  rec.onend = ()=>{ if(btn){ btn.textContent="🎙️ Antippen & sprechen"; btn.classList.remove("live"); } };
-  try{ rec.start(); }catch(e){}
-}
-
-function vocabFeedback(ok, answer, note){
-  const l = L(vocabRT.code);
-  const card = vocabRT.queue[vocabRT.pos];
-  const fb = document.getElementById("vFeedback");
-  fb.innerHTML = `
-    <div class="feedback ${ok?'ok':'no'}">
-      <b>${ok?'Richtig! 🎉':'Nicht ganz'}</b>
-      ${note?esc(note):''}
-      <button class="btn soft sm" style="margin-top:10px" onclick="speak(${esc(JSON.stringify(card.term))},'${l.speak}')">🔊 ${esc(card.term)} anhören</button>
-    </div>
-    <button class="btn" style="margin-top:14px" onclick="gradeVocab('${ok?'good':'again'}')">Weiter</button>`;
-  fb.scrollIntoView({behavior:"smooth", block:"center"});
-}
-
-function gradeVocab(grade){
-  const rt = vocabRT, code = rt.code, card = rt.queue[rt.pos];
-  scheduleRec(code, card.term, grade);
-  rt.reviewed++;
-  if(grade!=="again") rt.correct++;
-  // bei "Nochmal" Karte später in der Session erneut zeigen (max 2x)
-  if(grade==="again" && card._again < 2){
-    const again = { ...card, _again:card._again+1, _mode:null, _done:false };
-    rt.queue.splice(Math.min(rt.queue.length, rt.pos + 4), 0, again);
-  }
-  saveState();
-  rt.pos++;
-  stopSpeak();
-  paintVocabCard();
-}
-
-function quitVocab(){ stopSpeak(); vocabRT=null; go("vocab",{lang:view.lang}); }
-
-function finishVocab(){
-  stopSpeak();
-  const rt = vocabRT, code = rt.code;
-  const acc = rt.reviewed ? Math.round(rt.correct/rt.reviewed*100) : 0;
-  recordReview(code, rt.reviewed);
-  const st = vocabStats(code);
-  vocabRT = null;
-  app().innerHTML = `
-    <div style="text-align:center;padding:44px 0;">
-      <div class="big-emoji" style="font-size:60px;margin-bottom:8px;">${acc>=80?'🌟':acc>=50?'👍':'💪'}</div>
-      <h1 class="page-title">Session beendet</h1>
-      <p class="page-sub">${rt.reviewed} Karten · ${acc}% richtig</p>
-      <div class="lesson-card" style="text-align:left;">
-        <div class="vocab-row"><span>Noch fällig</span><b>${st.due}</b></div>
-        <div class="vocab-row"><span>Gefestigt insgesamt</span><b>${st.mastered}</b></div>
-      </div>
-      ${st.due>0?`<button class="btn" onclick="startVocabSession('mixed')">Weiterüben (${st.due} fällig)</button>`:`<button class="btn" onclick="go('vocab',{lang:'${code}'})">Zur Übersicht</button>`}
-      <button class="btn ghost" style="margin-top:10px" onclick="go('path',{lang:'${code}'})">Zum Lernpfad</button>
-    </div>
-  `;
-}
-
-/* =========================================================
-   CALL MODE
-   ========================================================= */
-const SCENARIOS = {
-  es:[
-    {t:"Im Café",d:"Bestellen, fragen, plaudern",p:"Wir sind in einem Café in Madrid. Du bist die Kellnerin/der Kellner."},
-    {t:"Sich vorstellen",d:"Kennenlernen, Smalltalk",p:"Wir treffen uns das erste Mal auf einer Party und lernen uns kennen."},
-    {t:"Nach dem Weg fragen",d:"Orientierung in der Stadt",p:"Ich bin Tourist:in und frage dich nach dem Weg."},
-    {t:"Freies Gespräch",d:"Worüber du willst",p:"Wir führen ein lockeres Alltagsgespräch."}
-  ],
-  fr:[
-    {t:"Au café",d:"Commander et bavarder",p:"Nous sommes dans un café à Paris. Tu es le serveur / la serveuse."},
-    {t:"Se présenter",d:"Faire connaissance",p:"On se rencontre pour la première fois et on fait connaissance."},
-    {t:"Demander son chemin",d:"S'orienter en ville",p:"Je suis touriste et je te demande mon chemin."},
-    {t:"Conversation libre",d:"Au choix",p:"On a une conversation détendue du quotidien."}
-  ],
-  sv:[
-    {t:"På kafé",d:"Beställa och prata",p:"Vi är på ett kafé i Stockholm. Du är servitören."},
-    {t:"Presentera sig",d:"Lära känna varandra",p:"Vi träffas för första gången och lär känna varandra."},
-    {t:"Fråga om vägen",d:"Hitta i staden",p:"Jag är turist och frågar dig om vägen."},
-    {t:"Fritt samtal",d:"Vad du vill",p:"Vi har ett avslappnat vardagssamtal."}
-  ]
-};
-
-let callScenarios = null;
-
-function resolveScenarios(code){
-  if(view.unitId){
-    const lesson = state.langs[code].lessons[view.unitId];
-    if(lesson && lesson.scenarios && lesson.scenarios.length) return lesson.scenarios;
-  }
-  return SCENARIOS[code];
-}
-
-function renderCall(){
-  const code = view.lang, l = L(code);
-  setAccent(code);
-  if(!call){
-    callScenarios = resolveScenarios(code);
-    const unit = view.unitId ? findUnit(code, view.unitId) : null;
-    const scs = callScenarios.map((s,i)=>`
-      <button onclick="startCall(${i})"><b>${esc(s.t)}</b><span>${esc(s.d)}</span></button>`).join("");
-    app().innerHTML = `
-      <div class="call-screen">
-        <div class="call-top">
-          <div class="call-who">${l.flag} ${unit?esc(unit.title):l.name}<small>Call Mode · Niveau ${l.level}</small></div>
-          <button class="call-end" onclick="endCall()" aria-label="schließen">✕</button>
-        </div>
-        <div class="call-stage">
-          <div class="orb">📞</div>
-          <div class="call-line">${unit?'Wähle eine Situation zum Thema':'Worüber möchtest du sprechen?'}</div>
-          <div class="scenario-pick">${scs}</div>
-        </div>
-      </div>`;
-    return;
-  }
-  paintCallStage();
-}
-
-async function startCall(scIdx){
-  const code = view.lang, l = L(code);
-  const list = callScenarios || resolveScenarios(code);
-  const sc = list[scIdx];
-  call = { code, scenario:sc, messages:[], line:"…", status:"verbindet …", correction:null, corrections:[], busy:true, listening:false };
-  paintCallStage();
-  const sys = callSystemPrompt(l, sc);
-  try{
-    const txt = await callAI(sys, [{role:"user",content:"(Das Gespräch beginnt. Begrüße mich kurz und stelle eine einfache Einstiegsfrage.)"}], {maxTokens:400});
-    handleTutorReply(txt);
-  }catch(e){
-    call.status = "Fehler: "+e.message; call.busy=false; paintCallStage();
-  }
-}
-
-function callSystemPrompt(l, sc){
-  return `Du bist ein freundlicher, geduldiger ${l.aiName}-Gesprächspartner für eine:n Lernende:n auf Niveau ${l.level} (GER).
-SZENARIO: ${sc.p}
-REGELN:
-- Sprich AUSSCHLIESSLICH ${l.aiName}, passend zu Niveau ${l.level}.
-- ${registerCallRule()}
-- Antworte mit maximal 1-2 kurzen Sätzen und stelle meist eine Rückfrage, damit das Gespräch locker läuft.
-- Wenn die lernende Person einen deutlichen Fehler macht, hänge GANZ AM ENDE eine separate Zeile an, die exakt so beginnt: "KORREKTUR: " gefolgt von einer kurzen Erklärung AUF DEUTSCH (natürlichere/richtige Form + Mini-Begründung, gern auch wie man es alltagssprachlich sagt). Mache das nur bei echten Fehlern, nicht bei jeder Nachricht.
-- Bleib im Szenario und in der Rolle, bleib natürlich und freundlich.`;
-}
-
-function handleTutorReply(txt){
-  let correction = null;
-  let line = txt;
-  const m = txt.match(/KORREKTUR:\s*([\s\S]*)$/i);
-  if(m){ correction = m[1].trim(); line = txt.slice(0, m.index).trim(); }
-  call.line = line || "…";
-  call.correction = correction;
-  if(correction) call.corrections.push(correction);
-  call.messages.push({role:"assistant", content:txt});
-  call.busy = false;
-  call.status = "spricht …";
-  paintCallStage();
-  // sprechen
-  const orb = document.querySelector(".orb");
-  if(orb) orb.classList.add("speaking");
-  speak(line, LANG_CONFIG[call.code].speak, ()=>{
-    const o = document.querySelector(".orb"); if(o) o.classList.remove("speaking");
-    if(call) { call.status = "Du bist dran"; const s=document.querySelector(".call-status"); if(s) s.textContent=call.status; }
-  });
-}
-
-function paintCallStage(){
-  const code = call.code, l = L(code);
-  const stt = sttAvailable();
-  app().innerHTML = `
-    <div class="call-screen">
-      <div class="call-top">
-        <div class="call-who">${l.flag} ${esc(call.scenario.t)}<small>${l.name} · Niveau ${l.level}</small></div>
-        <button class="call-end" onclick="endCall()" aria-label="auflegen">✕</button>
-      </div>
-      <div class="call-stage">
-        <div class="orb ${call.busy?'':''}">${call.busy?'<div class="spin" style="border-top-color:#fff;border-color:rgba(255,255,255,.3);border-top-color:#fff;"></div>':'🗣️'}</div>
-        <div class="call-line">${call.busy?'…':esc(call.line)}</div>
-        ${call.correction?`<div class="correction"><b>Korrektur</b>${esc(call.correction)}</div>`:''}
-        <div class="call-status">${esc(call.status||'')}</div>
-      </div>
-      <div class="call-controls">
-        ${call.line && !call.busy ? `<button class="btn soft sm" style="background:rgba(255,255,255,.14);color:#fff;align-self:center;width:auto;" onclick="replayLine()">🔊 Wiederholen</button>`:''}
-        <div class="call-row">
-          ${stt
-            ? `<button class="mic ${call.listening?'live':''}" id="micBtn" onclick="toggleMic()">${call.listening?'⏹ Zuhören…':'🎤 Antippen & sprechen'}</button>`
-            : ``}
-        </div>
-        <div class="call-row">
-          <input class="call-textin" id="callText" placeholder="${stt?'… oder hier tippen':'Tippe deine Antwort'}" autocomplete="off" autocapitalize="off"
-            onkeydown="if(event.key==='Enter')sendCallText()">
-          <button class="mic-icon" onclick="sendCallText()" aria-label="senden">➤</button>
-        </div>
-        ${!stt?`<p style="opacity:.6;font-size:12px;text-align:center;margin:2px 0 0;">Spracherkennung in diesem Browser/Fenster nicht verfügbar — tippe deine Antwort. Auf dem iPhone-Homescreen (PWA) funktioniert das Mikrofon.</p>`:''}
-      </div>
-    </div>`;
-}
-
-function replayLine(){
-  if(!call || !call.line) return;
-  const orb=document.querySelector(".orb"); if(orb) orb.classList.add("speaking");
-  speak(call.line, LANG_CONFIG[call.code].speak, ()=>{ const o=document.querySelector(".orb"); if(o)o.classList.remove("speaking"); });
-}
-
-let recog = null;
-function toggleMic(){
-  if(call.listening){ stopMic(); return; }
-  if(!SR){ toast("Spracherkennung nicht verfügbar"); return; }
-  stopSpeak();
-  recog = new SR();
-  recog.lang = LANG_CONFIG[call.code].speak;
-  recog.interimResults = true;
-  recog.continuous = false;
-  recog.maxAlternatives = 1;
-  call.listening = true;
-  let heard = "", sent = false;
-  const orb=document.querySelector(".orb"); if(orb){orb.classList.remove("speaking");orb.classList.add("listening");}
-  const btn=document.getElementById("micBtn"); if(btn){btn.classList.add("live");btn.textContent="⏹ Fertig";}
-  const st=document.querySelector(".call-status"); if(st) st.textContent="Ich höre zu …";
-  recog.onresult = (e)=>{
-    let t = "";
-    for(let i=0;i<e.results.length;i++) t += e.results[i][0].transcript;
-    heard = t.trim();
-    const s=document.querySelector(".call-status"); if(s && heard) s.textContent = heard;
-  };
-  recog.onerror = (e)=>{
-    call.listening=false; resetMicUI();
-    if(e.error==="not-allowed" || e.error==="service-not-allowed") toast("Mikrofon nicht erlaubt — in den Safari-Einstellungen freigeben");
-    else if(e.error!=="aborted" && e.error!=="no-speech" && !heard) toast("Nicht verstanden — bitte nochmal");
-  };
-  recog.onend = ()=>{
-    call.listening=false; resetMicUI();
-    if(heard && !sent){ sent=true; sendUserTurn(heard); }
-  };
-  try{ recog.start(); }catch(e){ call.listening=false; resetMicUI(); }
-}
-function stopMic(){ if(recog){ try{recog.stop();}catch(e){} } if(call) call.listening=false; resetMicUI(); }
-function resetMicUI(){
-  const orb=document.querySelector(".orb"); if(orb) orb.classList.remove("listening");
-  const btn=document.getElementById("micBtn"); if(btn){btn.classList.remove("live");btn.textContent="🎤 Antippen & sprechen";}
-}
-
-function sendCallText(){
-  const inp=document.getElementById("callText");
-  const v=(inp.value||"").trim();
-  if(!v) return;
-  inp.value="";
-  sendUserTurn(v);
-}
-
-async function sendUserTurn(text){
-  if(!call || call.busy) return;
-  stopMic(); stopSpeak();
-  call.messages.push({role:"user", content:text});
-  call.busy=true; call.correction=null; call.line="…"; call.status="denkt nach …";
-  paintCallStage();
-  const l = L(call.code);
-  const sys = callSystemPrompt(l, call.scenario);
-  try{
-    const txt = await callAI(sys, call.messages.slice(-12), {maxTokens:400});
-    handleTutorReply(txt);
-  }catch(e){
-    call.busy=false; call.status="Fehler: "+e.message; paintCallStage();
-  }
-}
-
-function endCall(){
-  stopSpeak(); stopMic();
-  const code = call ? call.code : view.lang;
-  if(call){
-    state.langs[code].xp += 5; saveState();
-    const userTurns = call.messages.filter(m=>m.role==="user").length;
-    if(userTurns >= 2){
-      ensureToday(); state.daily.xp += 5; recordConv(code);
-      lastReport = { code, corrections:call.corrections.slice(), messages:call.messages.slice() };
-      call = null;
-      showCallReport();
-      return;
-    }
-  }
-  call=null;
-  go("path",{lang:code});
-}
-
-let lastReport = null;
-function showCallReport(){
-  const rep = lastReport, code = rep.code, l = L(code);
-  setAccent(null);
-  const corr = rep.corrections.length
-    ? `<div class="lesson-card"><h3>Korrekturen (${rep.corrections.length})</h3>${rep.corrections.map(c=>`<div style="padding:9px 0;border-bottom:1px solid var(--line-soft);font-size:14.5px;">${esc(c)}</div>`).join("")}</div>`
-    : `<div class="lesson-card"><p style="margin:0;color:var(--ink-soft)">Keine Korrekturen — sauber gesprochen.</p></div>`;
-  app().innerHTML = `
-    <button class="back" onclick="go('path',{lang:'${code}'})">‹ Fertig</button>
-    <h1 class="page-title">Gesprächsbericht</h1>
-    <p class="page-sub">${l.name}</p>
-    ${corr}
-    <div id="repVocab"></div>
-    <button class="btn" onclick="extractCallVocab()">Wichtige Wörter in den Trainer übernehmen</button>
-    <button class="btn ghost" style="margin-top:10px" onclick="go('path',{lang:'${code}'})">Schließen</button>
-  `;
-}
-async function extractCallVocab(){
-  const rep = lastReport, code = rep.code, l = LANG_CONFIG[code];
-  const box = document.getElementById("repVocab");
-  if(box) box.innerHTML = loadingHTML("Sammle Wörter aus dem Gespräch …");
-  const convo = rep.messages.map(m=>(m.role==="assistant"?"A: ":"U: ")+m.content).join("\n").slice(-3000);
-  const sys = "Du extrahierst nützliche Lernvokabeln aus einem Übungsgespräch. Antworte AUSSCHLIESSLICH mit einem gültigen JSON-Array, ohne Markdown.";
-  const usr = `Aus diesem ${l.aiName}-Übungsgespräch: liste 6-10 nützliche, alltagsnahe Vokabeln/Wendungen, die die lernende Person üben sollte. JSON-Array, jeder Eintrag {"term":"<${l.aiName}>","de":"<deutsche Bedeutung>","cat":"Aus Gespräch"}. ${ALLTAG}\n\n${convo}`;
-  try{
-    const txt = await callAI(sys, [{role:"user",content:usr}], {maxTokens:1200});
-    const arr = extractObjects(txt).filter(v=>v&&v.term).map(v=>({term:String(v.term),de:String(v.de||""),cat:"Aus Gespräch"}));
-    if(!arr.length){ if(box) box.innerHTML = `<div class="err">Keine Wörter gefunden.</div>`; return; }
-    state.langs[code].lessons["call-"+Date.now()] = { vocab:arr };
-    saveState();
-    if(box) box.innerHTML = `<div class="lesson-card"><h3>${arr.length} Wörter übernommen</h3>${arr.map(v=>`<div class="vocab-row"><div class="vocab-term">${esc(v.term)}</div><div class="vocab-de">${esc(v.de)}</div></div>`).join("")}</div>`;
-    toast("In den Trainer übernommen");
-  }catch(e){ if(box) box.innerHTML = `<div class="err">Fehler: ${esc(e.message)}</div>`; }
+function markVocab(code, idx){
+  const id=vocabId(code,idx), was=unitDone(code,id);
+  if(was){ state.langs[code].progress[id]=undefined; saveState(); toast("Markierung entfernt"); }
+  else { recordSessionDone(code, id); toast("Erledigt 🎉 Streak "+state.streak.current); }
+  renderVocabItem();
 }
 
 /* =========================================================
    SONGTEXT-ANALYSE
    ========================================================= */
 let songRT = null;
-function resetSong(){ songRT = null; renderSong(); }
+function resetSong(){ songRT=null; renderSong(); }
 function renderSong(){
-  const code = view.lang, l = L(code);
+  const code=view.lang, l=L(code);
   const have = songRT && songRT.code===code && songRT.segments;
   let body;
   if(!have){
     body = `
-      <p class="page-sub">Füge einen Songtext ein, zu dem du legalen Zugang hast — sprich. zerlegt ihn Zeile für Zeile in Übersetzung, Vokabeln, Grammatik und eine Erklärung im Kontext.</p>
+      <p class="page-sub">Füge einen Songtext ein, zu dem du legalen Zugang hast — die App zerlegt ihn in Übersetzung, Vokabeln, Grammatik und Kontext.</p>
       <input id="songTitle" placeholder="Titel & Interpret (optional)" style="margin-bottom:10px">
       <textarea id="songText" rows="9" placeholder="Songtext hier einfügen…"></textarea>
       <button class="btn" style="margin-top:14px" onclick="analyzeSong()">Text analysieren</button>
-      <p class="hint" style="margin-top:10px">Auch lange Lieder werden vollständig analysiert — der Text wird automatisch in Abschnitte zerlegt und wiederholte Refrains zusammengefasst.</p>`;
+      <p class="hint" style="margin-top:10px">Auch lange Lieder werden vollständig analysiert (automatisch in Abschnitte zerlegt, Refrains zusammengefasst).</p>`;
   }else{
     const segs = songRT.segments.map(s=>`
-      <div class="lesson-card song-seg">
-        <div class="song-line"><span>${esc(s.line)}</span>
-          <button class="btn soft sm" style="width:auto" onclick="speak(${esc(JSON.stringify(s.line))},'${l.speak}')">🔊</button></div>
+      <div class="card song-seg">
+        <div class="song-line">${esc(s.line)}</div>
         ${s.de?`<div class="song-de">${esc(s.de)}</div>`:""}
-        ${(s.vocab&&s.vocab.length)?`<div class="song-vocab">${s.vocab.map(v=>`<div class="vocab-row"><div class="vocab-term">${esc(v.term)}</div><div class="vocab-de">${esc(v.de||"")}</div></div>`).join("")}</div>`:""}
+        ${(s.vocab&&s.vocab.length)?`<div class="song-vocab">${s.vocab.map(v=>`<div class="word"><b>${esc(v.term)}</b><span>${esc(v.de||"")}</span></div>`).join("")}</div>`:""}
         ${s.grammar?`<div class="song-gram"><b>Grammatik</b> ${esc(s.grammar)}</div>`:""}
         ${s.context?`<div class="song-context"><b>Im Kontext</b> ${esc(s.context)}</div>`:""}
       </div>`).join("");
     body = `
       ${songRT.title?`<p class="page-sub">${esc(songRT.title)}</p>`:""}
-      ${songRT.summary?`<div class="lesson-card"><h3>Worum geht es?</h3><p style="margin:0;color:var(--ink-soft);line-height:1.5">${esc(songRT.summary)}</p></div>`:""}
-      <button class="btn" onclick="addSongVocab()">Alle Vokabeln in den Trainer übernehmen</button>
-      <div id="songVocabMsg"></div>
+      ${songRT.summary?`<div class="card"><h3>Worum geht es?</h3><p style="margin:6px 0 0;color:var(--ink-soft);line-height:1.5">${esc(songRT.summary)}</p></div>`:""}
       ${segs}
-      <button class="btn ghost" style="margin-top:14px" onclick="resetSong()">Anderen Text analysieren</button>`;
+      <button class="btn ghost" style="margin-top:12px" onclick="resetSong()">Anderen Text analysieren</button>`;
   }
   app().innerHTML = `
-    <button class="back" onclick="go('path',{lang:'${code}'})">‹ Zurück</button>
+    <button class="back" onclick="go('lang',{lang:'${code}'})">‹ ${esc(l.name)}</button>
     <h1 class="page-title">${l.flag} Songtext</h1>
     ${body}`;
 }
 function chunkLyrics(text){
   let lines = text.split(/\r?\n/).map(s=>s.trim()).filter(Boolean);
-  // identische Zeilen (Refrains) zusammenfassen, Reihenfolge erhalten
-  const seen = new Set(), uniq = [];
-  for(const ln of lines){ const k = ln.toLowerCase(); if(!seen.has(k)){ seen.add(k); uniq.push(ln); } }
+  const seen=new Set(), uniq=[];
+  for(const ln of lines){ const k=ln.toLowerCase(); if(!seen.has(k)){ seen.add(k); uniq.push(ln); } }
   lines = uniq;
-  // kaum Zeilenumbrüche → grob nach Länge teilen
-  if(lines.length < 2 && text.length > 80){
-    const words = text.split(/\s+/); lines = []; let cur = "";
-    for(const w of words){ if((cur+" "+w).trim().length > 55){ lines.push(cur.trim()); cur = w; } else cur += " "+w; }
+  if(lines.length<2 && text.length>80){
+    const words=text.split(/\s+/); lines=[]; let cur="";
+    for(const w of words){ if((cur+" "+w).trim().length>55){ lines.push(cur.trim()); cur=w; } else cur+=" "+w; }
     if(cur.trim()) lines.push(cur.trim());
   }
-  const perChunk = 7, chunks = [];
-  for(let i=0;i<lines.length;i+=perChunk) chunks.push(lines.slice(i,i+perChunk).join("\n"));
-  return chunks.slice(0, 16); // Sicherheits-Cap (~112 Zeilen)
+  const per=7, chunks=[];
+  for(let i=0;i<lines.length;i+=per) chunks.push(lines.slice(i,i+per).join("\n"));
+  return chunks.slice(0,16);
 }
-
 async function runPool(items, limit, worker, onProgress){
-  const results = new Array(items.length);
-  let idx = 0, done = 0;
+  const results=new Array(items.length); let idx=0, done=0;
   async function next(){
-    const i = idx++;
-    if(i >= items.length) return;
-    try{ results[i] = await worker(items[i], i); }catch(e){ results[i] = null; }
+    const i=idx++; if(i>=items.length) return;
+    try{ results[i]=await worker(items[i],i); }catch(e){ results[i]=null; }
     done++; if(onProgress) onProgress(done, items.length);
     return next();
   }
-  const runners = [];
-  for(let k=0;k<Math.min(limit, items.length);k++) runners.push(next());
+  const runners=[]; for(let k=0;k<Math.min(limit,items.length);k++) runners.push(next());
   await Promise.all(runners);
   return results;
 }
-
 async function analyzeSong(){
-  const code = view.lang, l = LANG_CONFIG[code];
-  const text = (document.getElementById("songText").value||"").trim();
-  const title = (document.getElementById("songTitle").value||"").trim();
+  const code=view.lang, l=LANG_CONFIG[code];
+  const text=(document.getElementById("songText").value||"").trim();
+  const title=(document.getElementById("songTitle").value||"").trim();
   if(text.length<10){ toast("Bitte Songtext einfügen"); return; }
-  const chunks = chunkLyrics(text);
-  const sysSeg = "Du bist Sprachlehrer:in und analysierst einen von der lernenden Person selbst bereitgestellten Liedtext-Abschnitt für den Sprachunterricht. Antworte AUSSCHLIESSLICH mit einem gültigen JSON-Array, ohne Markdown, ohne Vorrede.";
-  const usrSeg = (chunk)=>`Sprache: ${l.aiName}. Niveau: ${l.level}. Analysiere die folgenden Liedzeilen Zeile für Zeile (oder sinnvolle kurze Phrase) für das Sprachenlernen.
-Gib ein JSON-Array von Objekten zurück, je Zeile/Phrase eines:
-{"line":"<Originalzeile>","de":"<deutsche Übersetzung>","vocab":[{"term":"<Wort/Phrase, ggf. Grundform/Artikel>","de":"<Bedeutung>"}],"grammar":"<knappe grammatische Form/Struktur, sonst leer>","context":"<Erklärung auf Deutsch: was die Zeile im Kontext bedeutet/ausdrückt und wie die wichtigen Vokabeln und die Grammatik hier zusammenwirken — inkl. Redewendungen, Konnotation, Bildsprache, Register>"}.
+  const chunks=chunkLyrics(text);
+  const sysSeg="Du bist Sprachlehrer:in und analysierst einen bereitgestellten Liedtext-Abschnitt. Antworte AUSSCHLIESSLICH mit einem gültigen JSON-Array, ohne Markdown.";
+  const usrSeg=(chunk)=>`Sprache: ${l.aiName}. Niveau: ${l.level}. Analysiere die folgenden Liedzeilen Zeile für Zeile für das Sprachenlernen.
+JSON-Array von Objekten, je {"line":"<Originalzeile>","de":"<Übersetzung>","vocab":[{"term":"...","de":"..."}],"grammar":"<knappe Form/Struktur, sonst leer>","context":"<Erklärung auf Deutsch: Bedeutung im Kontext und wie Vokabeln & Grammatik zusammenwirken — inkl. Redewendungen, Bildsprache, Register>"}.
 ${ALLTAG}
 
 Zeilen:
 ${chunk}`;
-
-  app().innerHTML = loadingHTML(`Analysiere den Songtext … (0/${chunks.length})`);
-
-  // Inhalts-Zusammenfassung läuft parallel mit
-  const summaryP = (async()=>{
-    try{
-      const s = await callAI(
-        "Du fasst Liedtexte für Sprachlernende zusammen. Antworte nur mit der Zusammenfassung, ohne Vorrede.",
-        [{role:"user",content:`Fasse in 2-4 deutschen Sätzen zusammen, worum es in diesem ${l.aiName}-Liedtext geht: Thema, Stimmung und zentrale Aussage.\n\n${text.slice(0,2200)}`}],
-        {maxTokens:400}
-      );
-      return (s||"").replace(/```/g,"").trim();
-    }catch(e){ return ""; }
-  })();
-
-  // Abschnitte parallel analysieren (max. 3 gleichzeitig) mit Wiederholversuchen; Reihenfolge bleibt erhalten
-  const segResults = await runPool(chunks, 3, async (chunk)=>{
-    let lastErr;
-    for(let attempt=0; attempt<4; attempt++){
-      if(attempt) await sleep(600*attempt + Math.floor(Math.random()*300));   // Backoff bei Rate-Limit
+  app().innerHTML=loadingHTML(`Analysiere den Songtext … (0/${chunks.length})`);
+  const summaryP=(async()=>{ try{
+    const s=await callAI("Du fasst Liedtexte für Sprachlernende zusammen. Antworte nur mit der Zusammenfassung.",
+      [{role:"user",content:`Fasse in 2-4 deutschen Sätzen zusammen, worum es in diesem ${l.aiName}-Liedtext geht: Thema, Stimmung, Aussage.\n\n${text.slice(0,2200)}`}],{maxTokens:400});
+    return (s||"").replace(/```/g,"").trim();
+  }catch(e){ return ""; } })();
+  const segResults=await runPool(chunks,3, async(chunk)=>{
+    let last;
+    for(let a=0;a<4;a++){
+      if(a) await sleep(600*a+Math.floor(Math.random()*300));
       try{
-        const txt = await callAI(sysSeg, [{role:"user",content:usrSeg(chunk)}], {maxTokens:3500});
-        let arr; try{ const p = parseJSON(txt); arr = Array.isArray(p) ? p : (p.segments||[]); }
-        catch(e){ arr = extractObjects(txt); }
-        const f = (arr||[]).filter(o=>o && o.line);
-        if(f.length) return f;
-        lastErr = new Error("leer");
-      }catch(e){ lastErr = e; }
+        const txt=await callAI(sysSeg,[{role:"user",content:usrSeg(chunk)}],{maxTokens:3500});
+        let arr; try{ const p=parseJSON(txt); arr=Array.isArray(p)?p:(p.segments||[]); }catch(e){ arr=extractObjects(txt); }
+        const f=(arr||[]).filter(o=>o&&o.line); if(f.length) return f; last=new Error("leer");
+      }catch(e){ last=e; }
     }
-    throw lastErr || new Error("fehlgeschlagen");
-  }, (d,t)=>{ app().innerHTML = loadingHTML(`Analysiere den Songtext … (${d}/${t})`); });
-
-  let allSegs = [], failed = 0;
-  segResults.forEach(r=>{ if(Array.isArray(r)) allSegs = allSegs.concat(r); else failed++; });
+    throw last||new Error("fehlgeschlagen");
+  }, (dn,tt)=>{ app().innerHTML=loadingHTML(`Analysiere den Songtext … (${dn}/${tt})`); });
+  let allSegs=[], failed=0;
+  segResults.forEach(r=>{ if(Array.isArray(r)) allSegs=allSegs.concat(r); else failed++; });
   if(!allSegs.length){ toast("Analyse fehlgeschlagen"); songRT=null; renderSong(); return; }
-
-  const summary = await summaryP;
-  songRT = { code, title, summary, segments:allSegs };
+  const summary=await summaryP;
+  songRT={ code, title, summary, segments:allSegs };
   renderSong();
-  if(failed) toast(`${failed} Abschnitt(e) fehlten — „Anderen Text analysieren" und erneut versuchen`);
-}
-function addSongVocab(){
-  if(!songRT) return;
-  const code = songRT.code, seen = {}, arr = [];
-  songRT.segments.forEach(s=>(s.vocab||[]).forEach(v=>{
-    if(!v || !v.term) return;
-    const k = String(v.term).toLowerCase(); if(seen[k]) return; seen[k]=1;
-    arr.push({ term:String(v.term), de:String(v.de||""), cat:"Aus Lied"+(songRT.title?" · "+songRT.title:"") });
-  }));
-  if(!arr.length){ toast("Keine Vokabeln gefunden"); return; }
-  state.langs[code].lessons["song-"+Date.now()] = { vocab:arr };
-  saveState();
-  const msg = document.getElementById("songVocabMsg");
-  if(msg) msg.innerHTML = `<div class="lesson-card"><b>${arr.length} Vokabeln übernommen</b></div>`;
-  toast("In den Trainer übernommen");
+  if(failed) toast(`${failed} Abschnitt(e) fehlten — erneut versuchen`);
 }
 
 /* =========================================================
-   SETTINGS
+   STATISTIK
    ========================================================= */
-function voiceField(code){
-  const l = L(code);
-  const vs = window.speechSynthesis ? speechSynthesis.getVoices() : [];
-  const base = l.speak.split("-")[0].toLowerCase();
-  const matches = vs.filter(v=>v.lang.toLowerCase().startsWith(base));
-  const matchURIs = new Set(matches.map(v=>v.voiceURI));
-  const others = vs.filter(v=>!matchURIs.has(v.voiceURI));
-  const auto = pickVoice(l.speak);
-  const opt = v=>`<option value="${esc(v.voiceURI)}" ${l.voiceURI===v.voiceURI?'selected':''}>${esc(v.name)} (${esc(v.lang)})</option>`;
-  let opts = `<option value="">Automatisch${auto?` — ${esc(auto.name)}`:""}</option>`;
-  opts += matches.map(opt).join("");
-  if(others.length) opts += `<optgroup label="Andere Stimmen (alle installierten)">${others.map(opt).join("")}</optgroup>`;
-  const none = matches.length ? "" : `<p class="hint">Keine ${esc(l.name)}-Stimme erkannt — wähle ggf. unter „Andere Stimmen" oder lade unten nach.</p>`;
-  return `
-    <div class="field">
-      <label>${l.flag} ${l.name}</label>
-      <div class="call-row" style="gap:8px;">
-        <select id="voice-${code}" onchange="setVoice('${code}', this.value)" style="flex:1;">${opts}</select>
-        <button class="btn soft sm" style="width:auto;" onclick="testVoice('${code}')">🔊 Test</button>
-      </div>
-      ${none}
-    </div>`;
-}
-function reloadVoices(){
-  if(window.speechSynthesis){ _voiceCount=-1; speechSynthesis.getVoices(); }
-  toast("Stimmen neu geladen");
-  renderSettings();
+function dayRec(ds){ if(state.daily && state.daily.date===ds) return {done:state.daily.done,sessions:state.daily.sessions}; return state.history[ds]||null; }
+function renderStats(){
+  ensureToday();
+  const days=[]; for(let i=13;i>=0;i--) days.push(todayStr(new Date(Date.now()-i*86400000)));
+  const vals=days.map(ds=>{ const r=dayRec(ds); return r?(r.sessions||0):0; });
+  const max=Math.max(3,...vals);
+  const bars=vals.map(v=>`<div style="flex:1;display:flex;align-items:flex-end;justify-content:center;"><div style="width:62%;height:${Math.round(v/max*72)}px;min-height:2px;background:var(--ink);border-radius:3px 3px 0 0;opacity:${v?1:.12}"></div></div>`).join("");
+  const activeDays = Object.keys(state.history).filter(k=>state.history[k].done).length + (state.daily.done?1:0);
+  const perLang = Object.keys(LANG_CONFIG).map(c=>{ const p=langProgress(c); return `<div class="card" style="display:flex;align-items:center;gap:12px;"><span class="flag" style="font-size:24px">${LANG_CONFIG[c].flag}</span><div style="flex:1"><b>${LANG_CONFIG[c].name}</b><div class="hint">${p.done}/${p.total||0} Einheiten · Niveau ${state.langs[c].level}</div></div></div>`; }).join("");
+  app().innerHTML = `
+    <button class="back" onclick="go('home')">‹ Zurück</button>
+    <h1 class="page-title">Statistik</h1>
+    <p class="page-sub">Dein Verlauf</p>
+    <div class="row" style="margin-bottom:12px">
+      <div class="card" style="flex:1;text-align:center;margin:0"><div class="streak-num">${state.streak.current}</div><div class="hint">Streak</div></div>
+      <div class="card" style="flex:1;text-align:center;margin:0"><div class="streak-num">${state.streak.longest||0}</div><div class="hint">Rekord</div></div>
+      <div class="card" style="flex:1;text-align:center;margin:0"><div class="streak-num">${activeDays}</div><div class="hint">Aktive Tage</div></div>
+    </div>
+    <p class="eyebrow" style="margin-top:14px">Sessions · 14 Tage</p>
+    <div class="card"><div style="display:flex;align-items:flex-end;gap:5px;height:84px;">${bars}</div></div>
+    <p class="eyebrow" style="margin-top:8px">Pro Sprache</p>
+    ${perLang}
+  `;
 }
 
+/* =========================================================
+   EINSTELLUNGEN
+   ========================================================= */
 function renderSettings(){
+  applyRegister();
   const s = state.settings;
-  const rate = s.rate || 0.95;
-  const langLevels = Object.keys(LANG_CONFIG).map(code=>{
-    const l=L(code);
-    const segs = LEVELS.map(lv=>`<button class="${l.level===lv?'on':''}" onclick="setLevel('${code}','${lv}')">${lv}</button>`).join("");
-    return `<div class="field"><label>${l.flag} ${l.name}</label><div class="seg">${segs}</div></div>`;
+  const langToggle = Object.keys(LANG_CONFIG).map(c=>`<button class="${state.routine.langs.includes(c)?'on':''}" onclick="toggleRoutineLang('${c}')">${LANG_CONFIG[c].flag} ${c.toUpperCase()}</button>`).join("");
+  const focusSeg = [`<button class="${state.routine.focusMode==='rotate'?'on':''}" onclick="setFocus('rotate')">Rotierend</button>`]
+    .concat(state.routine.langs.map(c=>`<button class="${state.routine.focusMode===c?'on':''}" onclick="setFocus('${c}')">${LANG_CONFIG[c].flag}</button>`)).join("");
+  const levelFields = Object.keys(LANG_CONFIG).map(c=>{
+    const segs = LEVELS.map(lv=>`<button class="${state.langs[c].level===lv?'on':''}" onclick="setLevel('${c}','${lv}')">${lv}</button>`).join("");
+    return `<div class="field"><label>${LANG_CONFIG[c].flag} ${LANG_CONFIG[c].name}</label><div class="seg">${segs}</div></div>`;
   }).join("");
-  const voiceFields = Object.keys(LANG_CONFIG).map(voiceField).join("");
-  const rateSeg = [["Langsam",0.8],["Normal",0.95],["Zügig",1.1]]
-    .map(([t,r])=>`<button class="${Math.abs(rate-r)<0.01?'on':''}" onclick="setRate(${r})">${t}</button>`).join("");
-
-  ensureRoutineState();
-  const r = state.routine;
-  const langToggle = Object.keys(LANG_CONFIG).map(c=>`<button class="${r.langs.includes(c)?'on':''}" onclick="toggleRoutineLang('${c}')">${LANG_CONFIG[c].flag} ${c.toUpperCase()}</button>`).join("");
-  const focusSeg = [`<button class="${r.focusMode==='rotate'?'on':''}" onclick="setRoutineFocus('rotate')">Rotierend</button>`]
-    .concat(r.langs.map(c=>`<button class="${r.focusMode===c?'on':''}" onclick="setRoutineFocus('${c}')">${LANG_CONFIG[c].flag}</button>`)).join("");
-  const revSeg = [10,20,30].map(n=>`<button class="${(r.reviews||20)===n?'on':''}" onclick="setReviews(${n})">${n}</button>`).join("");
-  const convSeg = [["An",true],["Aus",false]].map(([t,v])=>`<button class="${(!!r.conv)===v?'on':''}" onclick="setRoutineConv(${v})">${t}</button>`).join("");
-  if(!s.reminder) s.reminder = { on:false, time:"19:00" };
-  if(!s.firebase) s.firebase = { config:"", lastSync:"" };
-  const rem = s.reminder;
-  const remOnSeg = [["An",true],["Aus",false]].map(([t,v])=>`<button class="${(!!rem.on)===v?'on':''}" onclick="setReminderOn(${v})">${t}</button>`).join("");
-  const regKey = registerKey();
-  const regSeg = Object.keys(REGISTERS).map(k=>`<button class="${regKey===k?'on':''}" onclick="setRegister('${k}')">${REGISTERS[k].label}</button>`).join("");
+  const regSeg = Object.keys(REGISTERS).map(k=>`<button class="${registerKey()===k?'on':''}" onclick="setRegister('${k}')">${REGISTERS[k].label}</button>`).join("");
 
   app().innerHTML = `
     <button class="back" onclick="go('home')">‹ Zurück</button>
     <h1 class="page-title">Einstellungen</h1>
-    <p class="page-sub">Niveau, Stimmen, KI-Verbindung & Installation</p>
+    <p class="page-sub">plan. erstellt deinen Lernplan und übergibt jede Einheit als Auftrag an Langua.</p>
 
-    <p class="eyebrow">Niveau pro Sprache</p>
-    ${langLevels}
-    <p class="hint" style="margin:-6px 0 24px;">Niveau ändern erzeugt einen neuen Lernpfad für diese Sprache.</p>
+    <p class="eyebrow">Niveau je Sprache</p>
+    ${levelFields}
+    <p class="hint" style="margin:-4px 0 22px">Niveau ändern wirkt sich auf neu erstellte Pläne aus.</p>
 
     <p class="eyebrow">Sprachstil</p>
-    <div class="field" style="margin-bottom:24px;"><div class="seg seg-wrap">${regSeg}</div>
-      <p class="hint">Steuert den Tonfall von Gesprächen und neu generierten Inhalten — von formell bis viel Slang. Gespräche wirken sofort; bereits erstellte Inhalte ändern sich erst bei Neugenerierung.</p></div>
+    <div class="field" style="margin-bottom:22px"><div class="seg">${regSeg}</div>
+      <p class="hint">Tonfall der Aufträge, Wörter und Beispiele.</p></div>
 
-    <p class="eyebrow">Tägliche Routine</p>
-    <div class="field"><label>Sprachen im Plan</label><div class="seg">${langToggle}</div>
-      <p class="hint">Alle ausgewählten Sprachen werden jeden Tag kurz aufgefrischt.</p></div>
-    <div class="field"><label>Tagesfokus</label><div class="seg">${focusSeg}</div>
-      <p class="hint">Die Fokus-Sprache bekommt das volle Programm (Wiederholen, neue Einheit, Gespräch). „Rotierend" wechselt täglich durch.</p></div>
-    <div class="field"><label>Wiederholungen pro Session</label><div class="seg">${revSeg}</div></div>
-    <div class="field" style="margin-bottom:24px;"><label>Konversation im Tagesziel</label><div class="seg">${convSeg}</div></div>
-
-    <p class="eyebrow">Stimmen</p>
-    ${voiceFields}
-    <button class="btn soft sm" style="width:auto;margin-bottom:14px" onclick="reloadVoices()">↻ Stimmen neu laden</button>
-    <div class="field">
-      <label>Sprechtempo</label>
-      <div class="seg">${rateSeg}</div>
-    </div>
-    <div class="lesson-card" style="margin-bottom:24px;">
-      <p style="margin:0;font-size:14px;color:var(--ink-soft);">Klingt es blechern? Lade auf dem iPhone die <b>natürlichen HD-Stimmen</b> nach: <b>Einstellungen → Bedienungshilfen → Gesprochene Inhalte → Stimmen</b> → Sprache wählen → eine Stimme mit dem Zusatz <b>„Premium"</b> oder <b>„Erweitert"</b> herunterladen. Danach hier oben „↻ Stimmen neu laden" und auswählen.<br><br>Hinweis: iOS gibt manche heruntergeladenen Stimmen (besonders die Siri-Stimmen) leider <b>nicht</b> an Web-Apps frei — diese erscheinen dann auch nach dem Neuladen nicht. Am besten funktioniert sprich. als <b>Home-Bildschirm-App</b>; ein Neustart nach dem Download hilft oft, dass die Stimmen sichtbar werden.</p>
-    </div>
+    <p class="eyebrow">Tagesfokus</p>
+    <div class="field"><label>Sprachen im Plan</label><div class="seg">${langToggle}</div></div>
+    <div class="field" style="margin-bottom:22px"><label>Fokus heute</label><div class="seg">${focusSeg}</div>
+      <p class="hint">„Rotierend" wechselt die Fokus-Sprache täglich.</p></div>
 
     <p class="eyebrow">KI-Verbindung</p>
-    <div class="field">
-      <label>API-Endpoint</label>
-      <input id="setEndpoint" value="${esc(s.endpoint)}">
-      <p class="hint">Hier im Chat funktioniert <code>api.anthropic.com</code> direkt. Für GitHub Pages trag deinen Cloudflare-Worker ein (z. B. <code>https://spring-water-f9f9.philipp-zart.workers.dev</code>) — er muss den Body als Anthropic-<code>/v1/messages</code>-Format weiterreichen.</p>
-    </div>
-    <div class="field">
-      <label>Modell</label>
-      <input id="setModel" value="${esc(s.model)}">
-      <p class="hint">z. B. <code>claude-sonnet-4-6</code> (beste Gesprächsqualität) oder <code>claude-3-5-haiku-20241022</code> (schnell/günstig).</p>
-    </div>
-    <button class="btn" onclick="saveSettings()">Verbindung speichern</button>
+    <div class="field"><label>Endpoint (Cloudflare-Worker)</label><input id="setEndpoint" value="${esc(s.endpoint||'')}" placeholder="https://…workers.dev/"></div>
+    <div class="field"><label>Modell</label><input id="setModel" value="${esc(s.model||'')}"></div>
+    <button class="btn soft sm" style="width:auto;margin-bottom:22px" onclick="saveConn()">Verbindung speichern</button>
 
-    <p class="eyebrow" style="margin-top:28px">Statistik</p>
-    <button class="btn soft" onclick="go('stats')">Aktivität & Verlauf ansehen</button>
+    <p class="eyebrow">Backup</p>
+    <button class="btn soft" onclick="exportData()">Daten exportieren</button>
+    <button class="btn ghost" style="margin-top:10px" onclick="document.getElementById('imp').click()">Daten importieren</button>
+    <input type="file" id="imp" accept="application/json" style="display:none" onchange="importData(event)">
 
-    <p class="eyebrow" style="margin-top:28px">Erinnerung</p>
-    <div class="field"><label>Tägliche Erinnerung</label><div class="seg">${remOnSeg}</div></div>
-    ${rem.on?`<div class="field"><label>Uhrzeit</label><input type="time" id="remTime" value="${esc(rem.time||'19:00')}" onchange="setReminderTime(this.value)"></div>`:""}
-    <p class="hint" style="margin:-6px 0 0;">Da eine Web-App keine zuverlässigen Hintergrund-Pushes auf iOS senden kann, erinnert dich sprich. beim Öffnen, falls dein Tagesziel noch offen ist. ${rem.on?`<button class="btn soft sm" style="width:auto;margin-top:10px" onclick="testReminderPermission()">Benachrichtigungen erlauben</button>`:""}</p>
-
-    <p class="eyebrow" style="margin-top:28px">Backup</p>
-    <button class="btn soft" onclick="exportData()">Daten exportieren (Sicherung)</button>
-    <button class="btn ghost" style="margin-top:10px" onclick="document.getElementById('importFile').click()">Daten importieren</button>
-    <input type="file" id="importFile" accept="application/json" style="display:none" onchange="importData(event)">
-    <p class="hint" style="margin:8px 0 0;">Alles liegt nur lokal in diesem Browser. Exportiere regelmäßig — und nutze dieselbe Datei, um sprich. auf einem anderen Gerät zu übernehmen.</p>
-
-    <p class="eyebrow" style="margin-top:28px">Cloud-Sync (Firebase, optional)</p>
-    <div class="field">
-      <label>Firebase Web-Config (JSON)</label>
-      <input id="fbConfig" value="${esc(s.firebase&&s.firebase.config||'')}" placeholder='{"apiKey":"…","projectId":"…",…}'>
-      <p class="hint">Aus deiner Firebase-Konsole (Projekteinstellungen → Web-App). Aktiviere dort „Anonyme Anmeldung" und Firestore. Dann gerätübergreifend sichern/laden.</p>
-    </div>
-    <div class="call-row" style="gap:8px;">
-      <button class="btn soft sm" style="flex:1" onclick="saveFirebaseConfig()">Config speichern</button>
-      <button class="btn soft sm" style="flex:1" onclick="cloudSave()">In Cloud sichern</button>
-      <button class="btn soft sm" style="flex:1" onclick="cloudLoad()">Aus Cloud laden</button>
-    </div>
-    <p class="hint" id="fbStatus" style="margin:8px 0 0;">${s.firebase&&s.firebase.lastSync?`Zuletzt synchronisiert: ${esc(s.firebase.lastSync)}`:""}</p>
-
-    <p class="eyebrow" style="margin-top:28px">Aufs iPhone</p>
-    <div class="lesson-card">
-      <p style="margin:0;font-size:14.5px;color:var(--ink-soft);">Safari öffnen → Teilen-Symbol → „Zum Home-Bildschirm". Dann startet <b>sprich.</b> als App im Vollbild, und das Mikrofon im Call Mode funktioniert.</p>
-    </div>
-
-    <button class="btn ghost" style="margin-top:20px;color:var(--bad);border-color:var(--bad);" onclick="resetAll()">Fortschritt zurücksetzen</button>
+    <button class="btn ghost" style="margin-top:22px;color:#9B9CA2;border-color:var(--line)" onclick="resetAll()">Alles zurücksetzen</button>
   `;
-
-  // Stimmen laden oft verzögert — bei Bedarf einmal neu rendern
-  if(window.speechSynthesis && !speechSynthesis.getVoices().length){
-    speechSynthesis.getVoices();
-    speechSynthesis.addEventListener("voiceschanged", function reload(){
-      speechSynthesis.removeEventListener("voiceschanged", reload);
-      if(view.name==="settings") renderSettings();
-    });
-  }
-}
-function setVoice(code, uri){
-  state.langs[code].voiceURI = uri || null;
-  saveState();
-  testVoice(code);
-}
-function testVoice(code){
-  const samples = { es:"Hola, ¿qué tal? Vamos a practicar.", fr:"Bonjour, on va s'entraîner ensemble.", sv:"Hej, ska vi öva lite tillsammans?" };
-  speak(samples[code]||"Hallo", LANG_CONFIG[code].speak);
-}
-function setRate(r){
-  state.settings.rate = r;
-  saveState();
-  renderSettings();
-  // kurze Hörprobe in einer verfügbaren Sprache
-  testVoice("es");
-}
-function setLevel(code, lv){
-  if(state.langs[code].level===lv){ return; }
-  applyLevel(code, lv);
 }
 function toggleRoutineLang(c){
-  ensureRoutineState();
-  const a = state.routine.langs, i = a.indexOf(c);
+  const a=state.routine.langs, i=a.indexOf(c);
   if(i>=0){ if(a.length>1) a.splice(i,1); } else a.push(c);
-  if(state.routine.focusMode!=="rotate" && !a.includes(state.routine.focusMode)) state.routine.focusMode = "rotate";
+  if(state.routine.focusMode!=="rotate" && !a.includes(state.routine.focusMode)) state.routine.focusMode="rotate";
   saveState(); renderSettings();
 }
-function setRoutineFocus(v){ ensureRoutineState(); state.routine.focusMode=v; saveState(); renderSettings(); }
-function setReviews(n){ ensureRoutineState(); state.routine.reviews=n; saveState(); renderSettings(); }
-function setRoutineConv(v){ ensureRoutineState(); state.routine.conv=v; saveState(); renderSettings(); }
-function setRegister(k){ if(!state.settings) state.settings={}; state.settings.register=k; applyRegister(); saveState(); renderSettings(); }
-
-function saveSettings(){
-  state.settings.endpoint = document.getElementById("setEndpoint").value.trim();
-  state.settings.model = document.getElementById("setModel").value.trim();
-  saveState();
-  toast("Gespeichert");
-}
-function resetAll(){
-  if(confirm("Allen Lernfortschritt und alle Lernpfade löschen?")){
-    localStorage.removeItem(STORE_KEY);
-    state = loadState();
-    toast("Zurückgesetzt");
-    go("home");
-  }
-}
-
-/* ---- Backup: Export / Import ---- */
+function setFocus(v){ state.routine.focusMode=v; saveState(); renderSettings(); }
+function setLevel(c,lv){ state.langs[c].level=lv; saveState(); renderSettings(); }
+function setRegister(k){ state.settings.register=k; applyRegister(); saveState(); renderSettings(); }
+function saveConn(){ state.settings.endpoint=document.getElementById("setEndpoint").value.trim(); state.settings.model=document.getElementById("setModel").value.trim(); saveState(); toast("Gespeichert"); }
 function exportData(){
   try{
-    const blob = new Blob([JSON.stringify(state)], {type:"application/json"});
-    const url = URL.createObjectURL(blob);
-    const a = document.createElement("a");
-    a.href = url; a.download = "sprich-backup-"+todayStr()+".json";
-    document.body.appendChild(a); a.click(); a.remove();
-    setTimeout(()=>URL.revokeObjectURL(url), 1000);
-    toast("Sicherung exportiert");
+    const blob=new Blob([JSON.stringify(state)],{type:"application/json"});
+    const url=URL.createObjectURL(blob); const a=document.createElement("a");
+    a.href=url; a.download="plan-backup-"+todayStr()+".json"; document.body.appendChild(a); a.click(); a.remove();
+    setTimeout(()=>URL.revokeObjectURL(url),1000); toast("Exportiert");
   }catch(e){ toast("Export fehlgeschlagen"); }
 }
 function importData(ev){
-  const file = ev.target.files && ev.target.files[0];
-  if(!file) return;
-  const rd = new FileReader();
-  rd.onload = ()=>{
-    try{
-      const obj = JSON.parse(rd.result);
-      if(!obj || !obj.langs) throw new Error("kein gültiges Backup");
-      if(!confirm("Aktuelle Daten durch das Backup ersetzen?")) return;
-      state = obj; saveState(); applyRegister(); toast("Backup importiert"); go("home");
-    }catch(e){ toast("Import fehlgeschlagen: "+e.message); }
-  };
-  rd.readAsText(file);
+  const f=ev.target.files&&ev.target.files[0]; if(!f) return;
+  const rd=new FileReader();
+  rd.onload=()=>{ try{ const o=JSON.parse(rd.result); if(!o||!o.langs) throw new Error("kein gültiges Backup"); if(!confirm("Daten ersetzen?")) return; state=migrate(o); saveState(); applyRegister(); toast("Importiert"); go("home"); }catch(e){ toast("Import fehlgeschlagen: "+e.message); } };
+  rd.readAsText(f);
 }
-
-/* ---- Erinnerung ---- */
-function setReminderOn(v){
-  if(!state.settings.reminder) state.settings.reminder={on:false,time:"19:00"};
-  state.settings.reminder.on = v;
-  saveState();
-  if(v) testReminderPermission();
-  renderSettings();
-}
-function setReminderTime(t){ if(!state.settings.reminder) state.settings.reminder={on:true,time:t}; state.settings.reminder.time=t; saveState(); }
-function testReminderPermission(){
-  if(!("Notification" in window)){ toast("Benachrichtigungen nicht unterstützt"); return; }
-  Notification.requestPermission().then(p=>{ toast(p==="granted"?"Benachrichtigungen erlaubt":"Erinnerung erscheint beim Öffnen"); });
-}
-function maybeRemind(){
-  const r = state.settings && state.settings.reminder;
-  if(!r || !r.on) return;
-  const d = ensureToday();
-  if(d.goalMet) return;
-  const now = new Date(), [h,m] = (r.time||"19:00").split(":").map(Number);
-  if(now.getHours()*60+now.getMinutes() < h*60+m) return;        // noch vor der Zeit
-  if(r.lastNudge===d.date) return;                                 // heute schon erinnert
-  r.lastNudge = d.date; saveState();
-  const msg = "Dein Tagesziel in sprich. ist noch offen.";
-  if(("Notification" in window) && Notification.permission==="granted"){
-    try{ new Notification("sprich.", { body:msg }); }catch(e){ toast(msg); }
-  }else{ toast(msg); }
-}
-
-/* ---- Cloud-Sync (Firebase, optional) ---- */
-function saveFirebaseConfig(){
-  if(!state.settings.firebase) state.settings.firebase={config:"",lastSync:""};
-  state.settings.firebase.config = document.getElementById("fbConfig").value.trim();
-  saveState(); toast("Config gespeichert");
-}
-let _fb = null;
-async function fbInit(){
-  const cfgRaw = state.settings.firebase && state.settings.firebase.config;
-  if(!cfgRaw) throw new Error("Keine Firebase-Config eingetragen");
-  let cfg; try{ cfg = JSON.parse(cfgRaw); }catch(e){ throw new Error("Config ist kein gültiges JSON"); }
-  if(_fb) return _fb;
-  async function load(src){ return new Promise((res,rej)=>{ const sc=document.createElement("script"); sc.src=src; sc.onload=res; sc.onerror=()=>rej(new Error("SDK-Ladefehler")); document.head.appendChild(sc); }); }
-  if(!window.firebase){
-    await load("https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js");
-    await load("https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js");
-    await load("https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js");
-  }
-  const app = window.firebase.apps.length ? window.firebase.app() : window.firebase.initializeApp(cfg);
-  await window.firebase.auth().signInAnonymously();
-  const uid = window.firebase.auth().currentUser.uid;
-  _fb = { db: window.firebase.firestore(), uid };
-  return _fb;
-}
-async function cloudSave(){
-  const st = document.getElementById("fbStatus"); if(st) st.textContent="Sichere …";
-  try{
-    const { db, uid } = await fbInit();
-    await db.collection("sprich").doc(uid).set({ data: JSON.stringify(state), updated: Date.now() });
-    state.settings.firebase.lastSync = new Date().toLocaleString("de-DE");
-    saveState();
-    if(st) st.textContent = "Gesichert: "+state.settings.firebase.lastSync;
-    toast("In Cloud gesichert");
-  }catch(e){ if(st) st.textContent="Fehler: "+e.message; toast("Sync-Fehler"); }
-}
-async function cloudLoad(){
-  const st = document.getElementById("fbStatus"); if(st) st.textContent="Lade …";
-  try{
-    const { db, uid } = await fbInit();
-    const snap = await db.collection("sprich").doc(uid).get();
-    if(!snap.exists){ if(st) st.textContent="Keine Cloud-Sicherung gefunden"; return; }
-    const obj = JSON.parse(snap.data().data);
-    if(!obj || !obj.langs) throw new Error("ungültige Daten");
-    if(!confirm("Lokale Daten durch die Cloud-Sicherung ersetzen?")) return;
-    obj.settings = obj.settings || state.settings;        // Config/Endpoint lokal behalten
-    obj.settings.firebase = state.settings.firebase;
-    obj.settings.endpoint = state.settings.endpoint;
-    state = obj; saveState(); applyRegister(); toast("Aus Cloud geladen"); go("home");
-  }catch(e){ if(st) st.textContent="Fehler: "+e.message; toast("Sync-Fehler"); }
-}
+function resetAll(){ if(confirm("Alle Pläne und Fortschritte löschen?")){ localStorage.removeItem(STORE_KEY); state=defaultState(); toast("Zurückgesetzt"); go("home"); } }
 
 /* =========================================================
-   Helpers
+   Globale Freigabe für inline-Handler
    ========================================================= */
-function loadingHTML(msg){ return `<div class="loading"><div class="spin"></div><div>${esc(msg)}</div></div>`; }
-function esc(s){ return String(s==null?"":s).replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c])); }
-function norm(s){ return String(s||"").toLowerCase().trim().replace(/[.,!?;:¿¡"']/g,"").replace(/\s+/g," "); }
-function stripAccents(s){ return s.normalize("NFD").replace(/[\u0300-\u036f]/g,""); }
-
-/* expose handlers (inline onclick) */
-Object.assign(window,{ go,openLang,renderPath,paintUnits,toggleModule,retryModule,openUnit,renderLesson,startExercises,startUnitConversation,regeneratePath,
-  answerMC,submitText,nextExercise,quitExercises,applyLevel,startCall,toggleMic,sendCallText,
-  sendCallText,replayLine,endCall,sendUserTurn,setLevel,saveSettings,resetAll,speak,paintCallStage,
-  setVoice,testVoice,setRate,reloadVoices,
-  startTodayReviews,openNextUnit,toggleRoutineLang,setRoutineFocus,setReviews,setRoutineConv,setRegister,
-  openQuickVocab,closeQuickVocab,startQuickVocab,updateFab,
-  renderSong,analyzeSong,addSongVocab,resetSong,
-  renderStats,exportData,importData,setReminderOn,setReminderTime,testReminderPermission,
-  saveFirebaseConfig,cloudSave,cloudLoad,addCustomTopic,deleteCustom,submitVocabDiktat,speakVocab,showCallReport,extractCallVocab,
-  renderVocab,startVocabSession,flipFlash,answerVocabMC,submitVocabWrite,submitVocabCloze,gradeVocab,quitVocab });
+Object.assign(window, {
+  go, openLang, openUnit, markUnit, markVocab,
+  toggleModule, addCustomTopic,
+  analyzeSong, resetSong, copyText,
+  toggleRoutineLang, setFocus, setLevel, setRegister, saveConn, exportData, importData, resetAll,
+  renderUnit, renderSong, renderSettings, renderVocabList, renderVocabItem
+});
 
 /* start */
 applyRegister();
