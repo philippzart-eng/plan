@@ -359,26 +359,35 @@ body{ background:var(--paper); }
 .btn.live{background:var(--ink-faint);}
 .seg.seg-wrap{flex-wrap:wrap;}
 .seg.seg-wrap button{flex:1 1 30%;}
-/* Schnellzugriff Vokabeln */
-.fab{position:fixed;right:18px;bottom:calc(20px + var(--safe-bot));z-index:50;width:58px;height:58px;border-radius:50%;
-  background:var(--ink);color:#fff;border:none;display:flex;align-items:center;justify-content:center;
-  box-shadow:0 6px 20px rgba(20,24,40,.28);cursor:pointer;}
-.fab:active{transform:scale(.94);}
-.qoverlay{position:fixed;inset:0;z-index:60;background:rgba(20,24,40,.32);display:flex;align-items:flex-end;justify-content:center;animation:qfade .18s ease;}
-@keyframes qfade{from{opacity:0}to{opacity:1}}
-.qsheet{width:100%;max-width:520px;background:var(--card);border-radius:22px 22px 0 0;padding:14px 18px calc(22px + var(--safe-bot));
-  box-shadow:0 -10px 30px rgba(20,24,40,.18);animation:qup .22s ease;}
-@keyframes qup{from{transform:translateY(20px)}to{transform:translateY(0)}}
-.qsheet-grip{width:40px;height:4px;border-radius:99px;background:var(--line);margin:2px auto 12px;}
-.qrow{display:flex;align-items:center;gap:12px;width:100%;background:var(--card);border:1px solid var(--line);border-radius:14px;padding:12px 14px;margin-bottom:8px;cursor:pointer;text-align:left;}
-.qrow:active{background:var(--accent-tint);}
+/* Untere Tab-Leiste */
+.tabbar{position:fixed;left:0;right:0;bottom:0;z-index:50;display:flex;background:var(--card);
+  border-top:1px solid var(--line);padding:6px 4px calc(6px + var(--safe-bot));max-width:520px;margin:0 auto;}
+.tab{flex:1;background:none;border:none;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;
+  padding:5px 2px;color:var(--ink-faint);cursor:pointer;font:inherit;min-width:0;}
+.tab .tab-ic{height:22px;display:flex;align-items:center;justify-content:center;font-size:19px;line-height:1;}
+.tab .tab-lb{font-size:10.5px;font-weight:600;max-width:100%;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+.tab.on{color:var(--ink);}
+.tab.on .tab-lb{font-weight:800;}
+#app{padding-bottom:calc(88px + var(--safe-bot));}
+/* Sprach-Header & Werkzeuge */
+.ph-title{font-family:var(--display);font-weight:700;font-size:24px;display:flex;align-items:center;gap:9px;}
+.tool-row{display:flex;gap:8px;margin-top:10px;}
+.tool-row .btn{flex:1;margin-top:0;}
+/* Songtext-Analyse */
+textarea{width:100%;border:1px solid var(--line);border-radius:12px;padding:12px 14px;font:inherit;font-size:15px;background:var(--card);color:var(--ink);resize:vertical;box-sizing:border-box;}
+textarea:focus{outline:none;border-color:var(--ink);}
+.song-line{display:flex;align-items:center;justify-content:space-between;gap:10px;font-weight:600;font-size:15.5px;}
+.song-de{color:var(--ink-soft);font-size:14px;margin-top:5px;}
+.song-vocab{margin-top:10px;border-top:1px solid var(--line-soft);padding-top:6px;}
+.song-gram{margin-top:8px;font-size:13.5px;color:var(--ink-soft);line-height:1.45;}
+.song-gram b{color:var(--ink);margin-right:4px;}
+.song-context{margin-top:8px;padding-top:8px;border-top:1px solid var(--line-soft);font-size:13.5px;color:var(--ink-soft);line-height:1.5;}
+.song-context b{color:var(--ink);margin-right:4px;}
 </style>
 </head>
 <body>
 <div id="app"></div>
-<button id="fab" class="fab" style="display:none" onclick="openQuickVocab()" aria-label="Schnell Vokabeln üben">
-  <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"><rect x="3" y="6" width="13" height="14" rx="2"/><path d="M8 3h11a2 2 0 0 1 2 2v12"/></svg>
-</button>
+<nav id="tabbar" class="tabbar" style="display:none"></nav>
 <div class="toast" id="toast"></div>
 
 <script>
@@ -691,13 +700,25 @@ function render(){
   else if(view.name==="vocab"){ setAccent(view.lang); renderVocab(); }
   else if(view.name==="stats"){ setAccent(null); renderStats(); }
   else if(view.name==="lesson"){ setAccent(view.lang); renderLesson(); }
+  else if(view.name==="song"){ setAccent(view.lang); renderSong(); }
   updateFab();
   window.scrollTo(0,0);
 }
 function updateFab(){
-  const f = document.getElementById("fab");
-  if(!f) return;
-  f.style.display = ["home","path","stats"].includes(view.name) ? "flex" : "none";
+  const bar = document.getElementById("tabbar");
+  if(!bar) return;
+  const hide = ["call","lesson"].includes(view.name);
+  if(hide){ bar.style.display="none"; return; }
+  bar.style.display = "flex";
+  const langs = (state.routine && state.routine.langs && state.routine.langs.length) ? state.routine.langs : Object.keys(LANG_CONFIG);
+  const isHome = view.name==="home";
+  const homeIc = `<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 11l9-7 9 7"/><path d="M5 10v9h14v-9"/></svg>`;
+  let tabs = `<button class="tab ${isHome?'on':''}" onclick="go('home')"><span class="tab-ic">${homeIc}</span><span class="tab-lb">Heute</span></button>`;
+  langs.forEach(c=>{
+    const active = !isHome && view.lang===c;
+    tabs += `<button class="tab ${active?'on':''}" onclick="go('path',{lang:'${c}'})"><span class="tab-ic">${LANG_CONFIG[c].flag}</span><span class="tab-lb">${LANG_CONFIG[c].name}</span></button>`;
+  });
+  bar.innerHTML = tabs;
 }
 function go(name, extra={}){ view = { name, ...extra }; render(); }
 
@@ -766,25 +787,6 @@ function renderHome(){
   const doneTasks = fTasks.filter(x=>x.done).length + others.filter(c=>!!d.maint[c]).length;
   const pct = totalTasks ? Math.round(doneTasks/totalTasks*100) : 0;
 
-  const cards = Object.keys(LANG_CONFIG).map(c=>{
-    const lc = L(c);
-    const total = (Array.isArray(lc.modules) && lc.modules.length) ? lc.modules.length*UNITS_PER_MODULE : PATH_MODULES*UNITS_PER_MODULE;
-    const done = Object.values(lc.progress).filter(s=>s==="done").length;
-    const p = total ? Math.min(100, Math.round(done/total*100)) : 0;
-    const words = wordsLearned(c);
-    return `
-    <button class="lang-card" onclick="openLang('${c}')" style="--lc:${lc.accent};--lct:${lc.tint};">
-      <span class="stripe"></span>
-      <div class="lang-head">
-        <span class="flag">${lc.flag}</span>
-        <div><div class="lang-name">${lc.name}</div><div class="lang-sub">${done} von ${total} Einheiten</div></div>
-        <span class="chip">${lc.level}</span>
-      </div>
-      <div class="bar"><i style="width:${p}%"></i></div>
-      <div class="lang-foot"><span>${lc.xp} XP</span><span>${words} Wörter</span><span>${p}%</span></div>
-    </button>`;
-  }).join("");
-
   app().innerHTML = `
     <div class="topbar">
       <div class="brand">sprich<span>.</span></div>
@@ -812,19 +814,7 @@ function renderHome(){
       ${others.length?`<div class="plan-sub">Kurz auffrischen</div>${maintHTML}`:""}
     </div>
 
-    <p class="eyebrow">Schnell üben</p>
-    <div class="quick-vocab">
-      ${Object.keys(LANG_CONFIG).map(c=>{
-        const due = vocabStats(c).due;
-        return `<button class="qv-btn" onclick="startTodayReviews('${c}')">
-          <span class="flag">${LANG_CONFIG[c].flag}</span>
-          <span class="qv-meta">${due>0?`${due} fällig`:'üben'}</span>
-        </button>`;
-      }).join("")}
-    </div>
-
-    <p class="eyebrow">Deine Sprachen</p>
-    ${cards}
+    <p class="hint" style="text-align:center;margin-top:18px">Wähle unten eine Sprache für Lektionen, Vokabeln, Songtexte und Gespräche.</p>
   `;
 }
 
@@ -982,14 +972,26 @@ function renderStats(){
    ========================================================= */
 async function renderPath(){
   const code = view.lang, l = L(code);
+  const isFocus = view.lang===ensureToday().focus;
   app().innerHTML = `
-    <button class="back" onclick="go('home')">‹ Sprachen</button>
-    <div style="display:flex;align-items:center;gap:12px;margin-bottom:4px;">
-      <span class="flag">${l.flag}</span>
-      <h1 class="page-title" style="margin:0">${l.name}</h1>
-      <span class="chip" style="--lc:${l.accent};--lct:${l.tint};margin-left:auto;background:${l.tint};color:${l.accent};">${l.level}</span>
+    <div class="topbar">
+      <div class="ph-title">${l.flag} ${l.name}</div>
+      <button class="iconbtn" onclick="go('settings')" aria-label="Einstellungen">⚙</button>
     </div>
-    <p class="page-sub">Lernpfad · Niveau ${l.level}</p>
+    <div style="display:flex;align-items:center;gap:8px;margin:0 0 16px;">
+      <span class="chip" style="background:var(--accent-tint);color:var(--ink);">Niveau ${l.level}</span>
+      ${isFocus?`<span class="chip">★ Fokus heute</span>`:""}
+    </div>
+
+    <p class="eyebrow">Werkzeuge</p>
+    <button class="btn" onclick="go('vocab',{lang:'${code}'})">Vokabeltrainer</button>
+    <div class="tool-row">
+      <button class="btn soft sm" onclick="go('call',{lang:'${code}'})">Gespräch</button>
+      <button class="btn soft sm" onclick="go('song',{lang:'${code}'})">Songtext</button>
+      <button class="btn soft sm" onclick="addCustomTopic('${code}')">Eigenes Thema</button>
+    </div>
+
+    <p class="eyebrow" style="margin-top:24px">Lernpfad</p>
     <div id="pathBody"></div>
   `;
   // Module einmalig erzeugen (1 Aufruf). Alte Pfade ohne Modul-Liste werden migriert.
@@ -1174,13 +1176,7 @@ function paintUnits(){
     }
   });
 
-  document.getElementById("pathBody").innerHTML = html + `
-    <div class="center-actions">
-      <button class="btn soft" onclick="addCustomTopic('${code}')">+ Eigenes Thema lernen</button>
-      <button class="btn" style="margin-top:10px" onclick="go('vocab',{lang:'${code}'})">Vokabeltrainer</button>
-      <button class="btn ghost" style="margin-top:10px" onclick="go('call',{lang:'${code}'})">Freies Gespräch im Call Mode</button>
-    </div>
-  `;
+  document.getElementById("pathBody").innerHTML = html;
 
   // offenes, noch nicht geladenes Modul nachladen
   const openMod = modules[openModuleIdx];
@@ -1844,12 +1840,13 @@ function speakVocab(){
 
 function vocabFeedback(ok, answer, note){
   const l = L(vocabRT.code);
+  const card = vocabRT.queue[vocabRT.pos];
   const fb = document.getElementById("vFeedback");
   fb.innerHTML = `
     <div class="feedback ${ok?'ok':'no'}">
       <b>${ok?'Richtig! 🎉':'Nicht ganz'}</b>
       ${note?esc(note):''}
-      <button class="btn soft sm" style="margin-top:10px" onclick="speak(${esc(JSON.stringify(answer))},'${l.speak}')">🔊 anhören</button>
+      <button class="btn soft sm" style="margin-top:10px" onclick="speak(${esc(JSON.stringify(card.term))},'${l.speak}')">🔊 ${esc(card.term)} anhören</button>
     </div>
     <button class="btn" style="margin-top:14px" onclick="gradeVocab('${ok?'good':'again'}')">Weiter</button>`;
   fb.scrollIntoView({behavior:"smooth", block:"center"});
@@ -2046,22 +2043,32 @@ function toggleMic(){
   stopSpeak();
   recog = new SR();
   recog.lang = LANG_CONFIG[call.code].speak;
-  recog.interimResults = false;
+  recog.interimResults = true;
+  recog.continuous = false;
   recog.maxAlternatives = 1;
   call.listening = true;
+  let heard = "", sent = false;
   const orb=document.querySelector(".orb"); if(orb){orb.classList.remove("speaking");orb.classList.add("listening");}
-  const btn=document.getElementById("micBtn"); if(btn){btn.classList.add("live");btn.textContent="⏹ Zuhören…";}
+  const btn=document.getElementById("micBtn"); if(btn){btn.classList.add("live");btn.textContent="⏹ Fertig";}
   const st=document.querySelector(".call-status"); if(st) st.textContent="Ich höre zu …";
   recog.onresult = (e)=>{
-    const text = e.results[0][0].transcript;
-    call.listening=false;
-    sendUserTurn(text);
+    let t = "";
+    for(let i=0;i<e.results.length;i++) t += e.results[i][0].transcript;
+    heard = t.trim();
+    const s=document.querySelector(".call-status"); if(s && heard) s.textContent = heard;
   };
-  recog.onerror = (e)=>{ call.listening=false; resetMicUI(); if(e.error!=="aborted") toast("Konnte nicht hören — bitte tippen"); };
-  recog.onend = ()=>{ call.listening=false; resetMicUI(); };
+  recog.onerror = (e)=>{
+    call.listening=false; resetMicUI();
+    if(e.error==="not-allowed" || e.error==="service-not-allowed") toast("Mikrofon nicht erlaubt — in den Safari-Einstellungen freigeben");
+    else if(e.error!=="aborted" && e.error!=="no-speech" && !heard) toast("Nicht verstanden — bitte nochmal");
+  };
+  recog.onend = ()=>{
+    call.listening=false; resetMicUI();
+    if(heard && !sent){ sent=true; sendUserTurn(heard); }
+  };
   try{ recog.start(); }catch(e){ call.listening=false; resetMicUI(); }
 }
-function stopMic(){ if(recog){ try{recog.stop();}catch(e){} } call.listening=false; resetMicUI(); }
+function stopMic(){ if(recog){ try{recog.stop();}catch(e){} } if(call) call.listening=false; resetMicUI(); }
 function resetMicUI(){
   const orb=document.querySelector(".orb"); if(orb) orb.classList.remove("listening");
   const btn=document.getElementById("micBtn"); if(btn){btn.classList.remove("live");btn.textContent="🎤 Antippen & sprechen";}
@@ -2142,6 +2149,149 @@ async function extractCallVocab(){
     if(box) box.innerHTML = `<div class="lesson-card"><h3>${arr.length} Wörter übernommen</h3>${arr.map(v=>`<div class="vocab-row"><div class="vocab-term">${esc(v.term)}</div><div class="vocab-de">${esc(v.de)}</div></div>`).join("")}</div>`;
     toast("In den Trainer übernommen");
   }catch(e){ if(box) box.innerHTML = `<div class="err">Fehler: ${esc(e.message)}</div>`; }
+}
+
+/* =========================================================
+   SONGTEXT-ANALYSE
+   ========================================================= */
+let songRT = null;
+function resetSong(){ songRT = null; renderSong(); }
+function renderSong(){
+  const code = view.lang, l = L(code);
+  const have = songRT && songRT.code===code && songRT.segments;
+  let body;
+  if(!have){
+    body = `
+      <p class="page-sub">Füge einen Songtext ein, zu dem du legalen Zugang hast — sprich. zerlegt ihn Zeile für Zeile in Übersetzung, Vokabeln, Grammatik und eine Erklärung im Kontext.</p>
+      <input id="songTitle" placeholder="Titel & Interpret (optional)" style="margin-bottom:10px">
+      <textarea id="songText" rows="9" placeholder="Songtext hier einfügen…"></textarea>
+      <button class="btn" style="margin-top:14px" onclick="analyzeSong()">Text analysieren</button>
+      <p class="hint" style="margin-top:10px">Auch lange Lieder werden vollständig analysiert — der Text wird automatisch in Abschnitte zerlegt und wiederholte Refrains zusammengefasst.</p>`;
+  }else{
+    const segs = songRT.segments.map(s=>`
+      <div class="lesson-card song-seg">
+        <div class="song-line"><span>${esc(s.line)}</span>
+          <button class="btn soft sm" style="width:auto" onclick="speak(${esc(JSON.stringify(s.line))},'${l.speak}')">🔊</button></div>
+        ${s.de?`<div class="song-de">${esc(s.de)}</div>`:""}
+        ${(s.vocab&&s.vocab.length)?`<div class="song-vocab">${s.vocab.map(v=>`<div class="vocab-row"><div class="vocab-term">${esc(v.term)}</div><div class="vocab-de">${esc(v.de||"")}</div></div>`).join("")}</div>`:""}
+        ${s.grammar?`<div class="song-gram"><b>Grammatik</b> ${esc(s.grammar)}</div>`:""}
+        ${s.context?`<div class="song-context"><b>Im Kontext</b> ${esc(s.context)}</div>`:""}
+      </div>`).join("");
+    body = `
+      ${songRT.title?`<p class="page-sub">${esc(songRT.title)}</p>`:""}
+      ${songRT.summary?`<div class="lesson-card"><h3>Worum geht es?</h3><p style="margin:0;color:var(--ink-soft);line-height:1.5">${esc(songRT.summary)}</p></div>`:""}
+      <button class="btn" onclick="addSongVocab()">Alle Vokabeln in den Trainer übernehmen</button>
+      <div id="songVocabMsg"></div>
+      ${segs}
+      <button class="btn ghost" style="margin-top:14px" onclick="resetSong()">Anderen Text analysieren</button>`;
+  }
+  app().innerHTML = `
+    <button class="back" onclick="go('path',{lang:'${code}'})">‹ Zurück</button>
+    <h1 class="page-title">${l.flag} Songtext</h1>
+    ${body}`;
+}
+function chunkLyrics(text){
+  let lines = text.split(/\r?\n/).map(s=>s.trim()).filter(Boolean);
+  // identische Zeilen (Refrains) zusammenfassen, Reihenfolge erhalten
+  const seen = new Set(), uniq = [];
+  for(const ln of lines){ const k = ln.toLowerCase(); if(!seen.has(k)){ seen.add(k); uniq.push(ln); } }
+  lines = uniq;
+  // kaum Zeilenumbrüche → grob nach Länge teilen
+  if(lines.length < 2 && text.length > 80){
+    const words = text.split(/\s+/); lines = []; let cur = "";
+    for(const w of words){ if((cur+" "+w).trim().length > 55){ lines.push(cur.trim()); cur = w; } else cur += " "+w; }
+    if(cur.trim()) lines.push(cur.trim());
+  }
+  const perChunk = 7, chunks = [];
+  for(let i=0;i<lines.length;i+=perChunk) chunks.push(lines.slice(i,i+perChunk).join("\n"));
+  return chunks.slice(0, 16); // Sicherheits-Cap (~112 Zeilen)
+}
+
+async function runPool(items, limit, worker, onProgress){
+  const results = new Array(items.length);
+  let idx = 0, done = 0;
+  async function next(){
+    const i = idx++;
+    if(i >= items.length) return;
+    try{ results[i] = await worker(items[i], i); }catch(e){ results[i] = null; }
+    done++; if(onProgress) onProgress(done, items.length);
+    return next();
+  }
+  const runners = [];
+  for(let k=0;k<Math.min(limit, items.length);k++) runners.push(next());
+  await Promise.all(runners);
+  return results;
+}
+
+async function analyzeSong(){
+  const code = view.lang, l = LANG_CONFIG[code];
+  const text = (document.getElementById("songText").value||"").trim();
+  const title = (document.getElementById("songTitle").value||"").trim();
+  if(text.length<10){ toast("Bitte Songtext einfügen"); return; }
+  const chunks = chunkLyrics(text);
+  const sysSeg = "Du bist Sprachlehrer:in und analysierst einen von der lernenden Person selbst bereitgestellten Liedtext-Abschnitt für den Sprachunterricht. Antworte AUSSCHLIESSLICH mit einem gültigen JSON-Array, ohne Markdown, ohne Vorrede.";
+  const usrSeg = (chunk)=>`Sprache: ${l.aiName}. Niveau: ${l.level}. Analysiere die folgenden Liedzeilen Zeile für Zeile (oder sinnvolle kurze Phrase) für das Sprachenlernen.
+Gib ein JSON-Array von Objekten zurück, je Zeile/Phrase eines:
+{"line":"<Originalzeile>","de":"<deutsche Übersetzung>","vocab":[{"term":"<Wort/Phrase, ggf. Grundform/Artikel>","de":"<Bedeutung>"}],"grammar":"<knappe grammatische Form/Struktur, sonst leer>","context":"<Erklärung auf Deutsch: was die Zeile im Kontext bedeutet/ausdrückt und wie die wichtigen Vokabeln und die Grammatik hier zusammenwirken — inkl. Redewendungen, Konnotation, Bildsprache, Register>"}.
+${ALLTAG}
+
+Zeilen:
+${chunk}`;
+
+  app().innerHTML = loadingHTML(`Analysiere den Songtext … (0/${chunks.length})`);
+
+  // Inhalts-Zusammenfassung läuft parallel mit
+  const summaryP = (async()=>{
+    try{
+      const s = await callAI(
+        "Du fasst Liedtexte für Sprachlernende zusammen. Antworte nur mit der Zusammenfassung, ohne Vorrede.",
+        [{role:"user",content:`Fasse in 2-4 deutschen Sätzen zusammen, worum es in diesem ${l.aiName}-Liedtext geht: Thema, Stimmung und zentrale Aussage.\n\n${text.slice(0,2200)}`}],
+        {maxTokens:400}
+      );
+      return (s||"").replace(/```/g,"").trim();
+    }catch(e){ return ""; }
+  })();
+
+  // Abschnitte parallel analysieren (max. 3 gleichzeitig) mit Wiederholversuchen; Reihenfolge bleibt erhalten
+  const segResults = await runPool(chunks, 3, async (chunk)=>{
+    let lastErr;
+    for(let attempt=0; attempt<4; attempt++){
+      if(attempt) await sleep(600*attempt + Math.floor(Math.random()*300));   // Backoff bei Rate-Limit
+      try{
+        const txt = await callAI(sysSeg, [{role:"user",content:usrSeg(chunk)}], {maxTokens:3500});
+        let arr; try{ const p = parseJSON(txt); arr = Array.isArray(p) ? p : (p.segments||[]); }
+        catch(e){ arr = extractObjects(txt); }
+        const f = (arr||[]).filter(o=>o && o.line);
+        if(f.length) return f;
+        lastErr = new Error("leer");
+      }catch(e){ lastErr = e; }
+    }
+    throw lastErr || new Error("fehlgeschlagen");
+  }, (d,t)=>{ app().innerHTML = loadingHTML(`Analysiere den Songtext … (${d}/${t})`); });
+
+  let allSegs = [], failed = 0;
+  segResults.forEach(r=>{ if(Array.isArray(r)) allSegs = allSegs.concat(r); else failed++; });
+  if(!allSegs.length){ toast("Analyse fehlgeschlagen"); songRT=null; renderSong(); return; }
+
+  const summary = await summaryP;
+  songRT = { code, title, summary, segments:allSegs };
+  renderSong();
+  if(failed) toast(`${failed} Abschnitt(e) fehlten — „Anderen Text analysieren" und erneut versuchen`);
+}
+function addSongVocab(){
+  if(!songRT) return;
+  const code = songRT.code, seen = {}, arr = [];
+  songRT.segments.forEach(s=>(s.vocab||[]).forEach(v=>{
+    if(!v || !v.term) return;
+    const k = String(v.term).toLowerCase(); if(seen[k]) return; seen[k]=1;
+    arr.push({ term:String(v.term), de:String(v.de||""), cat:"Aus Lied"+(songRT.title?" · "+songRT.title:"") });
+  }));
+  if(!arr.length){ toast("Keine Vokabeln gefunden"); return; }
+  state.langs[code].lessons["song-"+Date.now()] = { vocab:arr };
+  saveState();
+  const msg = document.getElementById("songVocabMsg");
+  if(msg) msg.innerHTML = `<div class="lesson-card"><b>${arr.length} Vokabeln übernommen</b></div>`;
+  toast("In den Trainer übernommen");
 }
 
 /* =========================================================
@@ -2449,6 +2599,7 @@ Object.assign(window,{ go,openLang,renderPath,paintUnits,toggleModule,retryModul
   setVoice,testVoice,setRate,
   startTodayReviews,openNextUnit,toggleRoutineLang,setRoutineFocus,setReviews,setRoutineConv,setRegister,
   openQuickVocab,closeQuickVocab,startQuickVocab,updateFab,
+  renderSong,analyzeSong,addSongVocab,resetSong,
   renderStats,exportData,importData,setReminderOn,setReminderTime,testReminderPermission,
   saveFirebaseConfig,cloudSave,cloudLoad,addCustomTopic,deleteCustom,submitVocabDiktat,speakVocab,showCallReport,extractCallVocab,
   renderVocab,startVocabSession,flipFlash,answerVocabMC,submitVocabWrite,submitVocabCloze,gradeVocab,quitVocab });
