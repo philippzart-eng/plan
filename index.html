@@ -638,8 +638,16 @@ function extractObjects(text){
 /* =========================================================
    Sprachausgabe (TTS) + Spracherkennung (STT)
    ========================================================= */
-let voicesReady = false;
-function loadVoices(){ if(window.speechSynthesis){ speechSynthesis.getVoices(); voicesReady=true; } }
+let voicesReady = false, _voiceCount = -1;
+function loadVoices(){
+  if(!window.speechSynthesis) return;
+  const n = speechSynthesis.getVoices().length;
+  voicesReady = true;
+  if(n !== _voiceCount){
+    _voiceCount = n;
+    if(typeof view!=="undefined" && view && view.name==="settings") renderSettings();
+  }
+}
 if(window.speechSynthesis){
   loadVoices();
   speechSynthesis.onvoiceschanged = loadVoices;
@@ -675,7 +683,7 @@ function speak(text, speakCode, onend){
   const u = new SpeechSynthesisUtterance(text);
   u.lang = speakCode;
   const v = resolveVoice(speakCode);
-  if(v) u.voice = v;
+  if(v){ u.voice = v; u.lang = v.lang || speakCode; }
   u.rate = state.settings.rate || 0.95;
   u.pitch = 1.0;
   if(onend){ u.onend = onend; u.onerror = onend; }
@@ -2302,10 +2310,14 @@ function voiceField(code){
   const vs = window.speechSynthesis ? speechSynthesis.getVoices() : [];
   const base = l.speak.split("-")[0].toLowerCase();
   const matches = vs.filter(v=>v.lang.toLowerCase().startsWith(base));
+  const matchURIs = new Set(matches.map(v=>v.voiceURI));
+  const others = vs.filter(v=>!matchURIs.has(v.voiceURI));
   const auto = pickVoice(l.speak);
+  const opt = v=>`<option value="${esc(v.voiceURI)}" ${l.voiceURI===v.voiceURI?'selected':''}>${esc(v.name)} (${esc(v.lang)})</option>`;
   let opts = `<option value="">Automatisch${auto?` — ${esc(auto.name)}`:""}</option>`;
-  opts += matches.map(v=>`<option value="${esc(v.voiceURI)}" ${l.voiceURI===v.voiceURI?'selected':''}>${esc(v.name)} (${esc(v.lang)})</option>`).join("");
-  const none = matches.length ? "" : `<p class="hint">Noch keine ${esc(l.name)}-Stimme auf dem Gerät — siehe Hinweis unten zum Nachladen.</p>`;
+  opts += matches.map(opt).join("");
+  if(others.length) opts += `<optgroup label="Andere Stimmen (alle installierten)">${others.map(opt).join("")}</optgroup>`;
+  const none = matches.length ? "" : `<p class="hint">Keine ${esc(l.name)}-Stimme erkannt — wähle ggf. unter „Andere Stimmen" oder lade unten nach.</p>`;
   return `
     <div class="field">
       <label>${l.flag} ${l.name}</label>
@@ -2315,6 +2327,11 @@ function voiceField(code){
       </div>
       ${none}
     </div>`;
+}
+function reloadVoices(){
+  if(window.speechSynthesis){ _voiceCount=-1; speechSynthesis.getVoices(); }
+  toast("Stimmen neu geladen");
+  renderSettings();
 }
 
 function renderSettings(){
@@ -2366,12 +2383,13 @@ function renderSettings(){
 
     <p class="eyebrow">Stimmen</p>
     ${voiceFields}
+    <button class="btn soft sm" style="width:auto;margin-bottom:14px" onclick="reloadVoices()">↻ Stimmen neu laden</button>
     <div class="field">
       <label>Sprechtempo</label>
       <div class="seg">${rateSeg}</div>
     </div>
     <div class="lesson-card" style="margin-bottom:24px;">
-      <p style="margin:0;font-size:14px;color:var(--ink-soft);">Klingt es blechern? Lade auf dem iPhone die <b>natürlichen HD-Stimmen</b> nach: <b>Einstellungen → Bedienungshilfen → Gesprochene Inhalte → Stimmen</b> → Sprache wählen → eine Stimme mit dem Zusatz <b>„Premium"</b> oder <b>„Erweitert"</b> herunterladen. Danach hier oben auswählen und testen.</p>
+      <p style="margin:0;font-size:14px;color:var(--ink-soft);">Klingt es blechern? Lade auf dem iPhone die <b>natürlichen HD-Stimmen</b> nach: <b>Einstellungen → Bedienungshilfen → Gesprochene Inhalte → Stimmen</b> → Sprache wählen → eine Stimme mit dem Zusatz <b>„Premium"</b> oder <b>„Erweitert"</b> herunterladen. Danach hier oben „↻ Stimmen neu laden" und auswählen.<br><br>Hinweis: iOS gibt manche heruntergeladenen Stimmen (besonders die Siri-Stimmen) leider <b>nicht</b> an Web-Apps frei — diese erscheinen dann auch nach dem Neuladen nicht. Am besten funktioniert sprich. als <b>Home-Bildschirm-App</b>; ein Neustart nach dem Download hilft oft, dass die Stimmen sichtbar werden.</p>
     </div>
 
     <p class="eyebrow">KI-Verbindung</p>
@@ -2596,7 +2614,7 @@ function stripAccents(s){ return s.normalize("NFD").replace(/[\u0300-\u036f]/g,"
 Object.assign(window,{ go,openLang,renderPath,paintUnits,toggleModule,retryModule,openUnit,renderLesson,startExercises,startUnitConversation,regeneratePath,
   answerMC,submitText,nextExercise,quitExercises,applyLevel,startCall,toggleMic,sendCallText,
   sendCallText,replayLine,endCall,sendUserTurn,setLevel,saveSettings,resetAll,speak,paintCallStage,
-  setVoice,testVoice,setRate,
+  setVoice,testVoice,setRate,reloadVoices,
   startTodayReviews,openNextUnit,toggleRoutineLang,setRoutineFocus,setReviews,setRoutineConv,setRegister,
   openQuickVocab,closeQuickVocab,startQuickVocab,updateFab,
   renderSong,analyzeSong,addSongVocab,resetSong,
