@@ -814,6 +814,7 @@ function render(){
   else if(view.name==="lang") renderLang();
   else if(view.name==="station") renderStation();
   else if(view.name==="levelinfo") renderLevelInfo();
+  else if(view.name==="auto") renderAuto();
   else if(view.name==="placement") renderPlacement();
   else if(view.name==="unit") renderUnit();
   else if(view.name==="song") renderSong();
@@ -967,7 +968,8 @@ function renderLang(){
     </div>`:""}
 
     <p class="eyebrow">Werkzeuge</p>
-    <div class="row" style="margin-bottom:10px">
+    <button class="btn soft" onclick="go('auto',{lang:'${code}'})">🚗 Auto-Modus — gesprochene Lehrstunde</button>
+    <div class="row" style="margin:10px 0">
       <button class="btn soft sm" onclick="go('vocab',{lang:'${code}'})">Wortschatz</button>
       <button class="btn soft sm" onclick="go('listen',{lang:'${code}'})">Hören</button>
       <button class="btn soft sm" onclick="go('song',{lang:'${code}'})">Songtext</button>
@@ -1089,6 +1091,157 @@ function gotoNextStation(code){
   if(f) openStation(code,f.ci); else go("lang",{lang:code});
 }
 function togglePreview(){ state.settings.preview=!state.settings.preview; saveState(); render(); }
+
+/* =========================================================
+   AUTO-MODUS — gesprochene Lehrstunde + Hörtext (freihändig)
+   ========================================================= */
+const AUTO_DUR = [
+  { key:"kurz",   label:"Kurz",   min:10, words:500 },
+  { key:"mittel", label:"Mittel", min:20, words:900 },
+  { key:"lang",   label:"Lang",   min:30, words:1400 },
+];
+const LESSON_TOPICS = [
+  "Sich vorstellen und kennenlernen","Über die Familie sprechen","Mein Tagesablauf","Im Restaurant bestellen",
+  "Lebensmittel einkaufen","Im Café","Nach dem Weg fragen","Mit öffentlichen Verkehrsmitteln unterwegs",
+  "Ein Hotel buchen und einchecken","Beim Arzt","In der Apotheke","Einen Termin vereinbaren",
+  "Telefonieren","Small Talk über das Wetter","Hobbys und Freizeit","Über das Wochenende erzählen",
+  "Urlaub und Reisen planen","Von einer Reise erzählen","Kleidung kaufen","Etwas reklamieren oder umtauschen",
+  "Eine Wohnung beschreiben","Wohnungssuche und mieten","Über die Arbeit sprechen","Ein Vorstellungsgespräch",
+  "Im Büro und im Meeting","Pläne für die Zukunft","Über Gefühle sprechen","Eine Einladung und Verabredung",
+  "An der Kasse bezahlen","Beim Friseur","Sport und Fitness","Kochen und ein Rezept erklären",
+  "Gesund leben","Über Filme und Serien sprechen","Über Musik sprechen","Über Bücher sprechen",
+  "Aktuelle Nachrichten besprechen","Eine Meinung äußern und begründen","Über Umwelt und Klima sprechen",
+  "Technik und Smartphone","Geld, Bank und Bezahlen","Notfall: um Hilfe bitten","Beim Amt und bei Behörden",
+  "Sich höflich beschweren","Über die eigene Stadt erzählen","Feste und Feiertage","Ein Problem gemeinsam lösen",
+  "Über kulturelle Unterschiede sprechen","Verhandeln und nach einem besseren Preis fragen","Über Träume und Ziele sprechen",
+];
+const PACE_OPTS = [
+  { key:"normal", label:"Normal", txt:"Gib mir nach jeder Frage ausreichend Zeit zum Antworten." },
+  { key:"ruhig",  label:"Mehr Zeit", txt:"Gib mir nach jeder Frage reichlich Zeit. Stelle nur EINE Frage und schweige dann vollständig, bis ich geantwortet habe. Hake niemals selbst nach, ergänze oder beantworte deine Frage nicht selbst, und füge keine weiteren Sätze an, bevor ich nicht gesprochen habe." },
+  { key:"sehr",   label:"Viel Zeit", txt:"Ich brauche lange zum Formulieren. Stelle genau EINE kurze Frage und sei danach komplett still. Warte geduldig, auch wenn eine längere Pause entsteht – unterbrich diese Stille auf keinen Fall und rede erst weiter, nachdem ich tatsächlich gesprochen habe. Wenn du unsicher bist, ob ich fertig bin, frage kurz: bist du fertig?" },
+];
+function paceOpt(key){ return PACE_OPTS.find(x=>x.key===key)||PACE_OPTS[1]; }
+function autoDur(key){ return AUTO_DUR.find(x=>x.key===key) || AUTO_DUR[1]; }
+function buildLessonPrompt(code, theme, grammar, vocab, level, minutes, immersive, paceKey){
+  const l = L(code);
+  const voc = (vocab&&vocab.length)? `Konzentriere dich auf diese Wortfelder: ${vocab.join(", ")}.` : "";
+  const pace = paceOpt(paceKey).txt;
+  const low = (level==="A1"||level==="A2");
+  const langBlock = immersive
+    ? `Sprache: Sprich AUSSCHLIESSLICH auf ${l.aiName} – durchgehend, ohne Deutsch und ohne Englisch, auch keine Übersetzungen in Klammern. Wenn ich etwas nicht verstehe, erkläre es mit einfacheren Worten, Synonymen, Beispielen und Umschreibungen auf ${l.aiName} und sprich langsamer.${low?` Da mein Niveau (${level}) noch niedrig ist, halte die Sätze sehr kurz und einfach und gib mir durch Kontext und Wiederholung die Chance, dich zu verstehen.`:""}`
+    : `Sprache & Erklärungen: Sprich überwiegend ${l.aiName}, langsam und deutlich. Erklärungen und Übersetzungen gibst du AUSSCHLIESSLICH auf Deutsch – niemals auf Englisch.`;
+  return `Du bist mein persönlicher Sprachlehrer für ${l.aiName} und gibst mir jetzt eine zusammenhängende, gesprochene Lehrstunde von etwa ${minutes} Minuten.
+WICHTIG (Autofahrt): Ich höre nur zu und spreche – ich kann nichts lesen oder tippen.
+TEMPO & WARTEN: Stelle immer nur eine Frage auf einmal und sprich dann in kurzen Abschnitten. ${pace}
+${langBlock}
+Niveau: ${level} (GER-Skala). Halte Wortschatz, Grammatik und Tempo konsequent auf ${level} – nicht einfacher.${level!=="A1"?" Begrüßungen, Zahlen und absolute Basics setze ich als bekannt voraus; steige direkt auf "+level+"-Niveau ein und wiederhole keine Anfängerwörter, außer ich bitte darum.":""}
+Meine Antworten: Ich spreche auf ${l.aiName} (manchmal auf Deutsch). Wenn meine Antwort unverständlich klingt oder offensichtlich falsch erkannt wurde (z. B. unsinnige oder fremdsprachige Wörter), gehe NICHT inhaltlich darauf ein, sondern bitte mich freundlich, den Satz noch einmal zu sagen.
+Thema der Stunde: „${theme}“. Grammatik-Schwerpunkt: ${grammar}. ${voc}
+
+Ablauf:
+1. Begrüße mich kurz und stelle eine einzige einfache Aufwärmfrage zum Thema.
+2. Führe nach und nach einige neue, niveaugerechte Wörter und Wendungen ein${immersive?" und erkläre ihre Bedeutung auf "+l.aiName+" (Umschreibung, Beispiel)":", sprich vor, gib die deutsche Bedeutung"}; lass mich nachsprechen.
+3. Übe den Grammatik-Schwerpunkt mit kurzen Beispielen und kleinen Sprechaufgaben (umformen, ergänzen).
+4. Führe ein lockeres Gespräch bzw. Rollenspiel zum Thema, in dem ich Wörter und Grammatik aktiv anwende.
+5. Korrigiere mich behutsam – immer nur das Wichtigste – und lass mich die korrigierte Version einmal wiederholen.
+6. Fasse am Ende kurz zusammen und gib mir zwei kurze Sätze zum Nachsprechen.
+
+Halte deine eigenen Redeanteile kurz, damit ich möglichst viel selbst spreche. Beginne jetzt mit der Begrüßung und der ersten Aufwärmfrage.`;
+}
+function renderAuto(){
+  const code=view.lang, l=L(code);
+  const cfg=state.settings.autoCfg||{};
+  const durKey=cfg.dur||"mittel";
+  const nx=nextStation(code);
+  const presetTheme = view.topic || (nx? nx.theme : "");
+  const defLevel = (nx && presetTheme===nx.theme)? nx.level : l.level;
+  const levelOpts = LEVELS.map(lv=>`<option value="${lv}" ${lv===defLevel?'selected':''}>${lv}</option>`).join("");
+  const durSeg=AUTO_DUR.map(x=>`<button type="button" class="${x.key===durKey?'on':''}" onclick="setAutoDur('${x.key}')">${x.label}<br><span style="font-weight:400;font-size:10px">~${x.min} Min</span></button>`).join("");
+  app().innerHTML=`
+    <button class="back" onclick="go('lang',{lang:'${code}'})">‹ ${esc(l.name)}</button>
+    <h1 class="page-title">🚗 Auto-Modus</h1>
+    <p class="page-sub">Freihändig lernen: ein Prompt startet eine gesprochene Lehrstunde. Nur zuhören und sprechen.</p>
+
+    <div class="field"><label>Thema wählen</label>
+      <select id="auTopicSel" onchange="pickAutoTopic(this.value)">
+        <option value="">— Vorschlag wählen —</option>
+        ${LESSON_TOPICS.map(t=>`<option value="${esc(t)}">${esc(t)}</option>`).join("")}
+      </select>
+    </div>
+    <div class="field"><label>Thema der Stunde (oder eigenes eingeben)</label><input id="auTopic" value="${esc(presetTheme)}" placeholder="z. B. Im Restaurant"></div>
+    ${nx?`<p class="hint" style="margin:-8px 0 12px">Vorgeschlagen aus deiner nächsten Station: ${esc(nx.title)} (${nx.level}) · Grammatik: ${esc(nx.grammar)}</p>`:""}
+    <div class="field"><label>Niveau</label><select id="auLevel">${levelOpts}</select></div>
+    <div class="field"><label>Gesprächssprache</label><div class="seg" id="auImmSeg">
+      <button type="button" class="${state.settings.immersion!==false?'on':''}" onclick="setImmersion(true)">Nur Zielsprache</button>
+      <button type="button" class="${state.settings.immersion===false?'on':''}" onclick="setImmersion(false)">Mit Deutsch</button>
+    </div></div>
+    <div class="field"><label>Antwortzeit für mich</label><div class="seg" id="auPaceSeg">
+      ${PACE_OPTS.map(x=>`<button type="button" class="${(state.settings.pace||'ruhig')===x.key?'on':''}" onclick="setPace('${x.key}')">${x.label}</button>`).join("")}
+    </div></div>
+    <div class="field"><label>Dauer</label><div class="seg" id="auDurSeg">${durSeg}</div></div>
+
+    <button class="btn" onclick="makeAutoPrompts()">Lehrstunde erzeugen</button>
+
+    <div id="autoOut" style="margin-top:16px"></div>
+
+    <p class="hint" style="margin-top:18px">Sicherheit: alles vor der Fahrt einrichten und den Sprachmodus starten. Tipp: Zum freien Sprechen ist <b>Langua (Call-Modus)</b> oft zuverlässiger als ChatGPT, weil es deine Zielsprache besser erkennt.</p>
+  `;
+}
+function setAutoDur(key){
+  state.settings.autoCfg=Object.assign({}, state.settings.autoCfg, {dur:key});
+  saveState();
+  const seg=document.getElementById("auDurSeg");
+  if(seg){ seg.querySelectorAll("button").forEach(b=>b.classList.remove("on")); const i=AUTO_DUR.findIndex(x=>x.key===key); if(i>=0&&seg.children[i]) seg.children[i].classList.add("on"); }
+}
+function setImmersion(on){
+  state.settings.immersion=on; saveState();
+  const seg=document.getElementById("auImmSeg");
+  if(seg){ seg.children[0].classList.toggle("on",on); seg.children[1].classList.toggle("on",!on); }
+}
+function pickAutoTopic(v){ if(!v) return; const inp=document.getElementById("auTopic"); if(inp) inp.value=v; }
+function setPace(key){
+  state.settings.pace=key; saveState();
+  const seg=document.getElementById("auPaceSeg");
+  if(seg){ seg.querySelectorAll("button").forEach(b=>b.classList.remove("on")); const i=PACE_OPTS.findIndex(x=>x.key===key); if(i>=0&&seg.children[i]) seg.children[i].classList.add("on"); }
+}
+function makeAutoPrompts(){
+  const code=view.lang, l=L(code);
+  const theme=(document.getElementById("auTopic").value||"").trim();
+  if(!theme){ toast("Bitte ein Thema eingeben"); return; }
+  const level=(document.getElementById("auLevel")&&document.getElementById("auLevel").value)||l.level;
+  const durKey=(state.settings.autoCfg&&state.settings.autoCfg.dur)||"mittel";
+  const d=autoDur(durKey);
+  const nx=nextStation(code);
+  const matches = nx && nx.theme===theme;
+  const grammar = matches? nx.grammar : "passend zum Niveau "+level;
+  const vocab = matches? nx.vocab.slice(0,4) : [];
+  state.settings.autoCfg={dur:durKey};
+  saveState();
+  const lesson=buildLessonPrompt(code, theme, grammar, vocab, level, d.min, state.settings.immersion!==false, state.settings.pace||"ruhig");
+  const listen=buildListenPrompt(code, level, theme, d.words);
+  const out=document.getElementById("autoOut");
+  out.innerHTML=`
+    <p class="eyebrow">1 · Gesprochene Lehrstunde</p>
+    <div class="card">
+      <div class="brief-prompt">${esc(lesson)}</div>
+      <div class="row" style="margin-top:12px">
+        <button class="btn sm" onclick="copyText(${esc(JSON.stringify(lesson))})">Prompt kopieren</button>
+        <button class="btn ghost sm" style="line-height:1.4" onclick="openLangua()">Langua ↗</button>
+        <button class="btn ghost sm" style="line-height:1.4" onclick="openChatGPT()">ChatGPT ↗</button>
+      </div>
+      <p class="hint" style="margin:10px 0 0">In den Sprachmodus einfügen (Langua-Call oder ChatGPT-Voice) und losfahren — die Stunde startet von selbst.</p>
+    </div>
+
+    <p class="eyebrow" style="margin-top:18px">2 · Hörtext zum Mithören</p>
+    <div class="card">
+      <div class="brief-prompt">${esc(listen)}</div>
+      <div class="row" style="margin-top:12px">
+        <button class="btn sm" onclick="copyText(${esc(JSON.stringify(listen))})">Prompt kopieren</button>
+        <button class="btn ghost sm" style="line-height:1.4" onclick="openChatGPT()">ChatGPT ↗</button>
+      </div>
+    </div>`;
+  out.scrollIntoView({behavior:"smooth", block:"nearest"});
+}
 
 /* ----- Niveau-Detail (CEFR-Kann-Beschreibungen + Selbsteinschätzung) ----- */
 function cefrChecked(code,level,skill){ const c=state.langs[code].cefr||{}; return !!(c[level]&&c[level][skill]); }
@@ -1728,6 +1881,7 @@ Object.assign(window, {
   go, openLang, openUnit, markUnit, markVocab, toggleVocabCat, toggleFlowStep, toggleFlowOpen, openLangua,
   makeListenPrompt, setListenWords, openChatGPT,
   openStation, toggleStationPart, completeStation, gotoNextStation, toggleCefr, renderLevelInfo, togglePreview,
+  renderAuto, makeAutoPrompts, setAutoDur, setImmersion, pickAutoTopic, setPace,
   startPlacement, selectAnswer, scorePlacement, choosePlacement, choosePlacementSelf, abortPlacement,
   analyzeSong, resetSong, copyText,
   toggleRoutineLang, setFocus, setLevel, setRegister, saveConn, testConn, exportData, importData, resetAll, replaceLevel,
