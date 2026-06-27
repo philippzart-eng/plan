@@ -815,6 +815,10 @@ function render(){
   else if(view.name==="station") renderStation();
   else if(view.name==="levelinfo") renderLevelInfo();
   else if(view.name==="auto") renderAuto();
+  else if(view.name==="games") renderGames();
+  else if(view.name==="gamelevel") renderGameLevel();
+  else if(view.name==="quiz") renderQuiz();
+  else if(view.name==="paare") renderMatch();
   else if(view.name==="placement") renderPlacement();
   else if(view.name==="unit") renderUnit();
   else if(view.name==="song") renderSong();
@@ -855,6 +859,381 @@ function nextUnit(code){
   }
   return null;
 }
+/* =========================================================
+   TAGESPLAN — 365 Tage pro Sprache (Sprechen + Vokabeln)
+   Vokabel-Aufgabe teilt die Häkchen mit Pfad/Wortschatz.
+   ========================================================= */
+let _vfCache=null;
+function buildVocabFlat(){
+  if(_vfCache) return _vfCache;
+  const out=[];
+  VOCAB_TAXONOMY.forEach((cat,ci)=>{ cat.t.forEach((topic,ti)=>{ out.push({ci,ti,topic,level:cat.lv}); }); });
+  _vfCache=out; return out;
+}
+function ensureDay(code){
+  const lg=state.langs[code];
+  if(!lg.day || typeof lg.day.n!=="number") lg.day={n:1, speakDone:false};
+  if(lg.day.n<1) lg.day.n=1; if(lg.day.n>365) lg.day.n=365;
+  return lg.day;
+}
+function dayInfo(code){
+  const dd=ensureDay(code), vf=buildVocabFlat(), n=dd.n;
+  const v=vf[(n-1)%vf.length];
+  const speakTheme=LESSON_TOPICS[(n-1)%LESSON_TOPICS.length];
+  const level=L(code).level||"A1";
+  const vocabDone=unitDone(code, vocabId(code, v.ci, v.ti));
+  const speakDone=!!dd.speakDone;
+  return {n, v, speakTheme, level, vocabDone, speakDone, complete:(vocabDone&&speakDone)};
+}
+function buildDailySpeakPrompt(code, theme, level){
+  const l=L(code), imm=state.settings.immersion!==false, pace=paceOpt(state.settings.pace||"ruhig").txt;
+  return `Lass uns auf ${l.aiName} sprechen – mein Niveau ist ${level} (GER). Thema: „${theme}“.
+Führe ein lockeres, realistisches Gespräch oder Rollenspiel dazu und lass mich möglichst viel selbst sprechen. ${imm?`Sprich ausschließlich auf ${l.aiName}; wenn ich etwas nicht verstehe, erkläre es mit einfacheren Worten auf ${l.aiName}.`:`Sprich überwiegend ${l.aiName} und erkläre bei Bedarf kurz auf Deutsch.`} Korrigiere meine Fehler behutsam – immer nur das Wichtigste – und lass mich die richtige Version einmal wiederholen. Stelle immer nur eine Frage auf einmal. ${pace} Beginne jetzt mit einer kurzen ersten Frage zum Thema.`;
+}
+function circleBtn(onclick, on){
+  return `<button onclick="${onclick}" style="width:30px;height:30px;border-radius:50%;border:1.5px solid ${on?'var(--ink)':'var(--line)'};background:${on?'var(--ink)':'transparent'};color:${on?'#fff':'var(--ink)'};flex:0 0 auto;cursor:pointer;font-size:14px">${on?'✓':''}</button>`;
+}
+function dailyCardHTML(code){
+  const l=L(code), di=dayInfo(code);
+  const speakPrompt=buildDailySpeakPrompt(code, di.speakTheme, di.level);
+  return `
+  <div class="card" style="padding:16px">
+    <div style="display:flex;justify-content:space-between;align-items:center">
+      <b>${l.flag} ${l.name} — Tag ${di.n}/365</b>
+      ${di.complete?'<span class="chip">erledigt ✓</span>':`<span class="chip">${(di.speakDone?1:0)+(di.vocabDone?1:0)}/2</span>`}
+    </div>
+
+    <div style="border-top:1px solid var(--line);margin-top:12px;padding-top:12px">
+      <div style="display:flex;align-items:center;gap:10px">
+        ${circleBtn(`toggleDaySpeak('${code}')`, di.speakDone)}
+        <div style="flex:1"><b>1 · Sprechen</b><div class="hint">${esc(di.speakTheme)} · ${di.level}</div></div>
+      </div>
+      <div class="row" style="margin-top:10px">
+        <button class="btn sm" onclick="copyText(${esc(JSON.stringify(speakPrompt))})">Prompt kopieren</button>
+        <button class="btn ghost sm" style="line-height:1.4" onclick="openLangua()">Langua ↗</button>
+        <button class="btn ghost sm" style="line-height:1.4" onclick="openChatGPT()">ChatGPT ↗</button>
+      </div>
+    </div>
+
+    <div style="border-top:1px solid var(--line);margin-top:12px;padding-top:12px">
+      <div style="display:flex;align-items:center;gap:10px">
+        ${circleBtn(`toggleDayVocab('${code}')`, di.vocabDone)}
+        <div style="flex:1"><b>2 · Vokabeln</b><div class="hint">${esc(di.v.topic)} · ${di.v.level}</div></div>
+        <button class="btn soft sm" style="width:auto" onclick="copyText(${esc(JSON.stringify(di.v.topic))})">Kopieren</button>
+      </div>
+      <div class="row" style="margin-top:10px">
+        <button class="btn ghost sm" style="line-height:1.4" onclick="openLangua()">Langua ↗</button>
+      </div>
+      <p class="hint" style="margin:8px 0 0">In Langua: Flashcards → Generate → 20–30 → „Related to a topic" → Thema einfügen.</p>
+    </div>
+
+    ${di.complete?`<button class="btn" style="margin-top:14px" onclick="completeDay('${code}')">Tag ${di.n} abschließen → weiter zu Tag ${Math.min(365,di.n+1)}</button>`
+      :`<p class="hint" style="margin:12px 0 0">Beides erledigt? Dann schließt du den Tag ab und Tag ${Math.min(365,di.n+1)} wird freigeschaltet.</p>`}
+  </div>`;
+}
+function toggleDaySpeak(code){ const dd=ensureDay(code); dd.speakDone=!dd.speakDone; saveState(); render(); }
+function toggleDayVocab(code){ const di=dayInfo(code); const id=vocabId(code, di.v.ci, di.v.ti); setPart(code, id, !unitDone(code,id)); render(); }
+function completeDay(code){
+  const dd=ensureDay(code), old=dd.n;
+  recordSessionDone(code, "day-"+code+"-"+old);
+  dd.n=Math.min(365, old+1); dd.speakDone=false; saveState();
+  toast("Tag "+old+" geschafft 🎉 Streak "+state.streak.current);
+  render();
+}
+
+/* =========================================================
+   SPIELE — Duolingo-artiger Wortschatz-Pfad (offline, fest eingebaut)
+   10 Level/Sprache, je 8 Wort-Paare [Zielsprache, Deutsch].
+   Quiz schaltet das nächste Level frei; Paare zum Üben.
+   ========================================================= */
+const GAME_LEVELS = {
+  es:[
+    {t:"Begrüßungen", w:[["hola","hallo"],["adiós","tschüss"],["buenos días","guten Morgen"],["buenas noches","gute Nacht"],["gracias","danke"],["por favor","bitte"],["sí","ja"],["no","nein"]]},
+    {t:"Familie", w:[["la familia","die Familie"],["la madre","die Mutter"],["el padre","der Vater"],["el hermano","der Bruder"],["la hermana","die Schwester"],["el hijo","der Sohn"],["la hija","die Tochter"],["el abuelo","der Großvater"]]},
+    {t:"Zahlen", w:[["uno","eins"],["dos","zwei"],["tres","drei"],["cuatro","vier"],["cinco","fünf"],["seis","sechs"],["siete","sieben"],["ocho","acht"]]},
+    {t:"Farben", w:[["rojo","rot"],["azul","blau"],["verde","grün"],["amarillo","gelb"],["negro","schwarz"],["blanco","weiß"],["gris","grau"],["naranja","orange"]]},
+    {t:"Essen & Trinken", w:[["el pan","das Brot"],["el agua","das Wasser"],["la leche","die Milch"],["la manzana","der Apfel"],["el queso","der Käse"],["la carne","das Fleisch"],["el café","der Kaffee"],["el huevo","das Ei"]]},
+    {t:"Zeit", w:[["hoy","heute"],["mañana","morgen"],["ayer","gestern"],["el día","der Tag"],["la semana","die Woche"],["la hora","die Stunde"],["el año","das Jahr"],["ahora","jetzt"]]},
+    {t:"Zuhause", w:[["la casa","das Haus"],["la puerta","die Tür"],["la mesa","der Tisch"],["la silla","der Stuhl"],["la cama","das Bett"],["la cocina","die Küche"],["el baño","das Bad"],["la ventana","das Fenster"]]},
+    {t:"Kleidung", w:[["la camisa","das Hemd"],["el pantalón","die Hose"],["los zapatos","die Schuhe"],["el vestido","das Kleid"],["la chaqueta","die Jacke"],["el sombrero","der Hut"],["los calcetines","die Socken"],["el abrigo","der Mantel"]]},
+    {t:"Reisen", w:[["el coche","das Auto"],["el tren","der Zug"],["el avión","das Flugzeug"],["el hotel","das Hotel"],["la calle","die Straße"],["la ciudad","die Stadt"],["el aeropuerto","der Flughafen"],["el billete","das Ticket"]]},
+    {t:"Verben", w:[["ser","sein"],["tener","haben"],["hacer","machen"],["ir","gehen"],["comer","essen"],["beber","trinken"],["hablar","sprechen"],["querer","wollen"]]},
+    {t:"Körper", w:[["la cabeza","der Kopf"],["la mano","die Hand"],["el ojo","das Auge"],["el pie","der Fuß"],["el brazo","der Arm"],["la pierna","das Bein"],["el pelo","das Haar"],["la boca","der Mund"]]},
+    {t:"Wetter & Natur", w:[["el sol","die Sonne"],["la lluvia","der Regen"],["la nieve","der Schnee"],["el viento","der Wind"],["el árbol","der Baum"],["la flor","die Blume"],["el mar","das Meer"],["la montaña","der Berg"]]},
+    {t:"Tiere", w:[["el perro","der Hund"],["el gato","die Katze"],["el caballo","das Pferd"],["el pájaro","der Vogel"],["el pez","der Fisch"],["la vaca","die Kuh"],["el cerdo","das Schwein"],["el ratón","die Maus"]]},
+    {t:"Berufe", w:[["el médico","der Arzt"],["el profesor","der Lehrer"],["el cocinero","der Koch"],["el policía","der Polizist"],["el abogado","der Anwalt"],["el ingeniero","der Ingenieur"],["el enfermero","der Krankenpfleger"],["el vendedor","der Verkäufer"]]},
+    {t:"Stadt & Orte", w:[["la tienda","das Geschäft"],["el banco","die Bank"],["la escuela","die Schule"],["el hospital","das Krankenhaus"],["el parque","der Park"],["la iglesia","die Kirche"],["el mercado","der Markt"],["la estación","der Bahnhof"]]},
+    {t:"Obst & Gemüse", w:[["la naranja","die Orange"],["el plátano","die Banane"],["la fresa","die Erdbeere"],["el tomate","die Tomate"],["la patata","die Kartoffel"],["la zanahoria","die Karotte"],["la cebolla","die Zwiebel"],["la lechuga","der Salat"]]},
+    {t:"Adjektive", w:[["grande","groß"],["pequeño","klein"],["bueno","gut"],["malo","schlecht"],["nuevo","neu"],["viejo","alt"],["fácil","einfach"],["difícil","schwierig"]]},
+    {t:"Fragewörter", w:[["qué","was"],["quién","wer"],["dónde","wo"],["cuándo","wann"],["por qué","warum"],["cómo","wie"],["cuánto","wie viel"],["cuál","welcher"]]},
+    {t:"Sport & Freizeit", w:[["el deporte","der Sport"],["el fútbol","der Fußball"],["nadar","schwimmen"],["correr","laufen"],["el equipo","die Mannschaft"],["jugar","spielen"],["ganar","gewinnen"],["la pelota","der Ball"]]},
+    {t:"Beruf & Büro", w:[["el trabajo","die Arbeit"],["la oficina","das Büro"],["el jefe","der Chef"],["la reunión","die Besprechung"],["el ordenador","der Computer"],["el correo","die E-Mail"],["el teléfono","das Telefon"],["el documento","das Dokument"]]},
+    {t:"Gefühle", w:[["feliz","glücklich"],["triste","traurig"],["enfadado","wütend"],["cansado","müde"],["el miedo","die Angst"],["el amor","die Liebe"],["contento","zufrieden"],["nervioso","nervös"]]},
+    {t:"Schule & Lernen", w:[["la clase","die Klasse"],["el libro","das Buch"],["el examen","die Prüfung"],["aprender","lernen"],["estudiar","studieren"],["la lección","die Lektion"],["la pregunta","die Frage"],["la respuesta","die Antwort"]]},
+    {t:"Verben 2", w:[["ver","sehen"],["oír","hören"],["leer","lesen"],["escribir","schreiben"],["comprar","kaufen"],["vender","verkaufen"],["abrir","öffnen"],["cerrar","schließen"]]},
+    {t:"Adjektive 2", w:[["rápido","schnell"],["lento","langsam"],["caliente","heiß"],["frío","kalt"],["caro","teuer"],["barato","billig"],["fuerte","stark"],["débil","schwach"]]},
+  ],
+  fr:[
+    {t:"Begrüßungen", w:[["bonjour","guten Tag"],["salut","hallo"],["au revoir","auf Wiedersehen"],["bonne nuit","gute Nacht"],["merci","danke"],["s'il vous plaît","bitte"],["oui","ja"],["non","nein"]]},
+    {t:"Familie", w:[["la famille","die Familie"],["la mère","die Mutter"],["le père","der Vater"],["le frère","der Bruder"],["la sœur","die Schwester"],["le fils","der Sohn"],["la fille","die Tochter"],["les parents","die Eltern"]]},
+    {t:"Zahlen", w:[["un","eins"],["deux","zwei"],["trois","drei"],["quatre","vier"],["cinq","fünf"],["six","sechs"],["sept","sieben"],["huit","acht"]]},
+    {t:"Farben", w:[["rouge","rot"],["bleu","blau"],["vert","grün"],["jaune","gelb"],["noir","schwarz"],["blanc","weiß"],["gris","grau"],["orange","orange"]]},
+    {t:"Essen & Trinken", w:[["le pain","das Brot"],["l'eau","das Wasser"],["le lait","die Milch"],["la pomme","der Apfel"],["le fromage","der Käse"],["la viande","das Fleisch"],["le café","der Kaffee"],["l'œuf","das Ei"]]},
+    {t:"Zeit", w:[["aujourd'hui","heute"],["demain","morgen"],["hier","gestern"],["le jour","der Tag"],["la semaine","die Woche"],["l'heure","die Stunde"],["l'année","das Jahr"],["maintenant","jetzt"]]},
+    {t:"Zuhause", w:[["la maison","das Haus"],["la porte","die Tür"],["la table","der Tisch"],["la chaise","der Stuhl"],["le lit","das Bett"],["la cuisine","die Küche"],["la salle de bain","das Bad"],["la fenêtre","das Fenster"]]},
+    {t:"Kleidung", w:[["la chemise","das Hemd"],["le pantalon","die Hose"],["les chaussures","die Schuhe"],["la robe","das Kleid"],["la veste","die Jacke"],["le chapeau","der Hut"],["les chaussettes","die Socken"],["le manteau","der Mantel"]]},
+    {t:"Reisen", w:[["la voiture","das Auto"],["le train","der Zug"],["l'avion","das Flugzeug"],["l'hôtel","das Hotel"],["la rue","die Straße"],["la ville","die Stadt"],["l'aéroport","der Flughafen"],["le billet","das Ticket"]]},
+    {t:"Verben", w:[["être","sein"],["avoir","haben"],["faire","machen"],["aller","gehen"],["manger","essen"],["boire","trinken"],["parler","sprechen"],["vouloir","wollen"]]},
+    {t:"Körper", w:[["la tête","der Kopf"],["la main","die Hand"],["l'œil","das Auge"],["le pied","der Fuß"],["le bras","der Arm"],["la jambe","das Bein"],["les cheveux","das Haar"],["la bouche","der Mund"]]},
+    {t:"Wetter & Natur", w:[["le soleil","die Sonne"],["la pluie","der Regen"],["la neige","der Schnee"],["le vent","der Wind"],["l'arbre","der Baum"],["la fleur","die Blume"],["la mer","das Meer"],["la montagne","der Berg"]]},
+    {t:"Tiere", w:[["le chien","der Hund"],["le chat","die Katze"],["le cheval","das Pferd"],["l'oiseau","der Vogel"],["le poisson","der Fisch"],["la vache","die Kuh"],["le cochon","das Schwein"],["la souris","die Maus"]]},
+    {t:"Berufe", w:[["le médecin","der Arzt"],["le professeur","der Lehrer"],["le cuisinier","der Koch"],["le policier","der Polizist"],["l'avocat","der Anwalt"],["l'ingénieur","der Ingenieur"],["l'infirmier","der Krankenpfleger"],["le vendeur","der Verkäufer"]]},
+    {t:"Stadt & Orte", w:[["le magasin","das Geschäft"],["la banque","die Bank"],["l'école","die Schule"],["l'hôpital","das Krankenhaus"],["le parc","der Park"],["l'église","die Kirche"],["le marché","der Markt"],["la gare","der Bahnhof"]]},
+    {t:"Obst & Gemüse", w:[["l'orange","die Orange"],["la banane","die Banane"],["la fraise","die Erdbeere"],["la tomate","die Tomate"],["la pomme de terre","die Kartoffel"],["la carotte","die Karotte"],["l'oignon","die Zwiebel"],["la salade","der Salat"]]},
+    {t:"Adjektive", w:[["grand","groß"],["petit","klein"],["bon","gut"],["mauvais","schlecht"],["nouveau","neu"],["vieux","alt"],["facile","einfach"],["difficile","schwierig"]]},
+    {t:"Fragewörter", w:[["que","was"],["qui","wer"],["où","wo"],["quand","wann"],["pourquoi","warum"],["comment","wie"],["combien","wie viel"],["quel","welcher"]]},
+    {t:"Sport & Freizeit", w:[["le sport","der Sport"],["le football","der Fußball"],["nager","schwimmen"],["courir","laufen"],["l'équipe","die Mannschaft"],["jouer","spielen"],["gagner","gewinnen"],["le ballon","der Ball"]]},
+    {t:"Beruf & Büro", w:[["le travail","die Arbeit"],["le bureau","das Büro"],["le patron","der Chef"],["la réunion","die Besprechung"],["l'ordinateur","der Computer"],["le courriel","die E-Mail"],["le téléphone","das Telefon"],["le document","das Dokument"]]},
+    {t:"Gefühle", w:[["heureux","glücklich"],["triste","traurig"],["fâché","wütend"],["fatigué","müde"],["la peur","die Angst"],["l'amour","die Liebe"],["content","zufrieden"],["nerveux","nervös"]]},
+    {t:"Schule & Lernen", w:[["la classe","die Klasse"],["le livre","das Buch"],["l'examen","die Prüfung"],["apprendre","lernen"],["étudier","studieren"],["la leçon","die Lektion"],["la question","die Frage"],["la réponse","die Antwort"]]},
+    {t:"Verben 2", w:[["voir","sehen"],["entendre","hören"],["lire","lesen"],["écrire","schreiben"],["acheter","kaufen"],["vendre","verkaufen"],["ouvrir","öffnen"],["fermer","schließen"]]},
+    {t:"Adjektive 2", w:[["rapide","schnell"],["lent","langsam"],["chaud","heiß"],["froid","kalt"],["cher","teuer"],["bon marché","billig"],["fort","stark"],["faible","schwach"]]},
+  ],
+  sv:[
+    {t:"Begrüßungen", w:[["hej","hallo"],["hej då","tschüss"],["god morgon","guten Morgen"],["god natt","gute Nacht"],["tack","danke"],["varsågod","bitte"],["ja","ja"],["nej","nein"]]},
+    {t:"Familie", w:[["familjen","die Familie"],["mamma","die Mutter"],["pappa","der Vater"],["bror","der Bruder"],["syster","die Schwester"],["son","der Sohn"],["dotter","die Tochter"],["föräldrar","die Eltern"]]},
+    {t:"Zahlen", w:[["ett","eins"],["två","zwei"],["tre","drei"],["fyra","vier"],["fem","fünf"],["sex","sechs"],["sju","sieben"],["åtta","acht"]]},
+    {t:"Farben", w:[["röd","rot"],["blå","blau"],["grön","grün"],["gul","gelb"],["svart","schwarz"],["vit","weiß"],["grå","grau"],["orange","orange"]]},
+    {t:"Essen & Trinken", w:[["bröd","das Brot"],["vatten","das Wasser"],["mjölk","die Milch"],["äpple","der Apfel"],["ost","der Käse"],["kött","das Fleisch"],["kaffe","der Kaffee"],["ägg","das Ei"]]},
+    {t:"Zeit", w:[["idag","heute"],["imorgon","morgen"],["igår","gestern"],["dag","der Tag"],["vecka","die Woche"],["timme","die Stunde"],["år","das Jahr"],["nu","jetzt"]]},
+    {t:"Zuhause", w:[["hus","das Haus"],["dörr","die Tür"],["bord","der Tisch"],["stol","der Stuhl"],["säng","das Bett"],["kök","die Küche"],["badrum","das Bad"],["fönster","das Fenster"]]},
+    {t:"Kleidung", w:[["skjorta","das Hemd"],["byxor","die Hose"],["skor","die Schuhe"],["klänning","das Kleid"],["jacka","die Jacke"],["hatt","der Hut"],["strumpor","die Socken"],["kappa","der Mantel"]]},
+    {t:"Reisen", w:[["bil","das Auto"],["tåg","der Zug"],["flygplan","das Flugzeug"],["hotell","das Hotel"],["gata","die Straße"],["stad","die Stadt"],["flygplats","der Flughafen"],["biljett","das Ticket"]]},
+    {t:"Verben", w:[["vara","sein"],["ha","haben"],["göra","machen"],["gå","gehen"],["äta","essen"],["dricka","trinken"],["prata","sprechen"],["vilja","wollen"]]},
+    {t:"Körper", w:[["huvud","der Kopf"],["hand","die Hand"],["öga","das Auge"],["fot","der Fuß"],["arm","der Arm"],["ben","das Bein"],["hår","das Haar"],["mun","der Mund"]]},
+    {t:"Wetter & Natur", w:[["sol","die Sonne"],["regn","der Regen"],["snö","der Schnee"],["vind","der Wind"],["träd","der Baum"],["blomma","die Blume"],["hav","das Meer"],["berg","der Berg"]]},
+    {t:"Tiere", w:[["hund","der Hund"],["katt","die Katze"],["häst","das Pferd"],["fågel","der Vogel"],["fisk","der Fisch"],["ko","die Kuh"],["gris","das Schwein"],["mus","die Maus"]]},
+    {t:"Berufe", w:[["läkare","der Arzt"],["lärare","der Lehrer"],["kock","der Koch"],["polis","der Polizist"],["advokat","der Anwalt"],["ingenjör","der Ingenieur"],["sjuksköterska","die Krankenpflegerin"],["säljare","der Verkäufer"]]},
+    {t:"Stadt & Orte", w:[["affär","das Geschäft"],["bank","die Bank"],["skola","die Schule"],["sjukhus","das Krankenhaus"],["park","der Park"],["kyrka","die Kirche"],["marknad","der Markt"],["station","der Bahnhof"]]},
+    {t:"Obst & Gemüse", w:[["apelsin","die Orange"],["banan","die Banane"],["jordgubbe","die Erdbeere"],["tomat","die Tomate"],["potatis","die Kartoffel"],["morot","die Karotte"],["lök","die Zwiebel"],["sallad","der Salat"]]},
+    {t:"Adjektive", w:[["stor","groß"],["liten","klein"],["bra","gut"],["dålig","schlecht"],["ny","neu"],["gammal","alt"],["lätt","einfach"],["svår","schwierig"]]},
+    {t:"Fragewörter", w:[["vad","was"],["vem","wer"],["var","wo"],["när","wann"],["varför","warum"],["hur","wie"],["hur mycket","wie viel"],["vilken","welcher"]]},
+    {t:"Sport & Freizeit", w:[["sport","der Sport"],["fotboll","der Fußball"],["simma","schwimmen"],["springa","laufen"],["lag","die Mannschaft"],["spela","spielen"],["vinna","gewinnen"],["boll","der Ball"]]},
+    {t:"Beruf & Büro", w:[["arbete","die Arbeit"],["kontor","das Büro"],["chef","der Chef"],["möte","die Besprechung"],["dator","der Computer"],["mejl","die E-Mail"],["telefon","das Telefon"],["dokument","das Dokument"]]},
+    {t:"Gefühle", w:[["glad","glücklich"],["ledsen","traurig"],["arg","wütend"],["trött","müde"],["rädsla","die Angst"],["kärlek","die Liebe"],["nöjd","zufrieden"],["nervös","nervös"]]},
+    {t:"Schule & Lernen", w:[["klass","die Klasse"],["bok","das Buch"],["prov","die Prüfung"],["lära sig","lernen"],["studera","studieren"],["lektion","die Lektion"],["fråga","die Frage"],["svar","die Antwort"]]},
+    {t:"Verben 2", w:[["se","sehen"],["höra","hören"],["läsa","lesen"],["skriva","schreiben"],["köpa","kaufen"],["sälja","verkaufen"],["öppna","öffnen"],["stänga","schließen"]]},
+    {t:"Adjektive 2", w:[["snabb","schnell"],["långsam","langsam"],["varm","heiß"],["kall","kalt"],["dyr","teuer"],["billig","billig"],["stark","stark"],["svag","schwach"]]},
+  ],
+};
+function gShuffle(a){ a=a.slice(); for(let i=a.length-1;i>0;i--){ const j=Math.floor(Math.random()*(i+1)); const tmp=a[i]; a[i]=a[j]; a[j]=tmp; } return a; }
+function gUniq(a){ return Array.from(new Set(a)); }
+function gameLevels(code){ return (GAME_LEVELS[code]||[]).concat(state.langs[code].gameExtra||[]); }
+function gamesState(code){ const lg=state.langs[code]; if(!lg.games) lg.games={done:{}}; if(!lg.games.done) lg.games.done={}; return lg.games; }
+function gameLevelDone(code,i){ return !!gamesState(code).done[i]; }
+function gameLevelUnlocked(code,i){ return i===0 || gameLevelDone(code,i-1); }
+function gamesProgress(code){ const lv=gameLevels(code); let d=0; lv.forEach((_,i)=>{ if(gameLevelDone(code,i)) d++; }); return {done:d,total:lv.length}; }
+function markGameDone(code,i){ const g=gamesState(code); const was=!!g.done[i]; g.done[i]=true; saveState(); if(!was) recordSessionDone(code,"game-"+code+"-"+i); }
+async function genChunk(code, items){
+  const l=L(code);
+  const results=await runPool(items, 2, async(item)=>{
+    const sys="Du lieferst Vokabellisten. Antworte AUSSCHLIESSLICH mit einem gültigen JSON-Array, ohne Markdown.";
+    const usr=`Gib die 10 wichtigsten ${l.aiName}-Vokabeln zum Thema „${item.topic}“ (Niveau ${item.level}). Format: JSON-Array von Paaren [Zielwort, deutsche Übersetzung]. Substantive mit bestimmtem Artikel. Nur korrekte, alltagsrelevante Wörter, keine Erklärungen.`;
+    for(let a=0;a<3;a++){
+      if(a) await sleep(400*a);
+      try{
+        const txt=await callAI(sys,[{role:"user",content:usr}],{maxTokens:900});
+        let arr; try{ arr=JSON.parse(txt.replace(/```json|```/g,"").trim()); }catch(e){ arr=parseJSON(txt); }
+        const w=(arr||[]).filter(p=>Array.isArray(p)&&p.length>=2&&p[0]&&p[1]).map(p=>[String(p[0]).trim(),String(p[1]).trim()]).slice(0,12);
+        if(w.length>=4) return {t:item.topic, w};
+      }catch(e){}
+    }
+    return null;
+  });
+  return results.filter(Boolean);
+}
+function genReady(code){
+  const ep=(state.settings.endpoint||"").trim();
+  if(!ep || /api\.anthropic\.com/i.test(ep)){ toast("Erst KI-Verbindung in den Einstellungen einrichten"); return false; }
+  return true;
+}
+async function generateMoreLevels(code, count){
+  if(!genReady(code)) return;
+  count=count||5;
+  const vf=buildVocabFlat();
+  let idx=state.langs[code].gameGenIdx||0;
+  const batch=vf.slice(idx, idx+count);
+  if(!batch.length){ toast("Alle Themen aus dem Wortschatz sind geladen 🎉"); return; }
+  app().innerHTML=loadingHTML("Weitere Level werden geladen …");
+  const valid=await genChunk(code, batch);
+  state.langs[code].gameExtra=(state.langs[code].gameExtra||[]).concat(valid);
+  state.langs[code].gameGenIdx=idx+batch.length;
+  saveState();
+  toast(valid.length? (valid.length+" neue Level gespeichert ✓") : "Konnte keine Level laden — erneut versuchen");
+  go("games",{lang:code});
+}
+let _genStop=false;
+async function generateAllLevels(code){
+  if(!genReady(code)) return;
+  const vf=buildVocabFlat();
+  if((state.langs[code].gameGenIdx||0)>=vf.length){ toast("Bereits alle Themen geladen 🎉"); return; }
+  _genStop=false;
+  while(!_genStop && (state.langs[code].gameGenIdx||0) < vf.length){
+    const idx=state.langs[code].gameGenIdx||0;
+    const batch=vf.slice(idx, idx+6);
+    app().innerHTML=loadingHTML("Lade gesamten Wortschatz … "+idx+"/"+vf.length+" Themen")
+      +`<div style="text-align:center;margin-top:14px"><button class="btn ghost sm" style="width:auto" onclick="stopGenAll()">Stoppen</button></div>`;
+    const valid=await genChunk(code, batch);
+    state.langs[code].gameExtra=(state.langs[code].gameExtra||[]).concat(valid);
+    state.langs[code].gameGenIdx=idx+batch.length;
+    saveState();
+  }
+  toast(_genStop? "Gestoppt — Fortschritt gespeichert" : "Fertig! Gesamter Wortschatz geladen 🎉");
+  go("games",{lang:code});
+}
+function stopGenAll(){ _genStop=true; toast("Wird nach diesem Block gestoppt …"); }
+
+function renderGames(){
+  const code=view.lang, l=L(code), lv=gameLevels(code), pr=gamesProgress(code);
+  const offs=[0,46,74,46,0,-46,-74,-46];
+  const nodes=lv.map((lvl,i)=>{
+    const done=gameLevelDone(code,i), unlocked=gameLevelUnlocked(code,i);
+    const dx=offs[i%offs.length];
+    const bg=done?'var(--ink)':(unlocked?'#fff':'#ECECEA');
+    const col=done?'#fff':(unlocked?'var(--ink)':'var(--ink-faint)');
+    const bd=unlocked?'var(--ink)':'var(--line)';
+    const tag=done?'★':(unlocked?(i+1):'🔒');
+    const el=unlocked?'button':'div';
+    const oc=unlocked?`onclick="openGameLevel('${code}',${i})"`:'';
+    return `<div style="display:flex;justify-content:center;margin:9px 0;transform:translateX(${dx}px)">
+      <${el} ${oc} style="display:flex;flex-direction:column;align-items:center;gap:6px;background:none;border:none;cursor:${unlocked?'pointer':'default'}">
+        <span style="width:60px;height:60px;border-radius:50%;background:${bg};color:${col};border:2px solid ${bd};display:flex;align-items:center;justify-content:center;font-size:20px;font-weight:800;box-shadow:0 4px 0 ${unlocked&&!done?'rgba(0,0,0,.12)':'transparent'}">${tag}</span>
+        <span style="font-size:11px;color:${unlocked?'var(--ink)':'var(--ink-faint)'};max-width:130px;text-align:center;line-height:1.2">${esc(lvl.t)}</span>
+      </${el}>
+    </div>`;
+  }).join("");
+  app().innerHTML=`
+    <button class="back" onclick="go('lang',{lang:'${code}'})">‹ ${esc(l.name)}</button>
+    <h1 class="page-title">🎮 Spiele</h1>
+    <p class="page-sub">${l.flag} ${l.name} · Wortschatz-Level zum Freischalten – ideal für zwischendurch. ${pr.done}/${pr.total} Level geschafft.</p>
+    <div style="margin-top:12px">${nodes}</div>
+    <p class="hint" style="margin-top:14px">Schließe das Quiz eines Levels ab (mind. 6 von 8 richtig), um das nächste freizuschalten.</p>
+    <p class="eyebrow" style="margin-top:18px">Mehr Wortschatz</p>
+    <p class="hint" style="margin:-6px 0 8px">Geladen aus deiner Taxonomie: ${state.langs[code].gameGenIdx||0}/${buildVocabFlat().length} Themen. Wird per KI erzeugt und dauerhaft offline gespeichert.</p>
+    <div class="row">
+      <button class="btn soft sm" style="width:auto" onclick="generateMoreLevels('${code}',5)">＋ 5 Themen laden</button>
+      <button class="btn sm" style="width:auto" onclick="generateAllLevels('${code}')">Alle laden</button>
+    </div>`;
+}
+function openGameLevel(code,i){ go("gamelevel",{lang:code, gi:i}); }
+function renderGameLevel(){
+  const code=view.lang, i=view.gi, l=L(code), lvl=gameLevels(code)[i];
+  const words=lvl.w.map(p=>`<div class="card" style="padding:10px 14px;display:flex;justify-content:space-between;gap:10px"><b>${esc(p[0])}</b><span style="color:var(--ink-soft)">${esc(p[1])}</span></div>`).join("");
+  app().innerHTML=`
+    <button class="back" onclick="go('games',{lang:'${code}'})">‹ Spiele</button>
+    <h1 class="page-title">${esc(lvl.t)}</h1>
+    <p class="page-sub">${l.flag} ${l.name} · Level ${i+1} · ${lvl.w.length} Wörter${gameLevelDone(code,i)?' · ★ geschafft':''}</p>
+    <div class="row">
+      <button class="btn" onclick="startQuiz('${code}',${i})">Quiz spielen</button>
+      <button class="btn soft" onclick="startMatch('${code}',${i})">Paare finden</button>
+    </div>
+    <p class="eyebrow" style="margin-top:18px">Wörter in diesem Level</p>
+    ${words}`;
+}
+
+/* ---- Quiz ---- */
+let gameQ=null;
+function startQuiz(code,i){
+  const words=gameLevels(code)[i].w, all=gameLevels(code).flatMap(x=>x.w);
+  const qs=gShuffle(words.map(pair=>{
+    const t2d=Math.random()<0.5;
+    const prompt=t2d?pair[0]:pair[1], correct=t2d?pair[1]:pair[0];
+    const pool=gUniq(all.map(p=>t2d?p[1]:p[0]).filter(x=>x!==correct));
+    const opts=gShuffle(gShuffle(pool).slice(0,3).concat(correct));
+    return {prompt,correct,options:opts,dir:t2d?'→ Deutsch':'→ '+L(code).name};
+  }));
+  gameQ={code,i,qs,idx:0,score:0,sel:null,answered:false};
+  go("quiz",{lang:code,gi:i});
+}
+function renderQuiz(){
+  if(!gameQ){ go("games",{lang:view.lang}); return; }
+  if(gameQ.idx>=gameQ.qs.length) return renderQuizResult();
+  const q=gameQ.qs[gameQ.idx], total=gameQ.qs.length;
+  const opts=q.options.map((o,oi)=>{
+    let bg='#fff',bd='var(--line)',col='var(--ink)';
+    if(gameQ.answered){ if(o===q.correct){bg='var(--ink)';col='#fff';bd='var(--ink)';} else if(o===gameQ.sel){bg='#f3dada';bd='#c98a8a';} }
+    return `<button onclick="answerQuiz(${oi})" ${gameQ.answered?'disabled':''} style="display:block;width:100%;text-align:left;margin:8px 0;padding:15px;border-radius:14px;border:1.5px solid ${bd};background:${bg};color:${col};font-size:16px;cursor:pointer">${esc(o)}</button>`;
+  }).join("");
+  app().innerHTML=`
+    <button class="back" onclick="go('gamelevel',{lang:'${gameQ.code}',gi:${gameQ.i}})">‹ Abbrechen</button>
+    <p class="page-sub" style="margin-top:6px">Frage ${gameQ.idx+1}/${total} · ${gameQ.score} richtig</p>
+    <div class="card" style="text-align:center;padding:24px;margin:6px 0 4px"><div style="font-size:13px;color:var(--ink-faint)">${q.dir}</div><div style="font-size:26px;font-weight:800;margin-top:6px">${esc(q.prompt)}</div></div>
+    ${opts}
+    ${gameQ.answered?`<button class="btn" style="margin-top:10px" onclick="nextQuiz()">${gameQ.idx+1>=total?'Ergebnis':'Weiter'}</button>`:''}`;
+}
+function answerQuiz(oi){
+  if(gameQ.answered) return;
+  const q=gameQ.qs[gameQ.idx];
+  gameQ.sel=q.options[oi]; gameQ.answered=true;
+  if(gameQ.sel===q.correct) gameQ.score++;
+  renderQuiz();
+}
+function nextQuiz(){ gameQ.idx++; gameQ.answered=false; gameQ.sel=null; renderQuiz(); }
+function renderQuizResult(){
+  const total=gameQ.qs.length, score=gameQ.score, pass=score>=Math.ceil(total*0.75);
+  const code=gameQ.code, i=gameQ.i;
+  if(pass) markGameDone(code,i);
+  const nextExists = i+1 < gameLevels(code).length;
+  app().innerHTML=`
+    <h1 class="page-title" style="text-align:center;margin-top:30px">${pass?'★ Geschafft!':'Fast!'}</h1>
+    <div class="card" style="text-align:center;padding:24px"><div style="font-size:40px;font-weight:800">${score}/${total}</div>
+      <p class="hint" style="margin-top:8px">${pass?'Level abgeschlossen – nächstes Level freigeschaltet.':'Du brauchst mindestens '+Math.ceil(total*0.75)+'/'+total+'. Versuch es nochmal!'}</p></div>
+    <button class="btn" style="margin-top:14px" onclick="startQuiz('${code}',${i})">Nochmal</button>
+    ${pass&&nextExists?`<button class="btn soft" style="margin-top:8px" onclick="openGameLevel('${code}',${i+1})">Nächstes Level →</button>`:''}
+    <button class="btn ghost" style="margin-top:8px" onclick="go('games',{lang:'${code}'})">Zurück zum Pfad</button>`;
+}
+
+/* ---- Paare (Matching) ---- */
+let gameM=null;
+function startMatch(code,i){
+  const words=gameLevels(code)[i].w.slice(0,6);
+  const tiles=[];
+  words.forEach((p,k)=>{ tiles.push({id:k,txt:p[0],side:'t'}); tiles.push({id:k,txt:p[1],side:'d'}); });
+  gameM={code,i,tiles:gShuffle(tiles),sel:null,matched:{},done:0,total:words.length};
+  go("paare",{lang:code,gi:i});
+}
+function renderMatch(){
+  if(!gameM){ go("games",{lang:view.lang}); return; }
+  const grid=gameM.tiles.map((t,ti)=>{
+    const m=!!gameM.matched[ti];
+    const sel=gameM.sel===ti;
+    const bg=m?'var(--ink)':(sel?'#e7e7e3':'#fff'), col=m?'#fff':'var(--ink)';
+    return `<button ${m?'disabled':''} onclick="tapTile(${ti})" style="padding:14px 8px;border-radius:14px;border:1.5px solid ${sel?'var(--ink)':'var(--line)'};background:${bg};color:${col};font-size:14px;min-height:56px;cursor:pointer">${m?'✓':esc(t.txt)}</button>`;
+  }).join("");
+  const fin=gameM.done>=gameM.total;
+  app().innerHTML=`
+    <button class="back" onclick="go('gamelevel',{lang:'${gameM.code}',gi:${gameM.i}})">‹ Zurück</button>
+    <h1 class="page-title">Paare finden</h1>
+    <p class="page-sub">Tippe ein Wort und seine Übersetzung an. ${gameM.done}/${gameM.total}</p>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:12px">${grid}</div>
+    ${fin?`<div class="card" style="text-align:center;margin-top:16px"><b>Alle Paare gefunden! ✓</b></div>
+      <button class="btn" style="margin-top:10px" onclick="startMatch('${gameM.code}',${gameM.i})">Nochmal mischen</button>
+      <button class="btn ghost" style="margin-top:8px" onclick="go('gamelevel',{lang:'${gameM.code}',gi:${gameM.i}})">Fertig</button>`:''}`;
+}
+function tapTile(ti){
+  if(gameM.matched[ti]) return;
+  if(gameM.sel===null){ gameM.sel=ti; renderMatch(); return; }
+  if(gameM.sel===ti){ gameM.sel=null; renderMatch(); return; }
+  const a=gameM.tiles[gameM.sel], b=gameM.tiles[ti];
+  if(a.id===b.id && a.side!==b.side){
+    gameM.matched[gameM.sel]=true; gameM.matched[ti]=true; gameM.done++; gameM.sel=null;
+    if(gameM.done>=gameM.total) markGameDone(gameM.code,gameM.i);
+    renderMatch();
+  }else{
+    gameM.sel=null; renderMatch();
+  }
+}
+
 function renderHome(){
   const d = ensureToday();
   const focus = d.focus;
@@ -865,30 +1244,17 @@ function renderHome(){
   }).join("");
 
   const fl = LANG_CONFIG[focus];
-  let focusCard;
-  if(!state.langs[focus].placed){
-    focusCard = `<button class="task" onclick="go('placement',{lang:'${focus}'})">
-      <span class="tk-ic">▸</span>
-      <div><div class="tk-t">Einstufungstest ${fl.name}</div><div class="tk-d">Finde deinen Startpunkt A1–C2</div></div>
-      <span class="tk-go">›</span></button>`;
-  }else{
-    const nx = nextStation(focus);
-    if(nx){
-      focusCard = `<button class="task" onclick="openStation('${focus}',${nx.ci})">
-        <span class="tk-ic">▸</span>
-        <div><div class="tk-t">${esc(nx.title)}</div><div class="tk-d">${fl.name} · ${nx.level} · ${esc(nx.grammar)}</div></div>
-        <span class="tk-go">›</span></button>`;
-    }else{
-      focusCard = `<div class="card"><div class="tk-t">${fl.flag} ${fl.name}</div><p class="hint" style="margin-top:6px">Pfad abgeschlossen 🎉</p></div>`;
-    }
-  }
+  const focusHint = !state.langs[focus].placed
+    ? `<p class="hint" style="margin:-2px 0 10px">Für das genaue Niveau kannst du den <button class="btn ghost sm" style="width:auto;padding:2px 8px" onclick="go('placement',{lang:'${focus}'})">Einstufungstest</button> machen — bis dahin startest du auf ${L(focus).level}.</p>`
+    : "";
+  const focusCard = focusHint + dailyCardHTML(focus);
 
   const others = (state.routine.langs||Object.keys(LANG_CONFIG)).filter(c=>c!==focus);
   const otherLinks = others.map(c=>{
-    const p=langProgress(c);
+    const di=dayInfo(c);
     return `<button class="task" onclick="go('lang',{lang:'${c}'})">
       <span class="tk-ic">${LANG_CONFIG[c].flag}</span>
-      <div><div class="tk-t">${LANG_CONFIG[c].name}</div><div class="tk-d">${p.done}/${p.total} Einheiten</div></div>
+      <div><div class="tk-t">${LANG_CONFIG[c].name}</div><div class="tk-d">Tag ${di.n}/365${di.complete?' · heute erledigt ✓':''}</div></div>
       <span class="tk-go">›</span></button>`;
   }).join("");
 
@@ -929,7 +1295,7 @@ function renderHome(){
       <div class="week-strip">${strip}</div>
     </div>
 
-    <p class="eyebrow">Fokus heute · ${fl.name}</p>
+    <p class="eyebrow">Heute · ${fl.name}</p>
     ${focusCard}
 
     ${otherLinks?`<p class="eyebrow" style="margin-top:22px">Weitere Sprachen</p>${otherLinks}`:""}
@@ -960,6 +1326,10 @@ function renderLang(){
     </div>
     ${state.settings.preview?`<p class="hint" style="margin:-6px 0 12px">Vorschau-Modus: alle Stationen sind zum Ansehen entsperrt. Dein Fortschritt bleibt unverändert.</p>`:""}
 
+    <p class="eyebrow">Heute</p>
+    ${dailyCardHTML(code)}
+    <p class="eyebrow" style="margin-top:22px">Lernpfad</p>
+
     ${!placed?`<div class="card" style="border-color:var(--ink)">
       <div class="pc-t">Wo stehst du?</div>
       <p class="hint" style="margin:6px 0 12px">Mach den Einstufungstest (A1–C2) — dann startet dein Pfad an der passenden Station.</p>
@@ -969,6 +1339,7 @@ function renderLang(){
 
     <p class="eyebrow">Werkzeuge</p>
     <button class="btn soft" onclick="go('auto',{lang:'${code}'})">🚗 Auto-Modus — gesprochene Lehrstunde</button>
+    <button class="btn soft" style="margin-top:8px" onclick="go('games',{lang:'${code}'})">🎮 Spiele — Wortschatz-Pfad</button>
     <div class="row" style="margin:10px 0">
       <button class="btn soft sm" onclick="go('vocab',{lang:'${code}'})">Wortschatz</button>
       <button class="btn soft sm" onclick="go('listen',{lang:'${code}'})">Hören</button>
@@ -1882,6 +2253,8 @@ Object.assign(window, {
   makeListenPrompt, setListenWords, openChatGPT,
   openStation, toggleStationPart, completeStation, gotoNextStation, toggleCefr, renderLevelInfo, togglePreview,
   renderAuto, makeAutoPrompts, setAutoDur, setImmersion, pickAutoTopic, setPace,
+  toggleDaySpeak, toggleDayVocab, completeDay,
+  renderGames, openGameLevel, renderGameLevel, startQuiz, answerQuiz, nextQuiz, startMatch, tapTile, generateMoreLevels, generateAllLevels, stopGenAll,
   startPlacement, selectAnswer, scorePlacement, choosePlacement, choosePlacementSelf, abortPlacement,
   analyzeSong, resetSong, copyText,
   toggleRoutineLang, setFocus, setLevel, setRegister, saveConn, testConn, exportData, importData, resetAll, replaceLevel,
